@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Workspace Name="Mammoth3D" Database="./Mammoth3D.tags">
+  <Project Name="engine" Path="engine.project" Active="Yes"/>
+  <Environment>
+    <![CDATA[]]>
+  </Environment>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Main" Selected="yes">
+      <Project Name="engine" ConfigName="Debug_x86"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>
