@@ -9,4 +9,4 @@ Should compile easily on Windows using the [codelite](http://www.codelite.org/) 
 
 ### Others platforms ###
 
-Just look at the .project settings to compile, the engine require [PortAudio](http://www.portaudio.com/),[libogg&libvorbis](http://xiph.org/downloads),[glfw](http://www.glfw.org/download.html) libraries.
+Just look at the .project settings to compile, the engine require: [PortAudio](http://www.portaudio.com/) [libogg&libvorbis](http://xiph.org/downloads) [glfw](http://www.glfw.org/download.html)
