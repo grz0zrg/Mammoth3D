@@ -32,11 +32,11 @@
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
-      <Compiler Options="" C_Options="">
+      <Compiler Options="-ggdb" C_Options="-ggdb">
         <IncludePath Value="./include"/>
         <IncludePath Value="./lib"/>
       </Compiler>
-      <Linker Options="-static-libgcc;-static-libstdc++">
+      <Linker Options="-static-libgcc;-static-libstdc++;-ggdb">
         <LibraryPath Value="./lib/x86/"/>
         <LibraryPath Value="./lib/x86/ogg"/>
         <LibraryPath Value="./lib/x86/vorbis"/>
@@ -60,7 +60,8 @@
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="./bin/x86/debug/$(ProjectName)" IntermediateDirectory="./obj/debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./bin/x86/debug" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
-        <![CDATA[]]>
+        <![CDATA[G_SLICE=always-malloc
+G_DEBUG=gc-friendly]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
         <PostConnectCommands/>
