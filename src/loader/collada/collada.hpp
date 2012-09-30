@@ -10,6 +10,9 @@
 
 	#include "tinyxml2/tinyxml2.h"
 	
+	// quickly made collada importer
+	// triangles are the only primitives supported so <vcount> always assumed to be 3
+	// do not parse <accessor ...>
 	namespace loader {
 		class Collada : public tinyxml2::XMLVisitor {
 			public:
@@ -20,7 +23,9 @@
 				};
 				
 				~Collada() {
-					cleanFloatArraysMap();
+					floatArrays.clear();
+					vcountArrays.clear();
+					polysArrays.clear();
 
 					if(data) {
 						meshIt = data->mesh.begin();
@@ -28,9 +33,18 @@
 							if(meshIt->second) {
 								delete meshIt->second;
 							}
+							meshIt++;
 						}
 						delete data;
 					}
+					
+					inputSemanticIt = inputSemantic.begin();
+					while(inputSemanticIt != inputSemantic.end()) {
+						if(inputSemanticIt->second) {
+							delete inputSemanticIt->second;
+						}
+						inputSemanticIt++;
+					}					
 				};
 				
 			private:
@@ -64,7 +78,8 @@
 						libType = libTypes[++i];
 					}
 					
-					// important step, this will resolve collada informations into basic mesh data
+					// important step, this will resolve collada informations 
+					// into basic mesh data
 					processData();
 				}
 				
@@ -126,9 +141,8 @@
 										unsigned int realSize = floatData.size();
 										if(count) {
 											if(count == realSize) {
-												floatArrays[id] = new float[realSize];
 												for(unsigned int i=0; i<realSize; i++) {
-													floatArrays[id][i] = (float)atof(floatData[i].c_str());
+													floatArrays[id].push_back((float)strtod(floatData[i].c_str(), NULL));
 												}
 											} else {
 												log(id, " float array size does not match count attribute");
@@ -140,17 +154,25 @@
 							}
 						// <vertices>
 						} else if (!strcmp(element->Name(), "vertices")) {
-							while(sourceChild) {	
-								// <input ...>
-								if (!strcmp(sourceChild->Name(), "input")) {
-									const char* semantic = element->Attribute("semantic");
-									const char* source = element->Attribute("source");
-									if(semantic && source) {
-										semanticLink[std::string(semantic)] = std::string(source);
+							const char* id = element->Attribute("id");
+							const std::string idStr(id);
+							if(id) {
+								while(sourceChild) {	
+									// <input ...>
+									if (!strcmp(sourceChild->Name(), "input")) {
+										const char* semantic = element->Attribute("semantic");
+										const char* source = element->Attribute("source");
+										
+										if(semantic && source) {
+											inputSemantic[idStr] = new InputSemanticData;
+											inputSemantic[idStr]->semantic = std::string(semantic);
+											inputSemantic[idStr]->source = std::string(source);
+											inputSemantic[idStr]->offset = -1;
+										}
 									}
+									
+									sourceChild = sourceChild->NextSiblingElement();
 								}
-								
-								sourceChild = sourceChild->NextSiblingElement();
 							}
 						// <polylist> <triangles> etc...
 						} else if (!strcmp(element->Name(), "polylist") ||
@@ -166,22 +188,45 @@
 								if (!strcmp(sourceChild->Name(), "input")) {
 									const char* semantic = element->Attribute("semantic");
 									const char* source = element->Attribute("source");
+									int offset = element->IntAttribute("offset");
 									if(semantic && source) {
-										semanticLink[std::string(semantic)] = std::string(source);
+										inputSemantic[str] = new InputSemanticData;
+										inputSemantic[str]->semantic = std::string(semantic);
+										inputSemantic[str]->source = std::string(source);
+										inputSemantic[str]->offset = offset;
 									}
 								// <vcount>
 								} else if (!strcmp(sourceChild->Name(), "vcount")) {
 									const char *text = sourceChild->GetText();
 									if (text) {
-										std::vector<std::string> floatData = 
-																splitText(text);										
+										std::vector<std::string> vcountData = 
+																splitText(text);
+
+										unsigned int realSize = vcountData.size();
+										if(count) {
+											if(count == realSize) {
+												for(unsigned int i=0; i<realSize; i++) {
+													vcountArrays[str].push_back(strtoul(vcountData[i].c_str(), NULL, 0));
+												}
+											} else {
+												log(str, " vcount array size does not match count attribute");
+											}
+										}
 									}
 								// <p>
 								} else if (!strcmp(sourceChild->Name(), "p")) {
 									const char *text = sourceChild->GetText();
 									if (text) {
-										std::vector<std::string> floatData = 
-																splitText(text);										
+										std::vector<std::string> polysData = 
+																splitText(text);
+
+										// should possibly check collada expected size?
+										unsigned int realSize = polysData.size();
+										if(!polysData.empty()) {
+											for(unsigned int i=0; i<realSize; i++) {
+												polysArrays[str].push_back(strtoul(polysData[i].c_str(), NULL, 0));
+											}
+										}
 									}
 								}
 
@@ -195,17 +240,25 @@
 				
 				// 
 				void processData() {
-					
-				}
-				
-				void cleanFloatArraysMap() {
-					floatArraysIt = floatArrays.begin();
-					while(floatArraysIt != floatArrays.end()) {
-						if(floatArraysIt->second) {
-							delete[] floatArraysIt->second;
+					if(data) {
+						// build meshs data
+						meshIt = data->mesh.begin();
+						while(meshIt != data->mesh.end()) {
+							if(meshIt->second) {
+								// resolves links
+								inputSemanticIt = inputSemantic.begin();
+								while(inputSemanticIt != inputSemantic.end()) {
+									if(inputSemanticIt->second->semantic == "VERTEX") {
+										
+									}	
+									inputSemanticIt++;			
+								}				
+								
+								//log(meshIt->second->name);
+							}
+							meshIt++;
 						}
 					}
-					floatArrays.clear();
 				}
 				
 				template <typename T>
@@ -222,8 +275,12 @@
 					std::string line;
 					std::vector<std::string> tokens;
 
-					while(*str) {
+					while(1) {
 						while(isspace(*str) && *str) str++;
+						
+						if(!*str) {
+							break;
+						}
 
 						line += *str++;
 						
@@ -238,6 +295,9 @@
 
 				typedef struct {
 					const char *name;
+					std::vector<float> vertices;
+					std::vector<float> normals;
+					std::vector<unsigned long int> indices;
 
 					//std::map<std::string, std::string> positions;
 				} Mesh;
@@ -246,15 +306,27 @@
 					std::map<std::string, Mesh*> mesh;
 				} Data;
 				
-				// used to store float arrays with their source link
-				std::map<std::string, float*> floatArrays;
+				typedef struct {
+					std::string semantic;
+					std::string source;
+					int offset;
+				} InputSemanticData;
 				
-				// used to store semantic-source link
-				std::map<std::string, std::string> semanticLink;
+				// used to store float arrays with their source link
+				std::map<std::string, std::vector<float> > floatArrays;
+				// used to store vcount/polys arrays with their mesh name
+				std::map<std::string, std::vector<unsigned long int> > vcountArrays;
+				std::map<std::string, std::vector<unsigned long int> > polysArrays;
+				
+				// used to store <input semantic ...> data
+				std::map<std::string, InputSemanticData*> inputSemantic;
 				
 				// iterators
-				std::map<std::string, float*>::iterator floatArraysIt;
+				std::map<std::string, std::vector<float> >::iterator floatArraysIt;
+				std::map<std::string, std::vector<unsigned long int> >::iterator ulintArraysIt;
 				std::map<std::string, Mesh*>::iterator meshIt;
+				std::map<std::string, InputSemanticData*>::iterator inputSemanticIt;
+				
 
 				enum e_libType{ ANIMATIONS, ASSET, CONTROLLERS, CAMERAS,
 								EFFECTS, GEOMETRIES, IMAGES, LIGHTS,
