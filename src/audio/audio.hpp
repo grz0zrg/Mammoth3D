@@ -12,20 +12,25 @@
 			private:
 				Audio() {
 					paErr = Pa_Initialize();
+					
+					paErr != paNoError ? terminatePa = false : terminatePa = true;
 					logPaError();
 					
+					music = 0;
 					music_stream = 0;
 					
 					log("", Pa_GetVersionText());
-					log("Initialized.");
+					log("Initialized");
 				};
 				
 				~Audio() {
 					freeMusic();
-					paErr = Pa_Terminate();
-					logPaError();
+					if(terminatePa) {
+						paErr = Pa_Terminate();
+						logPaError();
+					}
 					
-					log("Terminated.");
+					log("Terminated");
 				};
 				
 				void logPaError() {
@@ -54,7 +59,8 @@
 					bool finished;
 				};
 		
-				static int paCallback( const void *inputBuffer, void *outputBuffer,
+				static int paCallback( const void *inputBuffer,
+						void *outputBuffer,
 						unsigned long framesPerBuffer,
 						const PaStreamCallbackTimeInfo* timeInfo,
 						PaStreamCallbackFlags statusFlags,
@@ -69,6 +75,8 @@
 
 				int _value;
 				static Audio *_singleton;
+				
+				bool terminatePa;
 
 			public:
 				void loadMusic(const char* fileName) {
@@ -125,7 +133,7 @@
 						} else {
 							for( frame = 0; frame < ret; ++frame ) {
 								music->left[frame + offset] = samples[0][frame];
-								music->right[frame + offset] = samples[1][frame];
+								music->right[frame + offset] =samples[1][frame];
 								total_in += 2;
 								if(frame + offset > length) {
 									log("Error reading music data: (offset + frame) = ", (offset + frame));
@@ -187,7 +195,7 @@
 						delete music;
 						music = 0;
 						
-						log("Music freed.");
+						log("Music freed");
 					}
 				}
 				
