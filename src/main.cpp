@@ -16,6 +16,8 @@
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
+loader::Collada *cola;
+
 GLuint CreateShader(GLenum eShaderType, const std::string &strShaderFile)
 {
 	GLuint shader = glCreateShader(eShaderType);
@@ -84,7 +86,8 @@ const std::string strVertexShader(
 	"layout(location = 0) in vec4 position;\n"
 	"void main()\n"
 	"{\n"
-	"   gl_Position = position;\n"
+	"   vec4 totalOffset = vec4(0.0, 0.0, 0.0, 1.0);\n"
+	"   gl_Position = position+totalOffset;\n"
 	"}\n"
 );
 
@@ -116,15 +119,20 @@ const float vertexPositions[] = {
 };
 
 GLuint positionBufferObject;
+GLuint testIBO;
 GLuint vao;
-
 
 void InitializeVertexBuffer()
 {
 	glGenBuffers(1, &positionBufferObject);
+	glGenBuffers(1, &testIBO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, cola->data->mesh["Cube-mesh"]->vertices.size() * sizeof(float), &cola->data->mesh["Cube-mesh"]->vertices.front(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, testIBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, cola->data->mesh["Cube-mesh"]->indices.size() * sizeof(unsigned int), &cola->data->mesh["Cube-mesh"]->indices[0], GL_STATIC_DRAW);
+	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -133,8 +141,13 @@ void init()
 	InitializeProgram();
 	InitializeVertexBuffer();
 
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	//glGenVertexArrays(1, &vao);
+	//glBindVertexArray(vao);
+}
+
+void cleanup() {
+	glDeleteBuffers(1, &positionBufferObject);
+	glDeleteBuffers(1, &testIBO);
 }
 
 void display()
@@ -145,11 +158,14 @@ void display()
 	glUseProgram(theProgram);
 
 	glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, testIBO);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-
+	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawElements(GL_TRIANGLES, cola->data->mesh["Cube-mesh"]->indices.size(), 
+					GL_UNSIGNED_INT, (void*)0);
+	
 	glDisableVertexAttribArray(0);
 	glUseProgram(0);
 
@@ -187,12 +203,6 @@ int main(int argc, char **argv) {
 	}
 	std::cout << "Status: Using GLEW: " << glewGetString(GLEW_VERSION) << std::endl;
 
-	if (GLEW_VERSION_2_0) {
-		std::cout << "OpenGL 2.0 supported! " << std::endl;
-	}
-	if (GLEW_VERSION_2_1) {
-		std::cout << "OpenGL 2.1 supported! " << std::endl;
-	}
 	if (GLEW_VERSION_3_0) {
 		std::cout << "OpenGL 3.0 supported! " << std::endl;
 	}
@@ -210,14 +220,18 @@ int main(int argc, char **argv) {
 	audioManager->loadMusic("../../../project/test/data/music/lithography.ogg");
 	audioManager->playMusic();
 	
-	loader::Collada *cola = new loader::Collada("../../../project/test/data/blender_monkey.dae");
-
+	cola = new loader::Collada("../../../project/test/data/blender_monkey.dae");
+	
 	init();
 	reshape(800, 600);
-	while(glfwGetKey( GLFW_KEY_ESC ) == GLFW_RELEASE) {
+	
+	do {
 		display();
-	}
-	std::cout << "OpenGL 3.3 supported! " << std::endl;
+	} while(glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS &&
+			glfwGetWindowParam(GLFW_OPENED));
+
+	cleanup();
+
 	audioManager->kill();
 
 	delete cola;
