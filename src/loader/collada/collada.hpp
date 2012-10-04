@@ -4,15 +4,14 @@
 	#include <iostream>  
 	#include <vector>
 	#include <map>
-	#include <cstring>
-	#include <cstdlib>
-	#include <cctype>
 
 	#include "tinyxml2/tinyxml2.h"
 	
-	// quickly made collada importer
-	// triangles are the only primitives supported so <vcount> always assumed to be 3
-	// do not parse <accessor ...>
+	/* quick&dirty collada importer
+	 * triangles are the only primitives supported
+	 * <vcount> always assumed to be 3 in case of <polylist> tag
+	 * also don't support <accessor ...> and many others things to simplify :)
+	 */
 	namespace loader {
 		class Collada : public tinyxml2::XMLVisitor {
 			public:
@@ -26,6 +25,8 @@
 					floatArrays.clear();
 					vcountArrays.clear();
 					polysArrays.clear();
+					
+					clearInputSemanticData();
 
 					if(data) {
 						meshIt = data->mesh.begin();
@@ -37,14 +38,6 @@
 						}
 						delete data;
 					}
-					
-					inputSemanticIt = inputSemantic.begin();
-					while(inputSemanticIt != inputSemantic.end()) {
-						if(inputSemanticIt->second) {
-							delete inputSemanticIt->second;
-						}
-						inputSemanticIt++;
-					}					
 				};
 				
 			private:
@@ -52,18 +45,31 @@
 					log("Parsing: ", fileName);
 					int ret = doc.LoadFile(fileName);
 					if (ret != tinyxml2::XML_NO_ERROR) {
-						log("LoadFile error code: ", ret);
+						log("Unable to load file: ", ret);
 						return;
 					}
 						
 					tinyxml2::XMLElement* rootElement = doc.FirstChildElement("COLLADA");
-					const char *version = rootElement->Attribute("version");
-					if(version) {
-						log("Collada schema version: ", version);
+					if (!rootElement) {
+						log("Missing COLLADA tag, aborting.");
+						return;
 					}
 					
-					data = new Data;
+					std::string version = rootElement->Attribute("version");
+					if (version.empty()) {
+						log("Missing or empty version attribute, aborting.");
+						return;
+					}
 					
+					if(version.substr(0, 3) != "1.4") {
+						log("Invalid file. Must be version 1.4.x, current: ", version);
+						return;
+					}
+					
+					log("Version ", version);
+					
+					data = new Data;
+						
 					// traverse all libraries
 					int i = 0;
 					e_libType libType = libTypes[i];
@@ -77,10 +83,6 @@
 						}
 						libType = libTypes[++i];
 					}
-					
-					// important step, this will resolve collada informations 
-					// into basic mesh data
-					processData();
 				}
 				
 				void parseGeometries(const tinyxml2::XMLElement* element) {
@@ -89,12 +91,12 @@
 						element = child;
 						child = child->NextSiblingElement();
 
-						const char *elementName = element->Name();
-						const char *meshId = element->Attribute("id");
-						const char *meshName = element->Attribute("name");
-						if(strcmp(elementName, "geometry") != 0 || 
+						const std::string elementName = element->Name();
+						const std::string meshId = element->Attribute("id");
+						const std::string meshName = element->Attribute("name");
+						if(elementName != "geometry" || 
 											element->NoChildren() ||
-											!meshId) {
+											meshId.empty()) {
 							continue;
 						}
 						
@@ -102,18 +104,20 @@
 						const tinyxml2::XMLElement* geomChild = 
 												element->FirstChildElement();
 						while(geomChild) {
-							const char *childName = geomChild->Name();
+							std::string childName = geomChild->Name();
 
 							// <mesh> content
-							if(!strcmp(childName, "mesh")) {
-								std::string idStr(meshId);
-								data->mesh[idStr] = new Mesh;
-								if(meshName) {
-									data->mesh[idStr]->name = meshName;
+							if(childName == "mesh") {
+								data->mesh[meshId] = new Mesh;
+								if(!meshName.empty()) {
+									data->mesh[meshId]->name = meshName;
 								}
+								inputSemantic["VERTEX"] = 0;
+								inputSemantic["POSITION"] = 0;
+								inputSemantic["NORMAL"] = 0;
 								
-								parseMeshData(idStr, geomChild->FirstChildElement());
-							} else if (!strcmp(childName, "extra")) { // <extra>
+								parseMeshData(meshId, geomChild->FirstChildElement());
+							} else if (childName == "extra") { // <extra>
 							}
 
 							geomChild = geomChild->NextSiblingElement();
@@ -125,12 +129,14 @@
 					while(element) {
 						const tinyxml2::XMLElement* sourceChild = 
 												element->FirstChildElement();
+						const std::string elementName = element->Name();
 						// <source>
-						if (!strcmp(element->Name(), "source")) {
+						if (elementName == "source") {
 							const char* id = element->Attribute("id");
 							while(sourceChild) {
 								//<float_array ...>
-								if (!strcmp(sourceChild->Name(), "float_array")) {
+								const std::string sourceChildName = sourceChild->Name();
+								if (sourceChildName == "float_array") {
 									// parse&store float array
 									const char *text = sourceChild->GetText();
 									if(id && text) {
@@ -153,21 +159,20 @@
 								sourceChild = sourceChild->NextSiblingElement();
 							}
 						// <vertices>
-						} else if (!strcmp(element->Name(), "vertices")) {
-							const char* id = element->Attribute("id");
-							const std::string idStr(id);
-							if(id) {
+						} else if (elementName == "vertices") {
+							const std::string id = element->Attribute("id");
+							if(!id.empty()) {
 								while(sourceChild) {	
 									// <input ...>
-									if (!strcmp(sourceChild->Name(), "input")) {
-										const char* semantic = element->Attribute("semantic");
-										const char* source = element->Attribute("source");
+									const std::string sourceChildName = sourceChild->Name();
+									if (sourceChildName == "input") {
+										const std::string semantic = sourceChild->Attribute("semantic");
+										std::string source = sourceChild->Attribute("source");
 										
-										if(semantic && source) {
-											inputSemantic[idStr] = new InputSemanticData;
-											inputSemantic[idStr]->semantic = std::string(semantic);
-											inputSemantic[idStr]->source = std::string(source);
-											inputSemantic[idStr]->offset = -1;
+										if(!semantic.empty() && !source.empty()) {
+											inputSemantic[semantic] = new InputSemanticData;
+											inputSemantic[semantic]->source = source.erase(0,1);
+											inputSemantic[semantic]->offset = -1;
 										}
 									}
 									
@@ -175,28 +180,29 @@
 								}
 							}
 						// <polylist> <triangles> etc...
-						} else if (!strcmp(element->Name(), "polylist") ||
-									!strcmp(element->Name(), "triangles") ||
-									!strcmp(element->Name(), "lines") ||
-									!strcmp(element->Name(), "linestrips") ||
-									!strcmp(element->Name(), "polygons") ||
-									!strcmp(element->Name(), "trifans") ||
-									!strcmp(element->Name(), "tristrips")) {
+						} else if (elementName == "polylist" ||
+									elementName == "triangles" ||
+									elementName == "lines" ||
+									elementName == "linestrips" ||
+									elementName == "polygons" ||
+									elementName == "trifans" ||
+									elementName == "tristrips") {
 							unsigned int count = element->IntAttribute("count");
 							while(sourceChild) {
+								const std::string sourceChildName = sourceChild->Name();
 								// <input ...>
-								if (!strcmp(sourceChild->Name(), "input")) {
-									const char* semantic = element->Attribute("semantic");
-									const char* source = element->Attribute("source");
-									int offset = element->IntAttribute("offset");
-									if(semantic && source) {
-										inputSemantic[str] = new InputSemanticData;
-										inputSemantic[str]->semantic = std::string(semantic);
-										inputSemantic[str]->source = std::string(source);
-										inputSemantic[str]->offset = offset;
+								if (sourceChildName == "input") {
+									const std::string semantic = sourceChild->Attribute("semantic");
+									std::string source = sourceChild->Attribute("source");
+									int offset = sourceChild->IntAttribute("offset");
+							
+									if(!semantic.empty() && !source.empty()) {
+										inputSemantic[semantic] = new InputSemanticData;
+										inputSemantic[semantic]->source = source.erase(0,1);
+										inputSemantic[semantic]->offset = offset;
 									}
 								// <vcount>
-								} else if (!strcmp(sourceChild->Name(), "vcount")) {
+								} else if (sourceChildName == "vcount") {
 									const char *text = sourceChild->GetText();
 									if (text) {
 										std::vector<std::string> vcountData = 
@@ -214,7 +220,7 @@
 										}
 									}
 								// <p>
-								} else if (!strcmp(sourceChild->Name(), "p")) {
+								} else if (sourceChildName == "p") {
 									const char *text = sourceChild->GetText();
 									if (text) {
 										std::vector<std::string> polysData = 
@@ -226,6 +232,28 @@
 											for(unsigned int i=0; i<realSize; i++) {
 												polysArrays[str].push_back(strtoul(polysData[i].c_str(), NULL, 0));
 											}
+											
+											int semanticCount = 0;
+											if(inputSemantic["VERTEX"]) {
+												semanticCount++;
+											}
+											if(inputSemantic["NORMAL"]) {
+												semanticCount++;
+											}			
+											unsigned int expectedSize = (count*3)*semanticCount;
+											
+											if(expectedSize == realSize) {
+												// process mesh
+												data->mesh[str]->vertices = floatArrays[inputSemantic["POSITION"]->source];
+												data->mesh[str]->normals = floatArrays[inputSemantic["NORMAL"]->source];
+												for(unsigned int i=0; i<realSize; i+=(semanticCount*3)) {
+													data->mesh[str]->indices.push_back(polysArrays[str][i]);
+													data->mesh[str]->indices.push_back(polysArrays[str][i+2]);
+													data->mesh[str]->indices.push_back(polysArrays[str][i+4]);
+												}
+											} else {
+												log(str, " polylist <p> count does not match expected size");
+											}
 										}
 									}
 								}
@@ -236,29 +264,24 @@
 						
 						element = element->NextSiblingElement();
 					}
+					
+					clearInputSemanticData();
+				}
+						
+				void clearInputSemanticData() {
+					inputSemanticIt = inputSemantic.begin();
+					while(inputSemanticIt != inputSemantic.end()) {
+						if(inputSemanticIt->second) {
+							delete inputSemanticIt->second;
+						}							
+						inputSemanticIt++;
+					}	
+					inputSemantic.clear();
 				}
 				
-				// 
-				void processData() {
-					if(data) {
-						// build meshs data
-						meshIt = data->mesh.begin();
-						while(meshIt != data->mesh.end()) {
-							if(meshIt->second) {
-								// resolves links
-								inputSemanticIt = inputSemantic.begin();
-								while(inputSemanticIt != inputSemantic.end()) {
-									if(inputSemanticIt->second->semantic == "VERTEX") {
-										
-									}	
-									inputSemanticIt++;			
-								}				
-								
-								//log(meshIt->second->name);
-							}
-							meshIt++;
-						}
-					}
+				// this export datas to binary model
+				void exportToMbm() {
+					
 				}
 				
 				template <typename T>
@@ -292,12 +315,12 @@
 
 					return tokens;
 				}
-
+				public: // temp
 				typedef struct {
-					const char *name;
+					std::string name;
 					std::vector<float> vertices;
 					std::vector<float> normals;
-					std::vector<unsigned long int> indices;
+					std::vector<unsigned /*long*/ int> indices;
 
 					//std::map<std::string, std::string> positions;
 				} Mesh;
@@ -307,7 +330,6 @@
 				} Data;
 				
 				typedef struct {
-					std::string semantic;
 					std::string source;
 					int offset;
 				} InputSemanticData;
@@ -318,7 +340,7 @@
 				std::map<std::string, std::vector<unsigned long int> > vcountArrays;
 				std::map<std::string, std::vector<unsigned long int> > polysArrays;
 				
-				// used to store <input semantic ...> data
+				// used to store <input semantic ...> data per meshs
 				std::map<std::string, InputSemanticData*> inputSemantic;
 				
 				// iterators
