@@ -245,11 +245,26 @@
 											if(expectedSize == realSize) {
 												// process mesh
 												data->mesh[str]->vertices = floatArrays[inputSemantic["POSITION"]->source];
-												data->mesh[str]->normals = floatArrays[inputSemantic["NORMAL"]->source];
+												const std::string normalSource = inputSemantic["NORMAL"]->source;
+												//data->mesh[str]->normals = floatArrays[inputSemantic["NORMAL"]->source];
+												data->mesh[str]->normals.reserve(floatArrays[normalSource].size());
 												for(unsigned int i=0; i<realSize; i+=(semanticCount*3)) {
-													data->mesh[str]->indices.push_back(polysArrays[str][i]);
-													data->mesh[str]->indices.push_back(polysArrays[str][i+2]);
-													data->mesh[str]->indices.push_back(polysArrays[str][i+4]);
+													unsigned long int iv1 = polysArrays[str][i];
+													unsigned long int iv2 = polysArrays[str][i+2];
+													unsigned long int iv3 = polysArrays[str][i+4];
+
+													unsigned long int in1 = polysArrays[str][i+1];
+													unsigned long int in2 = polysArrays[str][i+3];
+													unsigned long int in3 = polysArrays[str][i+5];
+													
+													data->mesh[str]->indices.push_back(iv1);
+													data->mesh[str]->indices.push_back(iv2);
+													data->mesh[str]->indices.push_back(iv3);
+
+													// re-build opengl-correct normals etc... ie: unify indices
+													data->mesh[str]->normals[iv1] = floatArrays[normalSource][in1];
+													data->mesh[str]->normals[iv2] = floatArrays[normalSource][in2];
+													data->mesh[str]->normals[iv3] = floatArrays[normalSource][in3];
 												}
 											} else {
 												log(str, " polylist <p> count does not match expected size");
