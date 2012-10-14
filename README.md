@@ -1,4 +1,4 @@
-Mammoth3D
+Mammoth3D v0.001
 =========
 
 ### Simple OpenGL 3.x demos engine ###
