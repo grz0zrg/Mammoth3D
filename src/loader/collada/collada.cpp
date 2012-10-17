@@ -1,5 +1,7 @@
 #include "collada.hpp"
 
+const std::string loader::Collada::meshFilenameExt = ".mm";
+
 const char *loader::Collada::libNames[] = { "asset", "scene",
 									"library_animations",
 									"library_controllers",

@@ -5,6 +5,8 @@
 		class MeshLoader {
 			public:
 				MeshLoader() { };
+				
+				
 		};
 	}
 

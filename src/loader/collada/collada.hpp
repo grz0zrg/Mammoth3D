@@ -4,6 +4,7 @@
 	#include <iostream>  
 	#include <vector>
 	#include <map>
+	#include <fstream>
 
 	#include "tinyxml2/tinyxml2.h"
 	
@@ -39,6 +40,49 @@
 						delete data;
 					}
 				};
+				
+				// this export meshs datas to a binary format (.mm)
+				void exportMeshsTo(const char *dir) {
+					std::string directory(dir);
+					if (directory.at(directory.length()-1) != '/') {
+						directory.append("/");
+					}
+					
+					meshIt = data->mesh.begin();
+					while(meshIt != data->mesh.end()) {
+						if(meshIt->second) {
+							std::string filename = directory+meshIt->second->name+meshFilenameExt;
+							std::ofstream file(filename.c_str(), std::ios::out | std::ios::binary);
+							if (!file.good() || !file.is_open()) {
+								log("Failed to export Mesh: ", filename);
+							}
+
+							// write mesh datas
+							char indicesType = 0;
+							file.write((char*)&indicesType, sizeof(indicesType));
+							
+							unsigned int indicesCount = meshIt->second->indices.size();
+							unsigned int verticesCount = meshIt->second->vertices.size();
+							unsigned int normalsCount = meshIt->second->normals.size();
+							file.write((char*)&indicesCount, sizeof(indicesCount));
+							for (unsigned int i = 0; i < indicesCount; i++) {
+								file.write((char*)&meshIt->second->indices[i], sizeof(unsigned int));
+							}
+
+							for (unsigned int i = 0; i < verticesCount; i++) {
+								file.write((char*)&meshIt->second->vertices[i], sizeof(float));
+							}
+							
+							for (unsigned int i = 0; i < normalsCount; i++) {
+								file.write((char*)&meshIt->second->normals[i], sizeof(float));
+							}
+							
+							file.close();
+						}							
+						meshIt++;
+					}						
+					
+				}
 				
 			private:
 				void loadFile(const char *fileName) {
@@ -247,25 +291,45 @@
 												data->mesh[str]->vertices = floatArrays[inputSemantic["POSITION"]->source];
 												const std::string normalSource = inputSemantic["NORMAL"]->source;
 												//data->mesh[str]->normals = floatArrays[inputSemantic["NORMAL"]->source];
+												data->mesh[str]->vertices.resize(floatArrays[normalSource].size(), 0.0f);
 												data->mesh[str]->normals.reserve(floatArrays[normalSource].size());
+												
+												unsigned int verticesCount = data->mesh[str]->vertices.size()/3;
 												for(unsigned int i=0; i<realSize; i+=(semanticCount*3)) {
+													// vertices indices
 													unsigned long int iv1 = polysArrays[str][i];
 													unsigned long int iv2 = polysArrays[str][i+2];
 													unsigned long int iv3 = polysArrays[str][i+4];
 
+													// normals indices
 													unsigned long int in1 = polysArrays[str][i+1];
 													unsigned long int in2 = polysArrays[str][i+3];
 													unsigned long int in3 = polysArrays[str][i+5];
 													
+													// duplicates vertices to match normals
+													if(in1 >= verticesCount) {
+														data->mesh[str]->vertices[in1] = data->mesh[str]->vertices[iv1];
+														iv1 = in1;
+													}
+													if(in2 >= verticesCount) {
+														data->mesh[str]->vertices[in2] = data->mesh[str]->vertices[iv2];
+														iv2 = in2;
+													}
+													if(in3 >= verticesCount) {
+														data->mesh[str]->vertices[in3] = data->mesh[str]->vertices[iv3];
+														iv3 = in3;
+													}
+													
 													data->mesh[str]->indices.push_back(iv1);
 													data->mesh[str]->indices.push_back(iv2);
 													data->mesh[str]->indices.push_back(iv3);
-
+													
 													// re-build opengl-correct normals etc... ie: unify indices
 													data->mesh[str]->normals[iv1] = floatArrays[normalSource][in1];
 													data->mesh[str]->normals[iv2] = floatArrays[normalSource][in2];
 													data->mesh[str]->normals[iv3] = floatArrays[normalSource][in3];
 												}
+												//log("",data->mesh[str]->vertices.size()/3);
 											} else {
 												log(str, " polylist <p> count does not match expected size");
 											}
@@ -292,11 +356,6 @@
 						inputSemanticIt++;
 					}	
 					inputSemantic.clear();
-				}
-				
-				// this export datas to binary model
-				void exportToMbm() {
-					
 				}
 				
 				template <typename T>
@@ -331,6 +390,7 @@
 					return tokens;
 				}
 				public: // temp
+				
 				typedef struct {
 					std::string name;
 					std::vector<float> vertices;
@@ -360,7 +420,6 @@
 				
 				// iterators
 				std::map<std::string, std::vector<float> >::iterator floatArraysIt;
-				std::map<std::string, std::vector<unsigned long int> >::iterator ulintArraysIt;
 				std::map<std::string, Mesh*>::iterator meshIt;
 				std::map<std::string, InputSemanticData*>::iterator inputSemanticIt;
 				
@@ -375,6 +434,8 @@
 				// define collada libraries to parse
 				const static char *libNames[];
 				const static e_libType libTypes[];
+				
+				const static std::string meshFilenameExt;
 		};
 	}
 
