@@ -65,6 +65,9 @@
 							unsigned int verticesCount = meshIt->second->vertices.size();
 							unsigned int normalsCount = meshIt->second->normals.size();
 							file.write((char*)&indicesCount, sizeof(indicesCount));
+							file.write((char*)&verticesCount, sizeof(verticesCount));
+							file.write((char*)&normalsCount, sizeof(normalsCount));
+							
 							for (unsigned int i = 0; i < indicesCount; i++) {
 								file.write((char*)&meshIt->second->indices[i], sizeof(unsigned int));
 							}
@@ -127,6 +130,8 @@
 						}
 						libType = libTypes[++i];
 					}
+					
+					log("Done.");
 				}
 				
 				void parseGeometries(const tinyxml2::XMLElement* element) {
@@ -389,8 +394,7 @@
 
 					return tokens;
 				}
-				public: // temp
-				
+
 				typedef struct {
 					std::string name;
 					std::vector<float> vertices;
