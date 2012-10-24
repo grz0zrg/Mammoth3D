@@ -11,12 +11,12 @@
 #include "core/vector3.hpp"
 #include "audio/audio.hpp"
 
-#include "loader/collada/collada.hpp"
+#include "loader/meshloader.hpp"
 
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
-loader::Collada *cola;
+loader::MeshLoader *monkey;
 
 GLuint CreateShader(GLenum eShaderType, const std::string &strShaderFile)
 {
@@ -96,7 +96,8 @@ const std::string strFragmentShader(
 	"out vec4 outputColor;\n"
 	"void main()\n"
 	"{\n"
-	"   outputColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
+	"	float lerpValue = gl_FragCoord.y / 600.0f;\n"
+	"	outputColor = mix(vec4(1.0f, 1.0f, 1.0f, 1.0f), vec4(0.2f, 0.2f, 0.2f, 1.0f), lerpValue);\n"
 	"}\n"
 );
 
@@ -129,9 +130,9 @@ void InitializeVertexBuffer()
 
 	glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
 	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
-	glBufferData(GL_ARRAY_BUFFER, cola->data->mesh["Cube-mesh"]->vertices.size() * sizeof(float), &cola->data->mesh["Cube-mesh"]->vertices.front(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, monkey->vertices.size() * sizeof(float), &monkey->vertices.front(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, testIBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, cola->data->mesh["Cube-mesh"]->indices.size() * sizeof(unsigned int), &cola->data->mesh["Cube-mesh"]->indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, monkey->indices.size() * sizeof(unsigned int), &monkey->indices[0], GL_STATIC_DRAW);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -163,7 +164,7 @@ void display()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	//glDrawArrays(GL_TRIANGLES, 0, 3);
-	glDrawElements(GL_TRIANGLES, cola->data->mesh["Cube-mesh"]->indices.size(), 
+	glDrawElements(GL_TRIANGLES, monkey->indices.size(), 
 					GL_UNSIGNED_INT, (void*)0);
 	
 	glDisableVertexAttribArray(0);
@@ -220,7 +221,7 @@ int main(int argc, char **argv) {
 	audioManager->loadMusic("../../../project/test/data/music/lithography.ogg");
 	audioManager->playMusic();
 	
-	cola = new loader::Collada("../../../project/test/data/blender_monkey.dae");
+	monkey = new loader::MeshLoader("../../../project/test/data/BlenderMonkey.mm");
 	
 	init();
 	reshape(800, 600);
@@ -234,6 +235,6 @@ int main(int argc, char **argv) {
 
 	audioManager->kill();
 
-	delete cola;
+	delete monkey;
 	glfwTerminate();
 }
