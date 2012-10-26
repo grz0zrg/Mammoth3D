@@ -365,11 +365,11 @@
 				
 				template <typename T>
 				void log(const std::string &str, T param) {
-					std::cout << "[COLLADA] " << str << param << std::endl;
+					std::cout << "[Collada] " << str << param << std::endl;
 				}
 					
 				void log(const char *str) {
-					std::cout << "[COLLADA] " << str << std::endl;
+					std::cout << "[Collada] " << str << std::endl;
 				}
 				
 				// split text, delimited by whitespaces

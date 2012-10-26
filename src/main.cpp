@@ -7,6 +7,7 @@
 #include <iostream>
 #include <stdio.h>
 
+#include "core/mammoth.hpp"
 #include "core/vector2.hpp"
 #include "core/vector3.hpp"
 #include "audio/audio.hpp"
@@ -188,34 +189,8 @@ void keyboard(unsigned char key, int x, int y)
 }
 
 int main(int argc, char **argv) {
-	if (glfwInit() != GL_TRUE)
-		return 0;
-
-	if (glfwOpenWindow(800, 600, 5, 6, 5, 0, 0, 0, GLFW_WINDOW) != GL_TRUE) {
-		glfwTerminate();
-		return 0;
-	}
-		
-	glfwSetWindowTitle("Mammoth3D");
-	
-	GLenum err = glewInit();
-	if (GLEW_OK != err) {
-		std::cout << "Error: " << glewGetErrorString(err) << std::endl;
-	}
-	std::cout << "Status: Using GLEW: " << glewGetString(GLEW_VERSION) << std::endl;
-
-	if (GLEW_VERSION_3_0) {
-		std::cout << "OpenGL 3.0 supported! " << std::endl;
-	}
-	if (GLEW_VERSION_3_1) {
-		std::cout << "OpenGL 3.1 supported! " << std::endl;
-	}
-	if (GLEW_VERSION_3_2) {
-		std::cout << "OpenGL 3.2 supported! " << std::endl;
-	}
-	if (GLEW_VERSION_3_3) {
-		std::cout << "OpenGL 3.3 supported! " << std::endl;
-	}
+	core::Mammoth *mammoth = core::Mammoth::getInstance();
+	mammoth->openWindow(800, 600);
 	
 	audio::Audio *audioManager = audio::Audio::getInstance();
 	audioManager->loadMusic("../../../project/test/data/music/lithography.ogg");
@@ -228,13 +203,12 @@ int main(int argc, char **argv) {
 	
 	do {
 		display();
-	} while(glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS &&
-			glfwGetWindowParam(GLFW_OPENED));
+	} while(mammoth->running());
 
 	cleanup();
 
 	audioManager->kill();
+	mammoth->kill;
 
 	delete monkey;
-	glfwTerminate();
 }

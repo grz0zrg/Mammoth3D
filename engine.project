@@ -18,6 +18,8 @@
       <File Name="src/core/math.hpp"/>
       <File Name="src/core/vector2.hpp"/>
       <File Name="src/core/vector3.hpp"/>
+      <File Name="src/core/mammoth.hpp"/>
+      <File Name="src/core/mammoth.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="loader">
       <File Name="src/loader/collada/collada.cpp"/>

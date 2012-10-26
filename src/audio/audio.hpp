@@ -41,11 +41,11 @@
 				
 				template <typename T>
 				void log(const std::string &str, T param) {
-					std::cout << "[AUDIO] " << str << param << std::endl;
+					std::cout << "[Audio] " << str << param << std::endl;
 				}
 
 				void log(const std::string &str) {
-					std::cout << "[AUDIO] " << str << std::endl;
+					std::cout << "[Audio] " << str << std::endl;
 				}
 
 				struct musicData {
