@@ -7,7 +7,7 @@
 	#include <string>
 	#include <iostream>
 
-	namespace core {
+	namespace framework {
 		class Mammoth {
 			private:
 				Mammoth() {
@@ -28,17 +28,17 @@
 				
 				template <typename T>
 				void logPretty(const std::string &str, T param) {
-					std::cout << "[Core] " << str << "\"" << 
+					std::cout << "[Mammoth] " << str << "\"" << 
 								param << "\"" << std::endl;
 				}
 				
 				template <typename T>
 				void log(const std::string &str, T param) {
-					std::cout << "[Core] " << str << param << std::endl;
+					std::cout << "[Mammoth] " << str << param << std::endl;
 				}
 					
 				void log(const char *str) {
-					std::cout << "[Core] " << str << std::endl;
+					std::cout << "[Mammoth] " << str << std::endl;
 				}
 				
 				void fail() {

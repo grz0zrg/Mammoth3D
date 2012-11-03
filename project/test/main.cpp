@@ -7,7 +7,7 @@
 #include <iostream>
 #include <stdio.h>
 
-#include "core/mammoth.hpp"
+#include "mammoth.hpp"
 #include "core/vector2.hpp"
 #include "core/vector3.hpp"
 #include "audio/audio.hpp"
@@ -189,14 +189,14 @@ void keyboard(unsigned char key, int x, int y)
 }
 
 int main(int argc, char **argv) {
-	core::Mammoth *mammoth = core::Mammoth::getInstance();
+	framework::Mammoth *mammoth = framework::Mammoth::getInstance();
 	mammoth->openWindow(800, 600);
 	
 	audio::Audio *audioManager = audio::Audio::getInstance();
-	audioManager->loadMusic("../../../project/test/data/music/lithography.ogg");
+	audioManager->loadMusic("data/music/lithography.ogg");
 	audioManager->playMusic();
 	
-	monkey = new loader::MeshLoader("../../../project/test/data/BlenderMonkey.mm");
+	monkey = new loader::MeshLoader("data/BlenderMonkey.mm");
 	
 	init();
 	reshape(800, 600);

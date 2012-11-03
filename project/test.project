@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="engine" InternalType="Console">
+<CodeLite_Project Name="test" InternalType="Console">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00080001N0005Debug0000000000000001N0009Debug_x640000000000000001N0009Debug_x860000000000000001N0017ReleaseStatic_x640000000000000001N0017ReleaseStatic_x860000000000000001N0011Release_x640000000000000001N0011Release_x860000000000000001N0015lightweight_x86000000000000]]>
@@ -7,42 +7,48 @@
   </Plugins>
   <Description/>
   <Dependencies/>
-  <VirtualDirectory Name="src">
+  <VirtualDirectory Name="framework">
     <VirtualDirectory Name="lib">
-      <File Name="lib/tinyxml2/tinyxml2.cpp"/>
-      <File Name="lib/tinyxml2/tinyxml2.h"/>
-      <File Name="lib/glew/glew.c"/>
+      <File Name="../lib/tinyxml2/tinyxml2.cpp"/>
+      <File Name="../lib/tinyxml2/tinyxml2.h"/>
+      <File Name="../lib/glew/glew.c"/>
     </VirtualDirectory>
-    <File Name="src/main.cpp"/>
     <VirtualDirectory Name="core">
-      <File Name="src/core/math.hpp"/>
-      <File Name="src/core/vector2.hpp"/>
-      <File Name="src/core/vector3.hpp"/>
-      <File Name="src/core/mammoth.hpp"/>
-      <File Name="src/core/mammoth.cpp"/>
+      <File Name="../src/core/math.hpp"/>
+      <File Name="../src/core/vector2.hpp"/>
+      <File Name="../src/core/vector3.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="loader">
-      <File Name="src/loader/collada/collada.cpp"/>
-      <File Name="src/loader/collada/collada.hpp"/>
-      <File Name="src/loader/meshloader.hpp"/>
-      <File Name="src/loader/meshloader.cpp"/>
+      <File Name="../src/loader/collada/collada.cpp"/>
+      <File Name="../src/loader/collada/collada.hpp"/>
+      <File Name="../src/loader/meshloader.hpp"/>
+      <File Name="../src/loader/meshloader.cpp"/>
+      <File Name="../src/loader/shaderloader.cpp"/>
+      <File Name="../src/loader/shaderloader.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="audio">
-      <File Name="src/audio/audio.cpp"/>
-      <File Name="src/audio/audio.hpp"/>
+      <File Name="../src/audio/audio.cpp"/>
+      <File Name="../src/audio/audio.hpp"/>
     </VirtualDirectory>
+    <File Name="../src/mammoth.cpp"/>
+    <File Name="../src/mammoth.hpp"/>
+    <File Name="../src/resourcemanager.cpp"/>
+    <File Name="../src/resourcemanager.hpp"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="src">
+    <File Name="test/main.cpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-ggdb" C_Options="-ggdb">
-        <IncludePath Value="./include"/>
-        <IncludePath Value="./lib"/>
+        <IncludePath Value="../include"/>
+        <IncludePath Value="../lib"/>
       </Compiler>
       <Linker Options="-static-libgcc;-static-libstdc++;-ggdb">
-        <LibraryPath Value="./lib/x86/"/>
-        <LibraryPath Value="./lib/x86/ogg"/>
-        <LibraryPath Value="./lib/x86/vorbis"/>
-        <LibraryPath Value="./lib/x86/portaudio"/>
+        <LibraryPath Value="../lib/x86/"/>
+        <LibraryPath Value="../lib/x86/ogg"/>
+        <LibraryPath Value="../lib/x86/vorbis"/>
+        <LibraryPath Value="../lib/x86/portaudio"/>
         <Library Value="portaudio.dll"/>
         <Library Value="ogg.dll"/>
         <Library Value="vorbisfile.dll"/>
@@ -51,6 +57,7 @@
     </GlobalSettings>
     <Configuration Name="Debug_x86" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g;-W;-O0" C_Options="-g;-W;-O0" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+        <IncludePath Value="../src"/>
         <Preprocessor Value="GLFW_DLL"/>
         <Preprocessor Value="GLEW_STATIC"/>
       </Compiler>
@@ -60,7 +67,7 @@
         <Library Value="glfwdll"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="./bin/x86/debug/$(ProjectName)" IntermediateDirectory="./obj/debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./bin/x86/debug" PauseExecWhenProcTerminates="yes"/>
+      <General OutputFile="./test/bin/$(ProjectName)" IntermediateDirectory="../obj/debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./test/bin" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[G_SLICE=always-malloc
 G_DEBUG=gc-friendly]]>
@@ -94,7 +101,7 @@ G_DEBUG=gc-friendly]]>
     </Configuration>
     <Configuration Name="Release_x86" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-O2;-W" C_Options="-O2;-W" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
-        <IncludePath Value="."/>
+        <IncludePath Value="../src"/>
         <Preprocessor Value="GLFW_DLL"/>
         <Preprocessor Value="GLEW_STATIC"/>
       </Compiler>
@@ -104,7 +111,7 @@ G_DEBUG=gc-friendly]]>
         <Library Value="glfwdll"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="./bin/x86/release/$(ProjectName)" IntermediateDirectory="./obj/release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./bin/x86/release" PauseExecWhenProcTerminates="yes"/>
+      <General OutputFile="./test/bin/$(ProjectName)" IntermediateDirectory="../obj/release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./test/bin" PauseExecWhenProcTerminates="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
