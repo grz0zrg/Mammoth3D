@@ -3,6 +3,8 @@ Mammoth3D v0.001
 
 ### Simple OpenGL 3.x demos framework ###
 
+All modules are independent.
+
 ### Usage ###
 
 All projects should compile easily on Windows using the [codelite](http://www.codelite.org/) .workspace.

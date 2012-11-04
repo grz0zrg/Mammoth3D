@@ -7,15 +7,13 @@
 #include <iostream>
 #include <stdio.h>
 
-#include "mammoth.hpp"
+#include "renderer/renderer.hpp"
+#include "window/window.hpp"
 #include "core/vector2.hpp"
 #include "core/vector3.hpp"
 #include "audio/audio.hpp"
 
 #include "loader/meshloader.hpp"
-
-#include <GL/glew.h>
-#include <GL/glfw.h>
 
 loader::MeshLoader *monkey;
 
@@ -189,8 +187,10 @@ void keyboard(unsigned char key, int x, int y)
 }
 
 int main(int argc, char **argv) {
-	framework::Mammoth *mammoth = framework::Mammoth::getInstance();
-	mammoth->openWindow(800, 600);
+	window::Window *screen = window::Window::getInstance();
+	screen->openWindow(800, 600);
+	
+	renderer::Renderer *rndr = renderer::Renderer::getInstance();
 	
 	audio::Audio *audioManager = audio::Audio::getInstance();
 	audioManager->loadMusic("data/music/lithography.ogg");
@@ -203,12 +203,12 @@ int main(int argc, char **argv) {
 	
 	do {
 		display();
-	} while(mammoth->running());
+	} while(screen->running());
 
 	cleanup();
 
 	audioManager->kill();
-	mammoth->kill;
+	screen->kill;
 
 	delete monkey;
 }

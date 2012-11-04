@@ -30,10 +30,16 @@
       <File Name="../src/audio/audio.cpp"/>
       <File Name="../src/audio/audio.hpp"/>
     </VirtualDirectory>
-    <File Name="../src/mammoth.cpp"/>
-    <File Name="../src/mammoth.hpp"/>
     <File Name="../src/resourcemanager.cpp"/>
     <File Name="../src/resourcemanager.hpp"/>
+    <VirtualDirectory Name="window">
+      <File Name="../src/window/window.cpp"/>
+      <File Name="../src/window/window.hpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="renderer">
+      <File Name="../src/renderer/renderer.cpp"/>
+      <File Name="../src/renderer/renderer.hpp"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="src">
     <File Name="test/main.cpp"/>

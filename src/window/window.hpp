@@ -1,61 +1,55 @@
-#ifndef MAMMOTH_HPP
-#define MAMMOTH_HPP
+#ifndef WINDOW_HPP
+#define WINDOW_HPP
 
-	#include <GL/glew.h>
 	#include <GL/glfw.h>
 	
 	#include <string>
 	#include <iostream>
 
-	namespace framework {
-		class Mammoth {
+	namespace window {
+		class Window {
 			private:
-				Mammoth() {
-					failure = false;
-					log("Mammoth3D v", engineVersion);
-	
+				Window() {
+					fail = false;
+
 					if (glfwInit() != GL_TRUE) {
 						log("glfwInit() failed.");
-						fail();
+						fail = true;
 					}
 				}
 				
-				~Mammoth() {
-					if (!failure) {
+				~Window() {
+					if (!fail) {
 						glfwTerminate();
 					}
 				}
 				
 				template <typename T>
 				void logPretty(const std::string &str, T param) {
-					std::cout << "[Mammoth] " << str << "\"" << 
+					std::cout << "[Window] " << str << "\"" << 
 								param << "\"" << std::endl;
 				}
 				
 				template <typename T>
 				void log(const std::string &str, T param) {
-					std::cout << "[Mammoth] " << str << param << std::endl;
+					std::cout << "[Window] " << str << param << std::endl;
 				}
 					
 				void log(const char *str) {
-					std::cout << "[Mammoth] " << str << std::endl;
+					std::cout << "[Window] " << str << std::endl;
 				}
 				
-				void fail() {
-					failure = true;
-				}
-				
-				bool failure;
+				bool fail;
 				
 				const static std::string engineVersion;
 			
-				Mammoth(const Mammoth&);
-				void operator=(const Mammoth&);
-				static Mammoth *_singleton;
+				Window(const Window&);
+				void operator=(const Window&);
+				static Window *_singleton;
 	
 			public:
 				void openWindow(int width, int height, bool fullscreen = false, const char *title = "Mammoth3D") {
-					if (failure) return;
+					if (fail) return;
 				
 					int ret = GL_FALSE;
 					if (fullscreen) {
@@ -66,35 +60,15 @@
 					
 					if (ret != GL_TRUE) {
 						log("glfwOpenWindow(...) failed.");
-						fail();
+						fail = true;
 						return;
 					}
 					
 					glfwSetWindowTitle(title);
-					
-					GLenum err = glewInit();
-					if (err != GLEW_OK) {
-						log("", glewGetErrorString(err));
-						fail();
-						glfwTerminate();
-						return;
-					}
-
-					logPretty("Renderer: ", glGetString(GL_VENDOR));
-					logPretty("Vendor: ", glGetString(GL_RENDERER));
-					logPretty("Version: ", glGetString(GL_VERSION));
-
-					if (!GLEW_VERSION_3_0) {
-						if (!GLEW_VERSION_4_0) {
-							log("Incompatible OpenGL version."); 
-							fail();
-							glfwTerminate();
-						}
-					}
 				}
 				
 				bool running() {
-					if (failure) { 
+					if (fail) { 
 						return false; 
 					} else {
 						return (glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS &&
@@ -102,10 +76,10 @@
 					}
 				}
 				
-				static Mammoth *getInstance()
+				static Window *getInstance()
 				{
 					if (!_singleton) {
-						_singleton =  new Mammoth;
+						_singleton =  new Window;
 					}
 
 					return _singleton;
