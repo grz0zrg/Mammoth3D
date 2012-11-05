@@ -1,9 +1,6 @@
 #ifndef RESOURCEMANAGER_HPP
 #define RESOURCEMANAGER_HPP
 
-	#include <GL/glew.h>
-	#include <GL/glfw.h>
-	
 	#include <string>
 	#include <iostream>
 

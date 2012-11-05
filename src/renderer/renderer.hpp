@@ -49,6 +49,15 @@
 				static Renderer *_singleton;
 	
 			public:
+				void setViewport(GLsizei w, GLsizei h) {
+					glViewport(0, 0, w, h);
+				}
+				
+				void clear() {
+					glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+					glClear(GL_COLOR_BUFFER_BIT);
+				}
+				
 				static Renderer *getInstance()
 				{
 					if (!_singleton) {

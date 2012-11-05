@@ -19,9 +19,7 @@
 				}
 				
 				~Window() {
-					if (!fail) {
-						glfwTerminate();
-					}
+					glfwTerminate();
 				}
 				
 				template <typename T>
@@ -42,15 +40,17 @@
 				bool fail;
 				
 				const static std::string engineVersion;
+				
+				int windowWidth, windowHeight;
 			
 				Window(const Window&);
 				void operator=(const Window&);
 				static Window *_singleton;
 	
 			public:
-				void openWindow(int width, int height, bool fullscreen = false, const char *title = "Mammoth3D") {
+				void openWindow(int width, int height, bool fullscreen = false, const char *title = "") {
 					if (fail) return;
-				
+					
 					int ret = GL_FALSE;
 					if (fullscreen) {
 						ret = glfwOpenWindow(width, height, 5, 6, 5, 0, 0, 0, GLFW_FULLSCREEN);
@@ -64,7 +64,42 @@
 						return;
 					}
 					
+					windowWidth  = width;
+					windowHeight = height;
+
 					glfwSetWindowTitle(title);
+				}
+				
+				void setVSync() {
+					glfwSwapInterval(1);
+				}
+				
+				void unsetVSync() {
+					glfwSwapInterval(0);
+				}	
+			
+				void swapBuffers() {
+					glfwSwapBuffers();
+				}
+				
+				double getTime() {
+					return glfwGetTime();
+				}
+				
+				void setFSAA(int level) {
+					if (glfwGetWindowParam(GLFW_OPENED)) {
+						log("FSAA cannot be applied, the window is already opened");
+						return;
+					}
+					glfwOpenWindowHint(GLFW_FSAA_SAMPLES, level);
+				}
+				
+				void setRefreshRate(int hz) {
+					glfwOpenWindowHint(GLFW_REFRESH_RATE, hz);
+				}
+
+				void onResize(GLFWwindowsizefun cbfun) {
+					glfwSetWindowSizeCallback(cbfun);
 				}
 				
 				bool running() {
@@ -74,6 +109,14 @@
 						return (glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS &&
 							glfwGetWindowParam(GLFW_OPENED));
 					}
+				}
+				
+				int getWindowWidth() {
+					return windowWidth;
+				}
+				
+				int getWindowHeight() {
+					return windowHeight;
 				}
 				
 				static Window *getInstance()

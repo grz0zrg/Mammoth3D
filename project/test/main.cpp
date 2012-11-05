@@ -16,6 +16,7 @@
 #include "loader/meshloader.hpp"
 
 loader::MeshLoader *monkey;
+renderer::Renderer *rndr;
 
 GLuint CreateShader(GLenum eShaderType, const std::string &strShaderFile)
 {
@@ -152,9 +153,6 @@ void cleanup() {
 
 void display()
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-
 	glUseProgram(theProgram);
 
 	glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
@@ -168,13 +166,6 @@ void display()
 	
 	glDisableVertexAttribArray(0);
 	glUseProgram(0);
-
-	glfwSwapBuffers();
-}
-
-void reshape (int w, int h)
-{
-	glViewport(0, 0, (GLsizei) w, (GLsizei) h);
 }
 
 void keyboard(unsigned char key, int x, int y)
@@ -186,11 +177,19 @@ void keyboard(unsigned char key, int x, int y)
 	}
 }
 
+void GLFWCALL windowResize(int width, int height)
+{
+	rndr->setViewport(width, height);
+}
+
 int main(int argc, char **argv) {
 	window::Window *screen = window::Window::getInstance();
+	screen->setFSAA(4);
 	screen->openWindow(800, 600);
+	screen->onResize(windowResize);
+	screen->setVSync();
 	
-	renderer::Renderer *rndr = renderer::Renderer::getInstance();
+	rndr = renderer::Renderer::getInstance();
 	
 	audio::Audio *audioManager = audio::Audio::getInstance();
 	audioManager->loadMusic("data/music/lithography.ogg");
@@ -199,10 +198,12 @@ int main(int argc, char **argv) {
 	monkey = new loader::MeshLoader("data/BlenderMonkey.mm");
 	
 	init();
-	reshape(800, 600);
+	rndr->setViewport(screen->getWindowWidth(), screen->getWindowHeight());
 	
 	do {
+		rndr->clear();
 		display();
+		screen->swapBuffers();
 	} while(screen->running());
 
 	cleanup();
