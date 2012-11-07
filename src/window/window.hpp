@@ -68,6 +68,8 @@
 					windowHeight = height;
 
 					glfwSetWindowTitle(title);
+					
+					log("Created.");
 				}
 				
 				void setVSync() {

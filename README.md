@@ -3,7 +3,7 @@ Mammoth3D v0.001
 
 ### Simple OpenGL 3.x demos framework ###
 
-All modules are independent.
+All modules are independent but to use the entire framework just include "mammoth3d.hpp".
 
 ### Usage ###
 

@@ -7,77 +7,10 @@
 #include <iostream>
 #include <stdio.h>
 
-#include "renderer/renderer.hpp"
-#include "window/window.hpp"
-#include "core/vector2.hpp"
-#include "core/vector3.hpp"
-#include "audio/audio.hpp"
-
-#include "loader/meshloader.hpp"
+#include "mammoth3d.hpp"
 
 loader::MeshLoader *monkey;
 renderer::Renderer *rndr;
-
-GLuint CreateShader(GLenum eShaderType, const std::string &strShaderFile)
-{
-	GLuint shader = glCreateShader(eShaderType);
-	const char *strFileData = strShaderFile.c_str();
-	glShaderSource(shader, 1, &strFileData, NULL);
-
-	glCompileShader(shader);
-
-	GLint status;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-	if (status == GL_FALSE)
-	{
-		GLint infoLogLength;
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
-
-		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
-		glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
-
-		const char *strShaderType = NULL;
-		switch(eShaderType)
-		{
-		case GL_VERTEX_SHADER: strShaderType = "vertex"; break;
-		case GL_GEOMETRY_SHADER: strShaderType = "geometry"; break;
-		case GL_FRAGMENT_SHADER: strShaderType = "fragment"; break;
-		}
-
-		fprintf(stderr, "Compile failure in %s shader:\n%s\n", strShaderType, strInfoLog);
-		delete[] strInfoLog;
-	}
-
-	return shader;
-}
-
-GLuint CreateProgram(const std::vector<GLuint> &shaderList)
-{
-	GLuint program = glCreateProgram();
-
-	for(size_t iLoop = 0; iLoop < shaderList.size(); iLoop++)
-		glAttachShader(program, shaderList[iLoop]);
-
-	glLinkProgram(program);
-
-	GLint status;
-	glGetProgramiv (program, GL_LINK_STATUS, &status);
-	if (status == GL_FALSE)
-	{
-		GLint infoLogLength;
-		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
-
-		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
-		glGetProgramInfoLog(program, infoLogLength, NULL, strInfoLog);
-		fprintf(stderr, "Linker failure: %s\n", strInfoLog);
-		delete[] strInfoLog;
-	}
-
-	for(size_t iLoop = 0; iLoop < shaderList.size(); iLoop++)
-		glDetachShader(program, shaderList[iLoop]);
-
-	return program;
-}
 
 GLuint theProgram;
 
@@ -101,18 +34,6 @@ const std::string strFragmentShader(
 	"}\n"
 );
 
-void InitializeProgram()
-{
-	std::vector<GLuint> shaderList;
-
-	shaderList.push_back(CreateShader(GL_VERTEX_SHADER, strVertexShader));
-	shaderList.push_back(CreateShader(GL_FRAGMENT_SHADER, strFragmentShader));
-
-	theProgram = CreateProgram(shaderList);
-
-	std::for_each(shaderList.begin(), shaderList.end(), glDeleteShader);
-}
-
 const float vertexPositions[] = {
 	0.75f, 0.75f, 0.0f, 1.0f,
 	0.75f, -0.75f, 0.0f, 1.0f,
@@ -121,7 +42,6 @@ const float vertexPositions[] = {
 
 GLuint positionBufferObject;
 GLuint testIBO;
-GLuint vao;
 
 void InitializeVertexBuffer()
 {
@@ -135,15 +55,6 @@ void InitializeVertexBuffer()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, monkey->indices.size() * sizeof(unsigned int), &monkey->indices[0], GL_STATIC_DRAW);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void init()
-{
-	InitializeProgram();
-	InitializeVertexBuffer();
-
-	//glGenVertexArrays(1, &vao);
-	//glBindVertexArray(vao);
 }
 
 void cleanup() {
@@ -168,15 +79,6 @@ void display()
 	glUseProgram(0);
 }
 
-void keyboard(unsigned char key, int x, int y)
-{
-	switch (key)
-	{
-	  case 0:
-		  return;
-	}
-}
-
 void GLFWCALL windowResize(int width, int height)
 {
 	rndr->setViewport(width, height);
@@ -195,9 +97,14 @@ int main(int argc, char **argv) {
 	audioManager->loadMusic("data/music/lithography.ogg");
 	audioManager->playMusic();
 	
+	loader::ShaderLoader *shaderloader = loader::ShaderLoader::getInstance();
+	shaderloader->compileShader(GL_VERTEX_SHADER, strVertexShader);
+	shaderloader->compileShader(GL_FRAGMENT_SHADER, strFragmentShader);
+	theProgram = shaderloader->buildProgram();
+
 	monkey = new loader::MeshLoader("data/BlenderMonkey.mm");
 	
-	init();
+	InitializeVertexBuffer();
 	rndr->setViewport(screen->getWindowWidth(), screen->getWindowHeight());
 	
 	do {
@@ -209,7 +116,9 @@ int main(int argc, char **argv) {
 	cleanup();
 
 	audioManager->kill();
+	rndr->kill();
 	screen->kill;
+	shaderloader->kill();
 
 	delete monkey;
 }
