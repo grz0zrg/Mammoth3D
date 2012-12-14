@@ -86,12 +86,13 @@
 						music_stream = 0;
 					}
 
-					log("Music loading: ", fileName);
+					log("loading: ", fileName);
 					
 					OggVorbis_File vf;
 					music = 0;
 					music = new musicData;
 					if(!music) {
+						music = 0;
 						log("Music alloc error.");
 						return;
 					}
@@ -159,11 +160,11 @@
 				}
 				
 				void playMusic(bool loop = false) {
-					if(music) {
+					if(music ) {
 						music->loop = loop;
 						paErr = Pa_StartStream(music_stream);
 						logPaError();
-						log("Playing...");
+						log("playing...");
 						music->paused = false;
 					}
 				}
@@ -172,7 +173,7 @@
 					if(music) {
 						paErr = Pa_StopStream(music_stream);
 						logPaError();
-						log("Paused...");
+						log("paused...");
 						music->paused = true;
 					}
 				}

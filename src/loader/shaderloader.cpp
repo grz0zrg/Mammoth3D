@@ -3,10 +3,10 @@
 loader::ShaderLoader *loader::ShaderLoader::_singleton = 0;
 
 void loader::ShaderLoader::compileShader(GLenum eShaderType, 
-										const std::string &strShaderFile) {
+										const std::string &strShader) {
 	GLuint shader = glCreateShader(eShaderType);
-	const char *strFileData = strShaderFile.c_str();
-	glShaderSource(shader, 1, &strFileData, NULL);
+	const char *shaderData = strShader.c_str();
+	glShaderSource(shader, 1, &shaderData, NULL);
 
 	glCompileShader(shader);
 
@@ -25,6 +25,22 @@ void loader::ShaderLoader::compileShader(GLenum eShaderType,
 	}
 
 	shaderList.push_back(shader);
+}
+
+void loader::ShaderLoader::compileShaderFile(GLenum eShaderType, 
+										const std::string &filename) {
+	std::fstream file(filename.c_str(), std::ios::in);
+	if (file.is_open())
+	{
+		std::stringstream buffer;
+		buffer << file.rdbuf();
+		
+		log("loading: ", filename);
+		
+		compileShader(eShaderType, buffer.str().c_str());
+	} else {
+		logPretty("Cannot open: ", filename);
+	}
 }
 
 GLuint loader::ShaderLoader::buildProgram() {

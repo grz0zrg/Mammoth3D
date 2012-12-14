@@ -5,8 +5,10 @@
 	#include <string>
 	#include <vector>
 	#include <iostream>
+	#include <sstream>
+	#include <fstream>
 	#include <algorithm>
-	
+
 	namespace loader {
 		class ShaderLoader {
 			private:
@@ -36,7 +38,8 @@
 				std::vector<GLuint> shaderList;
 			
 			public:
-				void compileShader(GLenum eShaderType, const std::string &strShaderFile);
+				void compileShader(GLenum eShaderType, const std::string &strShader);
+				void compileShaderFile(GLenum eShaderType, const std::string &filename);
 				GLuint buildProgram();
 				
 				static ShaderLoader *getInstance()

@@ -14,26 +14,6 @@ renderer::Renderer *rndr;
 
 GLuint theProgram;
 
-const std::string strVertexShader(
-	"#version 330\n"
-	"layout(location = 0) in vec4 position;\n"
-	"void main()\n"
-	"{\n"
-	"   vec4 totalOffset = vec4(0.0, 0.0, 0.0, 1.0);\n"
-	"   gl_Position = position+totalOffset;\n"
-	"}\n"
-);
-
-const std::string strFragmentShader(
-	"#version 330\n"
-	"out vec4 outputColor;\n"
-	"void main()\n"
-	"{\n"
-	"	float lerpValue = gl_FragCoord.y / 600.0f;\n"
-	"	outputColor = mix(vec4(1.0f, 1.0f, 1.0f, 1.0f), vec4(0.2f, 0.2f, 0.2f, 1.0f), lerpValue);\n"
-	"}\n"
-);
-
 const float vertexPositions[] = {
 	0.75f, 0.75f, 0.0f, 1.0f,
 	0.75f, -0.75f, 0.0f, 1.0f,
@@ -98,8 +78,8 @@ int main(int argc, char **argv) {
 	audioManager->playMusic();
 	
 	loader::ShaderLoader *shaderloader = loader::ShaderLoader::getInstance();
-	shaderloader->compileShader(GL_VERTEX_SHADER, strVertexShader);
-	shaderloader->compileShader(GL_FRAGMENT_SHADER, strFragmentShader);
+	shaderloader->compileShaderFile(GL_VERTEX_SHADER, "data/glsl/test.vert");
+	shaderloader->compileShaderFile(GL_FRAGMENT_SHADER, "data/glsl/test.frag");
 	theProgram = shaderloader->buildProgram();
 
 	monkey = new loader::MeshLoader("data/BlenderMonkey.mm");
