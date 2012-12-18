@@ -5,6 +5,8 @@
 	#include <iostream>
 	#include <vector>
 	
+	#include <GL/glew.h>
+	
 	namespace loader {
 		class MeshLoader {
 			public:
@@ -14,10 +16,18 @@
 					loadMesh(fileName); 
 				};
 				
-				~MeshLoader() { };
+				~MeshLoader() { 
+					glDeleteBuffers(1, &ibo);
+					glDeleteBuffers(1, &vbo);
+				};
 				
+				GLuint vbo, ibo;
+				unsigned int indicesCount;
+
 			private:
 				void loadMesh(const std::string &fileName);
+				
+				int createBuffers();
 
 				template <typename T>
 				void logPretty(const std::string &str, T param) {
@@ -37,8 +47,7 @@
 			char indsType;
 			
 			std::string name;
-			
-			public: // temp
+			public:
 			std::vector<unsigned int> indices;
 			std::vector<float> vertices;
 			std::vector<float> normals;

@@ -42,7 +42,7 @@
 					return _singleton;
 				}
 
-				static void kill()
+				static void free()
 				{
 					if (_singleton)
 					{

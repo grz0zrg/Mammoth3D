@@ -5,6 +5,8 @@
 	
 	#include <string>
 	#include <iostream>
+	
+	#include "../loader/meshloader.hpp"
 
 	namespace renderer {
 		class Renderer {
@@ -58,6 +60,9 @@
 					glClear(GL_COLOR_BUFFER_BIT);
 				}
 				
+				void render(const loader::MeshLoader *mesh, 
+											int count = 1);
+				
 				static Renderer *getInstance()
 				{
 					if (!_singleton) {
@@ -67,7 +72,7 @@
 					return _singleton;
 				}
 
-				static void kill()
+				static void free()
 				{
 					if (_singleton)
 					{
