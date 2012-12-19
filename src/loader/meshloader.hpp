@@ -12,6 +12,11 @@
 			public:
 				MeshLoader(const std::string &fileName) { 
 					indsType = sizeof(unsigned int);
+					polyMode = GL_FILL;
+					cullMode = GL_BACK;
+					depthWrite = false;
+					depthTest = false;
+					program = 0;
 
 					loadMesh(fileName); 
 				};
@@ -21,7 +26,34 @@
 					glDeleteBuffers(1, &vbo);
 				};
 				
-				GLuint vbo, ibo;
+				void setPolyMode(GLenum mode) {
+					polyMode = mode;
+				}
+				
+				void setCulling(GLenum mode) {
+					cullMode = mode;
+				}
+				
+				void disableCulling() {
+					cullMode = GL_NONE;
+				}
+				
+				void setDepthWrite(bool enabled) {
+					depthWrite = enabled;
+				}
+
+				void setDepthTest(bool enabled) {
+					depthTest = enabled;
+				}
+				
+				void setProgram(GLuint p) {
+					p = program;
+				}
+				
+				GLuint vbo, ibo, program;
+				GLenum polyMode, cullMode;
+				bool depthWrite, depthTest;
+				
 				unsigned int indicesCount;
 
 			private:
@@ -47,7 +79,6 @@
 			char indsType;
 			
 			std::string name;
-			public:
 			std::vector<unsigned int> indices;
 			std::vector<float> vertices;
 			std::vector<float> normals;

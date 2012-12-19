@@ -38,15 +38,15 @@ int main(int argc, char **argv) {
 	theProgram = shaderloader->buildProgram();
 
 	monkey = new loader::MeshLoader("data/BlenderMonkey.mm");
+	monkey->setProgram(theProgram);
+	monkey->setPolyMode(GL_LINE);
 
 	rndr->setViewport(screen->getWindowWidth(), screen->getWindowHeight());
 	
 	do {
 		rndr->clear();
 		
-		glUseProgram(theProgram);
 		rndr->render(monkey);
-		glUseProgram(0);
 
 		screen->swapBuffers();
 	} while(screen->running());
