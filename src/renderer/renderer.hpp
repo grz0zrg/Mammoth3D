@@ -49,6 +49,8 @@
 				Renderer(const Renderer&);
 				void operator=(const Renderer&);
 				static Renderer *_singleton;
+				
+				
 	
 			public:
 				void setViewport(GLsizei w, GLsizei h) {
@@ -80,6 +82,10 @@
 						_singleton = 0;
 					}
 				}
+				
+				GLuint previousProgram;
+				GLenum previousPolyMode, previousCullMode;
+				bool previousDepthWrite, previousDepthTest;
 		};
 	}
 	

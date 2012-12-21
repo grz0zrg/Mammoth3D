@@ -12,13 +12,14 @@
 			public:
 				MeshLoader(const std::string &fileName) { 
 					indsType = sizeof(unsigned int);
+
+					loadMesh(fileName); 
+
 					polyMode = GL_FILL;
 					cullMode = GL_BACK;
 					depthWrite = false;
 					depthTest = false;
-					program = 0;
-
-					loadMesh(fileName); 
+					program = 0;	
 				};
 				
 				~MeshLoader() { 
@@ -49,12 +50,13 @@
 				void setProgram(GLuint p) {
 					p = program;
 				}
+
+				GLuint vbo, ibo;
+				unsigned int indicesCount;
 				
-				GLuint vbo, ibo, program;
+				GLuint program;
 				GLenum polyMode, cullMode;
 				bool depthWrite, depthTest;
-				
-				unsigned int indicesCount;
 
 			private:
 				void loadMesh(const std::string &fileName);

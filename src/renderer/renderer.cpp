@@ -3,33 +3,44 @@
 renderer::Renderer *renderer::Renderer::_singleton = 0;
 
 void renderer::Renderer::render(const loader::MeshLoader *mesh, int count) {
-	glPolygonMode(GL_FRONT_AND_BACK, mesh->polyMode);
-	if (mesh->cullMode == GL_NONE) {
-		glDisable(GL_CULL_FACE);
-	} else {
-		glEnable(GL_CULL_FACE);
-		glCullFace(mesh->cullMode);
-	}
-	
-	if (mesh->depthWrite) {
-		glDepthMask(GL_TRUE);
-	} else {
-		glDepthMask(GL_FALSE);
+	if (previousPolyMode != mesh->polyMode) {
+		glPolygonMode(GL_FRONT_AND_BACK, mesh->polyMode);
 	}
 
-	if (mesh->depthTest) {
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LEQUAL);
-	} else {
-		if (mesh->depthWrite) {
-			glEnable(GL_DEPTH_TEST);
-			glDepthFunc(GL_ALWAYS);
+	if (previousCullMode != mesh->cullMode) {
+		if (mesh->cullMode == GL_NONE) {
+			glDisable(GL_CULL_FACE);
 		} else {
-			glDisable(GL_DEPTH_TEST);
+			glEnable(GL_CULL_FACE);
+			glCullFace(mesh->cullMode);
+		}
+	}
+	
+	if (previousDepthWrite != mesh->depthWrite) {
+		if (mesh->depthWrite) {
+			glDepthMask(GL_TRUE);
+		} else {
+			glDepthMask(GL_FALSE);
 		}
 	}
 
-	glUseProgram(mesh->program);
+	if (mesh->depthTest == true && previousDepthTest != mesh->depthTest) {
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
+	} else {
+		if (previousDepthWrite != mesh->depthWrite) {
+			if (mesh->depthWrite) {
+				glEnable(GL_DEPTH_TEST);
+				glDepthFunc(GL_ALWAYS);
+			} else {
+				glDisable(GL_DEPTH_TEST);
+			}
+		}
+	}
+
+	if (previousProgram != mesh->program) {
+		glUseProgram(mesh->program);
+	}
 
 	if (count > 1) {
 		
@@ -45,4 +56,10 @@ void renderer::Renderer::render(const loader::MeshLoader *mesh, int count) {
 		
 		glDisableVertexAttribArray(0);
 	}
+	
+	previousProgram    = mesh->program;
+	previousPolyMode   = mesh->polyMode;
+	previousCullMode   = mesh->cullMode;
+	previousDepthWrite = mesh->depthWrite;
+	previousDepthTest  = mesh->depthTest;
 }
