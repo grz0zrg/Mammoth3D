@@ -126,12 +126,43 @@
 							log("Parsing element: ", libNames[i]);
 							if(libType == GEOMETRIES) {
 								parseGeometries(element->FirstChildElement());
+							} else if(libType == IMAGES) {
+								parseImages(element->FirstChildElement());
 							}
 						}
 						libType = libTypes[++i];
 					}
 					
 					log("Done.");
+				}
+				
+				void parseImages(const tinyxml2::XMLElement* element) {
+					const tinyxml2::XMLElement* child = element;
+					while(child) {
+						element = child;
+						child = child->NextSiblingElement();
+
+						const std::string elementName = element->Name();
+						const std::string imageId = element->Attribute("id");
+						if(elementName != "image" || 
+											element->NoChildren() ||
+											imageId.empty()) {
+							continue;
+						}
+						
+						// parse <image ...> childs
+						const tinyxml2::XMLElement* imgChild = 
+												element->FirstChildElement();
+						while(imgChild) {
+							std::string childName = imgChild->Name();
+							if(childName == "init_from") {
+								const char *text = imgChild->GetText();
+								data->image[imageId] = std::string(text);
+							}
+							
+							imgChild = imgChild->NextSiblingElement();
+						}
+					}					
 				}
 				
 				void parseGeometries(const tinyxml2::XMLElement* element) {
@@ -406,6 +437,7 @@
 
 				typedef struct {
 					std::map<std::string, Mesh*> mesh;
+					std::map<std::string, std::string> image;
 				} Data;
 				
 				typedef struct {
