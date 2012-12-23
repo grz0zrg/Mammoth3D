@@ -6,7 +6,7 @@
 	#include <string>
 	#include <iostream>
 	
-	#include "../loader/meshloader.hpp"
+	#include "../objects/mesh.hpp"
 
 	namespace renderer {
 		class Renderer {
@@ -62,7 +62,7 @@
 					glClear(GL_COLOR_BUFFER_BIT);
 				}
 				
-				void render(const loader::MeshLoader *mesh, 
+				void render(const object::Mesh *mesh, 
 											int count = 1);
 				
 				static Renderer *getInstance()

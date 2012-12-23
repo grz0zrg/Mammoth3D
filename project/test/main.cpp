@@ -9,10 +9,10 @@
 
 #include "mammoth3d.hpp"
 
-loader::MeshLoader *monkey;
+material::Material *monkeyMat;
+object::Mesh *monkey;
 renderer::Renderer *rndr;
-
-GLuint theProgram;
+loader::Loader *ldr;
 
 void GLFWCALL windowResize(int width, int height)
 {
@@ -32,14 +32,14 @@ int main(int argc, char **argv) {
 	audioManager->loadMusic("data/music/lithography.ogg");
 	audioManager->playMusic();
 	
-	loader::ShaderLoader *shaderloader = loader::ShaderLoader::getInstance();
-	shaderloader->compileShaderFile(GL_VERTEX_SHADER, "data/glsl/test.vert");
-	shaderloader->compileShaderFile(GL_FRAGMENT_SHADER, "data/glsl/test.frag");
-	theProgram = shaderloader->buildProgram();
-
-	monkey = new loader::MeshLoader("data/BlenderMonkey.mm");
-	monkey->setProgram(theProgram);
-	monkey->setPolyMode(GL_LINE);
+	ldr = loader::Loader::getInstance();
+	
+	GLuint program = ldr->loadProgram("data/glsl/test.vert", "data/glsl/test.frag");
+	monkey = ldr->loadMesh("data/BlenderMonkey.mm");
+	monkeyMat = new material::Material();
+	monkeyMat->setProgram(program);
+	monkeyMat->polyMode = GL_LINE;
+	monkey->setMaterial(monkeyMat);
 
 	rndr->setViewport(screen->getWindowWidth(), screen->getWindowHeight());
 	
@@ -52,9 +52,10 @@ int main(int argc, char **argv) {
 	} while(screen->running());
 
 	audioManager->free();
+	ldr->free();
 	rndr->free();
 	screen->free;
-	shaderloader->free();
 
 	delete monkey;
+	delete monkeyMat;
 }

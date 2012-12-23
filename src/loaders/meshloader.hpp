@@ -13,50 +13,16 @@
 				MeshLoader(const std::string &fileName) { 
 					indsType = sizeof(unsigned int);
 
-					loadMesh(fileName); 
-
-					polyMode = GL_FILL;
-					cullMode = GL_BACK;
-					depthWrite = false;
-					depthTest = false;
-					program = 0;	
-				};
-				
+					loadMesh(fileName);
+				}
+			
 				~MeshLoader() { 
 					glDeleteBuffers(1, &ibo);
 					glDeleteBuffers(1, &vbo);
-				};
-				
-				void setPolyMode(GLenum mode) {
-					polyMode = mode;
-				}
-				
-				void setCulling(GLenum mode) {
-					cullMode = mode;
-				}
-				
-				void disableCulling() {
-					cullMode = GL_NONE;
-				}
-				
-				void setDepthWrite(bool enabled) {
-					depthWrite = enabled;
-				}
-
-				void setDepthTest(bool enabled) {
-					depthTest = enabled;
-				}
-				
-				void setProgram(GLuint p) {
-					p = program;
 				}
 
 				GLuint vbo, ibo;
 				unsigned int indicesCount;
-				
-				GLuint program;
-				GLenum polyMode, cullMode;
-				bool depthWrite, depthTest;
 
 			private:
 				void loadMesh(const std::string &fileName);

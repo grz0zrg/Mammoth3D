@@ -18,20 +18,20 @@
       <File Name="../src/core/vector2.hpp"/>
       <File Name="../src/core/vector3.hpp"/>
     </VirtualDirectory>
-    <VirtualDirectory Name="loader">
-      <File Name="../src/loader/collada/collada.cpp"/>
-      <File Name="../src/loader/collada/collada.hpp"/>
-      <File Name="../src/loader/meshloader.hpp"/>
-      <File Name="../src/loader/meshloader.cpp"/>
-      <File Name="../src/loader/shaderloader.cpp"/>
-      <File Name="../src/loader/shaderloader.hpp"/>
+    <VirtualDirectory Name="loaders">
+      <File Name="../src/loaders/meshloader.cpp"/>
+      <File Name="../src/loaders/meshloader.hpp"/>
+      <File Name="../src/loaders/shaderloader.cpp"/>
+      <File Name="../src/loaders/shaderloader.hpp"/>
+      <File Name="../src/loaders/collada/collada.cpp"/>
+      <File Name="../src/loaders/collada/collada.hpp"/>
+      <File Name="../src/loaders/loader.cpp"/>
+      <File Name="../src/loaders/loader.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="audio">
       <File Name="../src/audio/audio.cpp"/>
       <File Name="../src/audio/audio.hpp"/>
     </VirtualDirectory>
-    <File Name="../src/resourcemanager.cpp"/>
-    <File Name="../src/resourcemanager.hpp"/>
     <VirtualDirectory Name="window">
       <File Name="../src/window/window.cpp"/>
       <File Name="../src/window/window.hpp"/>
@@ -41,6 +41,14 @@
       <File Name="../src/renderer/renderer.hpp"/>
     </VirtualDirectory>
     <File Name="../src/mammoth3d.hpp"/>
+    <VirtualDirectory Name="materials">
+      <File Name="../src/materials/material.cpp"/>
+      <File Name="../src/materials/material.hpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="objects">
+      <File Name="../src/objects/mesh.cpp"/>
+      <File Name="../src/objects/mesh.hpp"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="src">
     <File Name="test/main.cpp"/>

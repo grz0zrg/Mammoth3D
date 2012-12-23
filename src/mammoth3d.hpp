@@ -6,7 +6,7 @@
 	#include "renderer/renderer.hpp"
 	#include "window/window.hpp"
 	#include "audio/audio.hpp"
-	#include "loader/meshloader.hpp"
-	#include "loader/shaderloader.hpp"
+	#include "objects/mesh.hpp"
+	#include "loaders/loader.hpp"
 	
 #endif
