@@ -10,25 +10,47 @@
 	namespace loader {
 		class MeshLoader {
 			public:
-				MeshLoader(const std::string &fileName) { 
+				MeshLoader() { 
 					indsType = sizeof(unsigned int);
-
-					loadMesh(fileName);
+					loaded = false;
 				}
 			
 				~MeshLoader() { 
-					glDeleteBuffers(1, &ibo);
-					glDeleteBuffers(1, &vbo);
+				}
+				
+				static MeshLoader *getInstance()
+				{
+					if (!_singleton) {
+						_singleton =  new MeshLoader;
+					}
+
+					return _singleton;
+				}
+
+				static void free()
+				{
+					if (_singleton)
+					{
+						delete _singleton;
+						_singleton = 0;
+					}
 				}
 
 				GLuint vbo, ibo;
 				unsigned int indicesCount;
-
-			private:
-				void loadMesh(const std::string &fileName);
 				
-				int createBuffers();
+				void loadMesh(const std::string &fileName);
 
+				char indsType;
+				
+				std::string name;
+				std::vector<unsigned int> indices;
+				std::vector<float> vertices;
+				std::vector<float> normals;
+				
+				bool loaded;
+			
+			private:
 				template <typename T>
 				void logPretty(const std::string &str, T param) {
 					std::cout << "[MeshLoader] " << str << "\"" << 
@@ -44,12 +66,9 @@
 					std::cout << "[MeshLoader] " << str << std::endl;
 				}
 				
-			char indsType;
-			
-			std::string name;
-			std::vector<unsigned int> indices;
-			std::vector<float> vertices;
-			std::vector<float> normals;
+			MeshLoader(const MeshLoader&);
+			void operator=(const MeshLoader&);
+			static MeshLoader *_singleton;
 		};
 	}
 

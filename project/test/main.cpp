@@ -10,7 +10,7 @@
 #include "mammoth3d.hpp"
 
 material::Material *monkeyMat;
-object::Mesh *monkey;
+object::Mesh *monkey = 0;
 renderer::Renderer *rndr;
 loader::Loader *ldr;
 
@@ -39,7 +39,9 @@ int main(int argc, char **argv) {
 	monkeyMat = new material::Material();
 	monkeyMat->setProgram(program);
 	monkeyMat->polyMode = GL_LINE;
-	monkey->setMaterial(monkeyMat);
+	if (monkey != 0) {
+		monkey->setMaterial(monkeyMat);
+	}
 
 	rndr->setViewport(screen->getWindowWidth(), screen->getWindowHeight());
 	

@@ -1,6 +1,14 @@
 #include "meshloader.hpp"
 
+loader::MeshLoader *loader::MeshLoader::_singleton = 0;
+
 void loader::MeshLoader::loadMesh(const std::string &fileName) {
+	indices.resize(0);
+	vertices.resize(0);
+	normals.resize(0);
+	indicesCount = 0;
+	loaded = false;
+
 	size_t mm = fileName.rfind(".mm");
 	//size_t dae = fileName.rfind(".dae");
 	
@@ -51,17 +59,10 @@ void loader::MeshLoader::loadMesh(const std::string &fileName) {
 				}
 				
 				file.close();
-				
-				if (createBuffers() != 1) {
-					indices.resize(0);
-					vertices.resize(0);
-					normals.resize(0);
-					indicesCount = 0;
-					log("Failed to create mesh buffers.");
-					return;
-				}
 
 				logPretty("loaded: ", name);
+				
+				loaded = true;
 			} else { 
 				logPretty("Failed to import Mesh: ", fileName);
 			}
@@ -71,29 +72,4 @@ void loader::MeshLoader::loadMesh(const std::string &fileName) {
 	} else {
 		logPretty("Invalid Mesh file extension (only *.mm): ", name);
 	}
-}
-
-int loader::MeshLoader::createBuffers() {
-	GLenum err;
-	
-	glGenBuffers(1, &ibo);
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), 
-		&vertices.front(), GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), 
-		&indices.front(), GL_STATIC_DRAW);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
-	err = glGetError();
-	if (err != GL_NO_ERROR) {
-		glDeleteBuffers(1, &ibo);
-		glDeleteBuffers(1, &vbo);
-		return -1;
-	}
-	
-	return 1;
 }

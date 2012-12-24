@@ -12,17 +12,11 @@
 		class Loader {
 			private:
 				Loader() { 
-					shaderloader = loader::ShaderLoader::getInstance();
 				}
 				
 				~Loader() {
-					std::map<std::string, loader::MeshLoader *>::iterator itMeshs;
-					for(itMeshs=meshs.begin() ; itMeshs != meshs.end(); itMeshs++) {
-						if ((*itMeshs).second != 0) {
-							delete (*itMeshs).second;
-						}
-					}
 					shaderloader->free();
+					meshloader->free();
 				}
 				
 				Loader(const Loader&);
@@ -30,8 +24,8 @@
 				static Loader *_singleton;
 				
 				loader::ShaderLoader *shaderloader;
-				std::map<std::string, loader::MeshLoader *> meshs;
-				
+				loader::MeshLoader *meshloader;
+
 			public:
 				static Loader *getInstance()
 				{
@@ -53,18 +47,20 @@
 				
 				GLuint loadProgram(const std::string &vertexShader, 
 									const std::string &fragmentShader) {
+					shaderloader = loader::ShaderLoader::getInstance();
 					shaderloader->compileShaderFile(GL_VERTEX_SHADER, vertexShader);
 					shaderloader->compileShaderFile(GL_FRAGMENT_SHADER, fragmentShader);
 					return shaderloader->buildProgram();
 				}
 				
 				object::Mesh *loadMesh(const std::string &fileName) {
-					if (meshs.find(fileName) == meshs.end()) {
-						meshs[fileName] = 0;
-						meshs[fileName] = new loader::MeshLoader(fileName);
-						return (new object::Mesh(meshs[fileName]));
+					meshloader = loader::MeshLoader::getInstance();
+					meshloader->loadMesh(fileName);
+					if (meshloader->loaded) {
+						return (new object::Mesh(meshloader));
+					} else {
+						return 0;
 					}
-					return (new object::Mesh(meshs[fileName]));
 				}
 		};
 	}

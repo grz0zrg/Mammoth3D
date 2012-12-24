@@ -37,8 +37,8 @@
       <File Name="../src/window/window.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="renderer">
-      <File Name="../src/renderer/renderer.cpp"/>
       <File Name="../src/renderer/renderer.hpp"/>
+      <File Name="../src/renderer/renderer.cpp"/>
     </VirtualDirectory>
     <File Name="../src/mammoth3d.hpp"/>
     <VirtualDirectory Name="materials">
