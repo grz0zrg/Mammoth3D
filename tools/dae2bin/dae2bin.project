@@ -9,10 +9,10 @@
   <Dependencies/>
   <VirtualDirectory Name="src">
     <File Name="main.cpp"/>
-    <File Name="../../src/loader/collada/collada.cpp"/>
-    <File Name="../../src/loader/collada/collada.hpp"/>
     <File Name="../../lib/tinyxml2/tinyxml2.cpp"/>
     <File Name="../../lib/tinyxml2/tinyxml2.h"/>
+    <File Name="../../src/loaders/collada/collada.cpp"/>
+    <File Name="../../src/loaders/collada/collada.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

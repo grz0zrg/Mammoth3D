@@ -7,7 +7,7 @@
  * TYPE can be: MESH (.mm)
  * */
  
-#include "../../src/loader/collada/collada.hpp"
+#include "../../src/loaders/collada/collada.hpp"
 
 int main(int argc, char **argv)
 {
