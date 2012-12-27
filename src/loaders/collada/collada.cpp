@@ -33,12 +33,31 @@ loader::Collada::~Collada() {
 	clearInputSemanticData();
 
 	if(data) {
+		std::map<std::string, Mesh*>::iterator meshIt;
 		meshIt = data->mesh.begin();
 		while(meshIt != data->mesh.end()) {
 			if(meshIt->second) {
 				delete meshIt->second;
 			}
 			meshIt++;
+		}
+		
+		std::map<std::string, Material*>::iterator materialIt;
+		materialIt = data->material.begin();
+		while(materialIt != data->material.end()) {
+			if(materialIt->second) {
+				delete materialIt->second;
+			}
+			materialIt++;
+		}
+		
+		std::map<std::string, Effect*>::iterator effectIt;
+		effectIt = data->effect.begin();
+		while(effectIt != data->effect.end()) {
+			if(effectIt->second) {
+				delete effectIt->second;
+			}
+			effectIt++;
 		}
 		delete data;
 	}
@@ -50,6 +69,7 @@ void loader::Collada::exportMeshsTo(const char *dir) {
 		directory.append("/");
 	}
 
+	std::map<std::string, Mesh*>::iterator meshIt;
 	meshIt = data->mesh.begin();
 	while(meshIt != data->mesh.end()) {
 		if(meshIt->second) {
@@ -153,6 +173,8 @@ void loader::Collada::parseEffects(const tinyxml2::XMLElement* element) {
 				effectId.empty()) {
 			continue;
 		}
+		
+		data->effect[effectId] = new Effect;
 						
 		// parse <effect ...> childs
 		const tinyxml2::XMLElement* effChild = element->FirstChildElement();
@@ -182,13 +204,17 @@ void loader::Collada::parseMaterials(const tinyxml2::XMLElement* element) {
 				materialId.empty()) {
 			continue;
 		}
-						
+
+		data->material[materialId] = new Material;
+		
 		// parse <material ...> childs
 		const tinyxml2::XMLElement* matChild = element->FirstChildElement();
 		while(matChild) {
 			std::string childName = matChild->Name();
 			if(childName == "instance_effect") {
-				const std::string effectUrl = matChild->Attribute("url");
+				std::string effectUrl = matChild->Attribute("url");
+				effectUrl.erase(0, 1); // erase "#" char
+				data->material[materialId]->effect = effectUrl;
 			}
 			matChild = matChild->NextSiblingElement();
 		}

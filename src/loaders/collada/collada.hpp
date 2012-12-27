@@ -89,7 +89,17 @@
 				} Mesh;
 
 				typedef struct {
+
+				} Effect;
+				
+				typedef struct {
+					std::string effect;
+				} Material;
+
+				typedef struct {
 					std::map<std::string, Mesh*> mesh;
+					std::map<std::string, Effect*> effect;
+					std::map<std::string, Material*> material;
 					std::map<std::string, std::string> image;
 				} Data;
 				
@@ -109,7 +119,6 @@
 				
 				// iterators
 				std::map<std::string, std::vector<float> >::iterator floatArraysIt;
-				std::map<std::string, Mesh*>::iterator meshIt;
 				std::map<std::string, InputSemanticData*>::iterator inputSemanticIt;
 				
 
