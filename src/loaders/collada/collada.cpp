@@ -181,14 +181,112 @@ void loader::Collada::parseEffects(const tinyxml2::XMLElement* element) {
 		while(effChild) {
 			std::string childName = effChild->Name();
 			if(childName == "profile_COMMON") {
-								
+				parseEffectData(effectId, effChild->FirstChildElement());
 			} else if(childName == "extra") {
-								
+				
 			}
 							
 			effChild = effChild->NextSiblingElement();
 		}
 	}							
+}
+
+void loader::Collada::parseEffectData(const std::string &effectId,
+										const tinyxml2::XMLElement* element) {
+	while(element) {
+		const tinyxml2::XMLElement* child = element->FirstChildElement();
+		const std::string elementName = element->Name();
+		
+		// <technique ...>
+		if (elementName == "technique") {
+			while(child) {
+				const std::string techChildName = child->Name();
+				if (techChildName == "phong") { // <phong>
+					const tinyxml2::XMLElement* matChild = 
+												child->FirstChildElement();
+					while (matChild) {
+						const std::string matChildName = matChild->Name();
+						data->effect[effectId]->effectData[matChildName] = 
+																	new Param;
+						
+						const tinyxml2::XMLElement* matDataChild = 
+												matChild->FirstChildElement();
+						while (matDataChild) {	
+							const std::string dataTypeName = 
+														matDataChild->Name();
+							
+							// <color ...>
+							if (dataTypeName == "color") {
+								const char *values = matDataChild->GetText();
+								if (values) {
+									std::vector<std::string> colorData = 
+															splitText(values);
+									unsigned int size = colorData.size();
+									if (colorData.size() <= 4) {
+										for(unsigned int i=0; i<size; i++) {
+											data->effect[effectId]
+												->effectData[matChildName]
+												->rgba[i] = 
+											strtof(colorData[i].c_str(), NULL);	
+										}
+									}
+								}
+
+							// <texture ...>
+							} else if (dataTypeName == "texture") { 
+								const std::string textureName = 
+											matDataChild->Attribute("texture");
+								const std::string texcoord = 
+											matDataChild->Attribute("texcoord");
+								if (texcoord == "UVMap") {
+									data->effect[effectId]
+										->effectData[matChildName]
+										->texcoord = 0;									
+								}
+								
+								// for the sake of simplicity we just get
+								// the image name at this point instead of
+								// parsing <newparam ...> sampler/surface tags...
+								std::size_t found = textureName.find("-sampler");
+								if (found != std::string::npos) {
+									data->effect[effectId]
+										->effectData[matChildName]
+										->image = textureName.substr(0,found);
+								} else {
+									data->effect[effectId]
+										->effectData[matChildName]
+										->image = textureName;									
+								}
+								
+							// <float ...>
+							} else if (dataTypeName == "float") {
+								const char *value = matDataChild->GetText();
+								data->effect[effectId]
+											->effectData[matChildName]
+											->v1 = 
+											strtof(value, NULL);						
+							}
+							
+							matDataChild = matDataChild->NextSiblingElement();
+						}
+						
+						matChild = matChild->NextSiblingElement();
+					}
+				}
+				
+				child = child->NextSiblingElement();
+			}
+
+		// <newparam ...> not supported
+		} else if (elementName == "newparam") {
+			
+		// <extra ...>
+		} else if (elementName == "extra") {
+			
+		}
+		
+		element = element->NextSiblingElement();
+	}
 }
 
 void loader::Collada::parseMaterials(const tinyxml2::XMLElement* element) {
@@ -213,8 +311,13 @@ void loader::Collada::parseMaterials(const tinyxml2::XMLElement* element) {
 			std::string childName = matChild->Name();
 			if(childName == "instance_effect") {
 				std::string effectUrl = matChild->Attribute("url");
-				effectUrl.erase(0, 1); // erase "#" char
-				data->material[materialId]->effect = effectUrl;
+				if (!effectUrl.empty()) {
+					std::size_t found = effectUrl.find("#")+1;
+					if (found != std::string::npos) {
+						effectUrl = effectUrl.substr(found);
+					}
+					data->material[materialId]->effect = effectUrl;
+				}
 			}
 			matChild = matChild->NextSiblingElement();
 		}
@@ -288,7 +391,8 @@ void loader::Collada::parseGeometries(const tinyxml2::XMLElement* element) {
 	}
 }
 
-void loader::Collada::parseMeshData(const std::string &str, const tinyxml2::XMLElement* element) {
+void loader::Collada::parseMeshData(const std::string &str,
+										const tinyxml2::XMLElement* element) {
 	while(element) {
 		const tinyxml2::XMLElement* sourceChild = element->FirstChildElement();
 		const std::string elementName = element->Name();
@@ -403,7 +507,10 @@ void loader::Collada::parseMeshData(const std::string &str, const tinyxml2::XMLE
 							}
 							if(inputSemantic["NORMAL"]) {
 								semanticCount++;
-							}			
+							}	
+							if(inputSemantic["TEXCOORD"]) {
+								semanticCount++;
+							}				
 							unsigned int expectedSize = (count*3)*semanticCount;
 											
 							if(expectedSize == realSize) {

@@ -8,10 +8,12 @@
 
 	#include "tinyxml2/tinyxml2.h"
 	
-	/* quick&dirty collada importer
+	/* Collada loader
 	 * triangles are the only primitives supported
 	 * <vcount> always assumed to be 3 in case of <polylist> tag
 	 * also don't support <accessor ...> and many others things to simplify :)
+	 * this loader was tested with .dae files from Blender collada export, don't
+	 * know if it work with others .dae export tools
 	 */
 	namespace loader {
 		class Collada : public tinyxml2::XMLVisitor {
@@ -26,6 +28,9 @@
 				void loadFile(const char *fileName);
 				
 				void parseEffects(const tinyxml2::XMLElement* element);
+				
+				void parseEffectData(const std::string &effectId, 
+									const tinyxml2::XMLElement* element);
 
 				void parseMaterials(const tinyxml2::XMLElement* element);
 				
@@ -89,7 +94,14 @@
 				} Mesh;
 
 				typedef struct {
-
+					float rgba[4];
+					std::string image;
+					int texcoord; // 0 = UVMap
+					float v1;
+				} Param;
+				
+				typedef struct {
+					std::map<std::string, Param*> effectData;
 				} Effect;
 				
 				typedef struct {
