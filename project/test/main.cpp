@@ -30,25 +30,26 @@ int main(int argc, char **argv) {
 	
 	audio::Audio *audioManager = audio::Audio::getInstance();
 	audioManager->loadMusic("data/music/lithography.ogg");
-	audioManager->playMusic();
+	//audioManager->playMusic();
 	
 	ldr = loader::Loader::getInstance();
 	
 	GLuint program = ldr->loadProgram("data/glsl/test.vert", "data/glsl/test.frag");
-	monkey = ldr->loadMesh("data/BlenderMonkey.mm");
+	monkey = ldr->loadMesh("data/Cube.mm");
 	monkeyMat = new material::Material();
 	monkeyMat->setProgram(program);
-	monkeyMat->polyMode = GL_LINE;
+	//monkeyMat->setPolyMode(GL_LINE);
 	if (monkey != 0) {
 		monkey->setMaterial(monkeyMat);
 	}
+	rndr->add(monkey);
 
-	rndr->setViewport(screen->getWindowWidth(), screen->getWindowHeight());
+	rndr->setViewport(screen->getWidth(), screen->getHeight());
 	
 	do {
 		rndr->clear();
 		
-		rndr->render(monkey);
+		rndr->render();
 
 		screen->swapBuffers();
 	} while(screen->running());
@@ -56,7 +57,7 @@ int main(int argc, char **argv) {
 	audioManager->free();
 	ldr->free();
 	rndr->free();
-	screen->free;
+	screen->free();
 
 	delete monkey;
 	delete monkeyMat;

@@ -8,12 +8,12 @@
 
 	#include "tinyxml2/tinyxml2.h"
 	
-	/* Collada loader
+	/* Simple Collada loader
 	 * triangles are the only primitives supported
 	 * <vcount> always assumed to be 3 in case of <polylist> tag
-	 * also don't support <accessor ...> and many others things to simplify :)
-	 * this loader was tested with .dae files from Blender collada export, don't
-	 * know if it work with others .dae export tools
+	 * also no <accessor ...> support and many others things to simplify
+	 * was tested with .dae files from Blender collada export,
+	 * it may work with others .dae export tools but not sure
 	 */
 	namespace loader {
 		class Collada : public tinyxml2::XMLVisitor {
@@ -88,7 +88,9 @@
 					std::string name;
 					std::vector<float> vertices;
 					std::vector<float> normals;
+					std::vector<float> texcoord;
 					std::vector<unsigned /*long*/ int> indices;
+					std::string material;
 
 					//std::map<std::string, std::string> positions;
 				} Mesh;

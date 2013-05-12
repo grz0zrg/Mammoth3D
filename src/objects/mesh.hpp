@@ -16,13 +16,15 @@
 					indices = meshData->indices;
 					vertices = meshData->vertices;
 					normals = meshData->normals;
+					texcoords = meshData->texcoords;
 					
 					if (createBuffers() != 1) {
 						indices.resize(0);
 						vertices.resize(0);
 						normals.resize(0);
+						texcoords.resize(0);
 						indicesCount = 0;
-						std::cout << "Failed to create mesh buffers." << std::endl;
+						std::cout << "Mesh buffers creation failure." << std::endl;
 					}
 				}
 				
@@ -47,6 +49,7 @@
 				std::vector<unsigned int> indices;
 				std::vector<float> vertices;
 				std::vector<float> normals;
+				std::vector<float> texcoords;
 		};
 	}
 	

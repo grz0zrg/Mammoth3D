@@ -6,6 +6,7 @@ void loader::MeshLoader::loadMesh(const std::string &fileName) {
 	indices.resize(0);
 	vertices.resize(0);
 	normals.resize(0);
+	texcoords.resize(0);
 	indicesCount = 0;
 	loaded = false;
 
@@ -31,15 +32,18 @@ void loader::MeshLoader::loadMesh(const std::string &fileName) {
 				file.seekg(0);
 				file.read((char*)&indsType, sizeof(indsType));
 				
-				unsigned int verticesCount = 0, normalsCount = 0;
+				unsigned int verticesCount = 0, normalsCount = 0, 
+				texcoordsCount = 0;
 				indicesCount = 0;
 				file.read((char*)&indicesCount, sizeof(indicesCount));
 				file.read((char*)&verticesCount, sizeof(verticesCount));
 				file.read((char*)&normalsCount, sizeof(normalsCount));
+				file.read((char*)&texcoordsCount, sizeof(texcoordsCount));
 				
 				indices.reserve(indicesCount);
 				vertices.reserve(verticesCount);
 				normals.reserve(normalsCount);
+				texcoords.reserve(texcoordsCount);
 				
 				for (unsigned int i = 0; i < indicesCount; i++) {
 					unsigned int ind = 0;
@@ -52,12 +56,19 @@ void loader::MeshLoader::loadMesh(const std::string &fileName) {
 					file.read((char*)&vert, sizeof(vert));
 					vertices.push_back(vert);
 				}
-
+				
 				for (unsigned int i = 0; i < normalsCount; i++) {
 					float norm = 0;
 					file.read((char*)&norm, sizeof(norm));
+					normals.push_back(norm);
 				}
-				
+	
+				for (unsigned int i = 0; i < texcoordsCount; i++) {
+					float texcoord = 0;
+					file.read((char*)&texcoord, sizeof(texcoord));
+					texcoords.push_back(texcoord);
+				}
+		
 				file.close();
 
 				logPretty("loaded: ", name);

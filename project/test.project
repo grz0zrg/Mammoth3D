@@ -78,7 +78,6 @@
       </Compiler>
       <Linker Options="" Required="yes">
         <Library Value="opengl32"/>
-        <Library Value="glu32"/>
         <Library Value="glfwdll"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>

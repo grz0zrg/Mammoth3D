@@ -16,8 +16,8 @@
 					if (err != GLEW_OK) {
 						log("", glewGetErrorString(err));
 					} else {
-						logPretty("Renderer: ", glGetString(GL_VENDOR));
-						logPretty("Vendor: ", glGetString(GL_RENDERER));
+						logPretty("Vendor: ", glGetString(GL_VENDOR));
+						logPretty("Renderer: ", glGetString(GL_RENDERER));
 						logPretty("Version: ", glGetString(GL_VERSION));
 
 						if (!GLEW_VERSION_3_0) {
@@ -50,7 +50,10 @@
 				void operator=(const Renderer&);
 				static Renderer *_singleton;
 				
+				std::vector<std::vector<const object::Mesh *> > render_queue;
+				std::vector<const material::Material *> mats; // all mats
 				
+				const material::Material *previousMat;
 	
 			public:
 				void setViewport(GLsizei w, GLsizei h) {
@@ -62,8 +65,27 @@
 					glClear(GL_COLOR_BUFFER_BIT);
 				}
 				
-				void render(const object::Mesh *mesh, 
-											int count = 1);
+				// add to render queue
+				// TODO: remove() and ignore multiples adds
+				void add(const object::Mesh *mesh) {
+					bool found = false;
+					for (unsigned int i = 0; i < mats.size(); i++) {
+						if (mats[i] == mesh->mat) {
+							render_queue[i].push_back(mesh);
+							found = true;
+							break;
+						}
+					}
+					
+					if (!found || mats.empty()) {
+						mats.push_back(mesh->mat);
+						std::vector<const object::Mesh *> mlist;
+						render_queue.push_back(mlist);
+						render_queue[mats.size()-1].push_back(mesh);
+					}
+				}
+				
+				void render();
 				
 				static Renderer *getInstance()
 				{

@@ -5,6 +5,12 @@ loader::ShaderLoader *loader::ShaderLoader::_singleton = 0;
 void loader::ShaderLoader::compileShader(GLenum eShaderType, 
 										const std::string &strShader) {
 	GLuint shader = glCreateShader(eShaderType);
+	
+	if (shader == 0) {
+		log("glCreateShader failed");
+		return;
+	}
+	
 	const char *shaderData = strShader.c_str();
 	glShaderSource(shader, 1, &shaderData, NULL);
 
@@ -22,6 +28,9 @@ void loader::ShaderLoader::compileShader(GLenum eShaderType,
 
 		log("Compile failure: ", strInfoLog);
 		delete[] strInfoLog;
+		glDeleteShader(shader);
+		
+		return;
 	}
 
 	shaderList.push_back(shader);
@@ -38,6 +47,7 @@ void loader::ShaderLoader::compileShaderFile(GLenum eShaderType,
 		log("loading: ", filename);
 		
 		compileShader(eShaderType, buffer.str().c_str());
+		file.close();
 	} else {
 		logPretty("Cannot open: ", filename);
 	}
@@ -46,13 +56,23 @@ void loader::ShaderLoader::compileShaderFile(GLenum eShaderType,
 GLuint loader::ShaderLoader::buildProgram() {
 	GLuint program = glCreateProgram();
 
-	for(size_t iLoop = 0; iLoop < shaderList.size(); iLoop++)
-		glAttachShader(program, shaderList[iLoop]);
-
+	if (program == 0) {
+		log("glCreateProgram failed");
+		return 0;
+	}
+	
+	for(size_t i = 0; i < shaderList.size(); i++) {
+		glAttachShader(program, shaderList[i]);
+		if (glGetError() == GL_INVALID_VALUE || 
+			glGetError() == GL_INVALID_OPERATION) {
+			log("glAttachShader failed");
+		}
+	}
+		
 	glLinkProgram(program);
 
 	GLint status;
-	glGetProgramiv (program, GL_LINK_STATUS, &status);
+	glGetProgramiv(program, GL_LINK_STATUS, &status);
 	if (status == GL_FALSE)
 	{
 		GLint infoLogLength;
@@ -62,12 +82,21 @@ GLuint loader::ShaderLoader::buildProgram() {
 		glGetProgramInfoLog(program, infoLogLength, NULL, strInfoLog);
 		log("Linker failure: ", strInfoLog);
 		delete[] strInfoLog;
+		
+		glDeleteProgram(program);
+		
+		return 0;
+	}
+	
+	programList.push_back(program);
+
+	for(size_t i = 0; i < shaderList.size(); i++) {
+		GLuint shader = shaderList[i];
+		glDetachShader(program, shader);
+		glDeleteShader(shader);
 	}
 
-	for(size_t iLoop = 0; iLoop < shaderList.size(); iLoop++)
-		glDetachShader(program, shaderList[iLoop]);
-
-	std::for_each(shaderList.begin(), shaderList.end(), glDeleteShader);
+	shaderList.clear();
 	
 	return program;
 }

@@ -14,7 +14,10 @@
 			private:
 				ShaderLoader() { };
 			
-				~ShaderLoader() { };
+				~ShaderLoader() {
+					std::for_each(programList.begin(), programList.end(), glDeleteProgram);
+					std::for_each(shaderList.begin(), shaderList.end(), glDeleteShader);
+				};
 			
 				template <typename T>
 				void logPretty(const std::string &str, T param) {
@@ -36,6 +39,7 @@
 				static ShaderLoader *_singleton;
 				
 				std::vector<GLuint> shaderList;
+				std::vector<GLuint> programList;
 			
 			public:
 				void compileShader(GLenum eShaderType, const std::string &strShader);

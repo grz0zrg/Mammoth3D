@@ -64,7 +64,7 @@
 						return;
 					}
 					
-					windowWidth  = width;
+					windowWidth = width;
 					windowHeight = height;
 
 					glfwSetWindowTitle(title);
@@ -113,11 +113,11 @@
 					}
 				}
 				
-				int getWindowWidth() {
+				int getWidth() {
 					return windowWidth;
 				}
 				
-				int getWindowHeight() {
+				int getHeight() {
 					return windowHeight;
 				}
 				

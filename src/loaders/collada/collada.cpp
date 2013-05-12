@@ -72,8 +72,10 @@ void loader::Collada::exportMeshsTo(const char *dir) {
 	std::map<std::string, Mesh*>::iterator meshIt;
 	meshIt = data->mesh.begin();
 	while(meshIt != data->mesh.end()) {
-		if(meshIt->second) {
-			std::string filename = directory+meshIt->second->name+meshFilenameExt;
+		const Mesh *mesh = meshIt->second;
+		
+		if(mesh) {
+			std::string filename = directory+mesh->name+meshFilenameExt;
 			std::ofstream file(filename.c_str(), std::ios::out | std::ios::binary);
 			if (!file.good() || !file.is_open()) {
 				log("Failed to export Mesh: ", filename);
@@ -83,25 +85,30 @@ void loader::Collada::exportMeshsTo(const char *dir) {
 			char indicesType = 0;
 			file.write((char*)&indicesType, sizeof(indicesType));
 
-			unsigned int indicesCount = meshIt->second->indices.size();
-			unsigned int verticesCount = meshIt->second->vertices.size();
-			unsigned int normalsCount = meshIt->second->normals.size();
+			unsigned int indicesCount = mesh->indices.size();
+			unsigned int verticesCount = mesh->vertices.size();
+			unsigned int normalsCount = mesh->normals.size();
+			unsigned int texcoordsCount = mesh->texcoord.size();
 			file.write((char*)&indicesCount, sizeof(indicesCount));
 			file.write((char*)&verticesCount, sizeof(verticesCount));
 			file.write((char*)&normalsCount, sizeof(normalsCount));
+			file.write((char*)&texcoordsCount, sizeof(texcoordsCount));
 
 			for (unsigned int i = 0; i < indicesCount; i++) {
-				file.write((char*)&meshIt->second->indices[i], sizeof(unsigned int));
+				file.write((char*)&mesh->indices[i], sizeof(unsigned int));
 			}
 
 			for (unsigned int i = 0; i < verticesCount; i++) {
-				file.write((char*)&meshIt->second->vertices[i], sizeof(float));
+				file.write((char*)&mesh->vertices[i], sizeof(float));
 			}
 
 			for (unsigned int i = 0; i < normalsCount; i++) {
-				file.write((char*)&meshIt->second->normals[i], sizeof(float));
+				file.write((char*)&mesh->normals[i], sizeof(float));
 			}
 
+			for (unsigned int i = 0; i < texcoordsCount; i++) {
+				file.write((char*)&mesh->texcoord[i], sizeof(float));
+			}
 			file.close();
 		}
 		meshIt++;
@@ -122,18 +129,16 @@ void loader::Collada::loadFile(const char *fileName) {
 		return;
 	}
 					
-	std::string version = rootElement->Attribute("version");
-	if (version.empty()) {
+	if (!rootElement->Attribute("version")) {
 		log("Missing or empty version attribute, aborting.");
 		return;
 	}
+	
+	std::string version = rootElement->Attribute("version");
 					
 	if(version.substr(0, 3) != "1.4") {
-		log("Invalid file. Must be version 1.4.x, current: ", version);
-		return;
+		log("Warning. Collada version != 1.4.x, current: ", version);
 	}
-					
-	log("Version ", version);
 					
 	data = new Data;
 						
@@ -167,12 +172,13 @@ void loader::Collada::parseEffects(const tinyxml2::XMLElement* element) {
 		child = child->NextSiblingElement();
 
 		const std::string elementName = element->Name();
-		const std::string effectId = element->Attribute("id");
 		if(elementName != "effect" || 
 				element->NoChildren() ||
-				effectId.empty()) {
+				!element->Attribute("id")) {
 			continue;
 		}
+		
+		std::string effectId = element->Attribute("id");
 		
 		data->effect[effectId] = new Effect;
 						
@@ -296,12 +302,13 @@ void loader::Collada::parseMaterials(const tinyxml2::XMLElement* element) {
 		child = child->NextSiblingElement();
 
 		const std::string elementName = element->Name();
-		const std::string materialId = element->Attribute("id");
 		if(elementName != "material" || 
 				element->NoChildren() ||
-				materialId.empty()) {
+				!element->Attribute("id")) {
 			continue;
 		}
+		
+		std::string materialId = element->Attribute("id");
 
 		data->material[materialId] = new Material;
 		
@@ -331,12 +338,13 @@ void loader::Collada::parseImages(const tinyxml2::XMLElement* element) {
 		child = child->NextSiblingElement();
 
 		const std::string elementName = element->Name();
-		const std::string imageId = element->Attribute("id");
 		if(elementName != "image" || 
 				element->NoChildren() ||
-				imageId.empty()) {
+				!element->Attribute("id")) {
 			continue;
 		}
+		
+		std::string imageId = element->Attribute("id");
 						
 		// parse <image ...> childs
 		const tinyxml2::XMLElement* imgChild = element->FirstChildElement();
@@ -359,13 +367,14 @@ void loader::Collada::parseGeometries(const tinyxml2::XMLElement* element) {
 		child = child->NextSiblingElement();
 
 		const std::string elementName = element->Name();
-		const std::string meshId = element->Attribute("id");
-		const std::string meshName = element->Attribute("name");
+		
 		if(elementName != "geometry" || 
 				element->NoChildren() ||
-				meshId.empty()) {
+				!element->Attribute("id")) {
 			continue;
 		}
+		
+		std::string meshId = element->Attribute("id");
 						
 		// parse <geometry ...> childs
 		const tinyxml2::XMLElement* geomChild = element->FirstChildElement();
@@ -375,8 +384,8 @@ void loader::Collada::parseGeometries(const tinyxml2::XMLElement* element) {
 			// <mesh> content
 			if(childName == "mesh") {
 				data->mesh[meshId] = new Mesh;
-				if(!meshName.empty()) {
-					data->mesh[meshId]->name = meshName;
+				if(element->Attribute("name")) {
+					data->mesh[meshId]->name = element->Attribute("name");;
 				}
 				inputSemantic["VERTEX"] = 0;
 				inputSemantic["POSITION"] = 0;
@@ -427,18 +436,18 @@ void loader::Collada::parseMeshData(const std::string &str,
 			
 			// <vertices>
 			} else if (elementName == "vertices") {
-				const std::string id = element->Attribute("id");
-				if(!id.empty()) {
+				if(element->Attribute("id")) {
+					std::string id = element->Attribute("id");
 					while(sourceChild) {	
 						// <input ...>
 						const std::string sourceChildName = sourceChild->Name();
 						if (sourceChildName == "input") {
-							const std::string semantic = 
+							if(sourceChild->Attribute("semantic") 
+								&& sourceChild->Attribute("source")) {
+								std::string semantic = 
 										sourceChild->Attribute("semantic");
-							std::string source = 
+								std::string source = 
 										sourceChild->Attribute("source");
-										
-							if(!semantic.empty() && !source.empty()) {
 								inputSemantic[semantic] = new InputSemanticData;
 								inputSemantic[semantic]->source = source.erase(0,1);
 								inputSemantic[semantic]->offset = -1;
@@ -458,15 +467,21 @@ void loader::Collada::parseMeshData(const std::string &str,
 					elementName == "trifans" ||
 					elementName == "tristrips") {
 				unsigned int count = element->IntAttribute("count");
+				const char *materialName = element->Attribute("material");
+				if (materialName) {
+					data->mesh[str]->material = std::string(materialName);
+				}
+				
 				while(sourceChild) {
 					const std::string sourceChildName = sourceChild->Name();
 					// <input ...>
 					if (sourceChildName == "input") {
-						const std::string semantic = sourceChild->Attribute("semantic");
-						std::string source = sourceChild->Attribute("source");
 						int offset = sourceChild->IntAttribute("offset");
 							
-						if(!semantic.empty() && !source.empty()) {
+						if(sourceChild->Attribute("semantic") 
+							&& sourceChild->Attribute("source")) {
+							std::string semantic = sourceChild->Attribute("semantic");
+							std::string source = sourceChild->Attribute("source");
 							inputSemantic[semantic] = new InputSemanticData;
 							inputSemantic[semantic]->source = source.erase(0,1);
 							inputSemantic[semantic]->offset = offset;
@@ -494,13 +509,14 @@ void loader::Collada::parseMeshData(const std::string &str,
 						if (text) {
 							std::vector<std::string> polysData = splitText(text);
 
-						// should possibly check collada expected size?
+						// should probably check collada expected size?
 						unsigned int realSize = polysData.size();
 						if(!polysData.empty()) {
 							for(unsigned int i=0; i<realSize; i++) {
 								polysArrays[str].push_back(strtoul(polysData[i].c_str(), NULL, 0));
 							}
-											
+
+							// calculate expected data size
 							int semanticCount = 0;
 							if(inputSemantic["VERTEX"]) {
 								semanticCount++;
@@ -510,55 +526,97 @@ void loader::Collada::parseMeshData(const std::string &str,
 							}	
 							if(inputSemantic["TEXCOORD"]) {
 								semanticCount++;
-							}				
-							unsigned int expectedSize = (count*3)*semanticCount;
-											
-							if(expectedSize == realSize) {
-								// process mesh
-								data->mesh[str]->vertices = floatArrays[inputSemantic["POSITION"]->source];
-								const std::string normalSource = inputSemantic["NORMAL"]->source;
-								//data->mesh[str]->normals = floatArrays[inputSemantic["NORMAL"]->source];
-								data->mesh[str]->vertices.resize(floatArrays[normalSource].size(), 0.0f);
-								data->mesh[str]->normals.reserve(floatArrays[normalSource].size());
-												
-								unsigned int verticesCount = data->mesh[str]->vertices.size()/3;
-								for(unsigned int i=0; i<realSize; i+=(semanticCount*3)) {
-									// vertices indices
-									unsigned long int iv1 = polysArrays[str][i];
-									unsigned long int iv2 = polysArrays[str][i+2];
-									unsigned long int iv3 = polysArrays[str][i+4];
+							}
+							
+							unsigned int expectedSize = 0;
+							for(unsigned int i=0; i<vcountArrays[str].size(); i++) {
+								expectedSize += vcountArrays[str][i]*semanticCount;
+							}
 
-									// normals indices
-									unsigned long int in1 = polysArrays[str][i+1];
-									unsigned long int in2 = polysArrays[str][i+3];
-									unsigned long int in3 = polysArrays[str][i+5];
-													
-									// duplicates vertices to match normals
-									if(in1 >= verticesCount) {
-										data->mesh[str]->vertices[in1] = data->mesh[str]->vertices[iv1];
-										iv1 = in1;
-									}
-									if(in2 >= verticesCount) {
-										data->mesh[str]->vertices[in2] = data->mesh[str]->vertices[iv2];
-										iv2 = in2;
-									}
-									if(in3 >= verticesCount) {
-										data->mesh[str]->vertices[in3] = data->mesh[str]->vertices[iv3];
-										iv3 = in3;
-									}
-													
-									data->mesh[str]->indices.push_back(iv1);
-									data->mesh[str]->indices.push_back(iv2);
-									data->mesh[str]->indices.push_back(iv3);
-													
-									// re-build opengl-correct normals etc... ie: unify indices
-									data->mesh[str]->normals[iv1] = floatArrays[normalSource][in1];
-									data->mesh[str]->normals[iv2] = floatArrays[normalSource][in2];
-									data->mesh[str]->normals[iv3] = floatArrays[normalSource][in3];
+							unsigned int vPerFaces = 3; // <vcount> always 3 vertices/faces
+							if (vcountArrays[str].empty()) {
+								expectedSize = count*2;
+								vPerFaces = 2; // hacky <lines> support
+							}
+							
+							// parse data, maximum ugliness begin here :)
+							if(expectedSize == realSize) {
+								data->mesh[str]->vertices = floatArrays[inputSemantic["POSITION"]->source];
+								
+								int vOffset = inputSemantic["VERTEX"]->offset;
+								int nOffset = 1, tOffset = 2;
+								
+								std::string texcoordSource;
+								if(inputSemantic["TEXCOORD"]) {
+									tOffset = inputSemantic["TEXCOORD"]->offset;
+									texcoordSource = inputSemantic["TEXCOORD"]->source;
+									//data->mesh[str]->texcoord = floatArrays[inputSemantic["TEXCOORD"]->source];
 								}
-								//log("",data->mesh[str]->vertices.size()/3);
+								std::string normalSource;
+								if(inputSemantic["NORMAL"]) {
+									nOffset = inputSemantic["NORMAL"]->offset;
+									normalSource = inputSemantic["NORMAL"]->source;
+									//data->mesh[str]->normals = floatArrays[inputSemantic["NORMAL"]->source];
+									data->mesh[str]->vertices.reserve(floatArrays[normalSource].size());
+									if(inputSemantic["TEXCOORD"]) {
+										data->mesh[str]->texcoord.resize(floatArrays[normalSource].size(), 0.0f);
+									}
+									data->mesh[str]->normals.resize(floatArrays[normalSource].size(), 0.0f);
+									data->mesh[str]->vertices.resize(floatArrays[normalSource].size(), 0.0f);
+								}
+	
+								unsigned long int face[9] = {0,0,0,
+															 0,0,0,
+															 0,0,0};
+															 
+								unsigned long int face_tmp[3] = {0,0,0};
+								
+								unsigned int verticesCount = data->mesh[str]->vertices.size()/vPerFaces;
+								for(unsigned int i=0; i<realSize; i+=(semanticCount*vPerFaces)) {
+									// indices
+									face[0] = polysArrays[str][i+vOffset];
+									face[1] = polysArrays[str][i+semanticCount+vOffset];
+									face[2] = polysArrays[str][i+semanticCount*2+vOffset];
+									
+									face_tmp[0] = face[0];
+									face_tmp[1] = face[1];
+									face_tmp[2] = face[2];
+									
+									if (inputSemantic["NORMAL"]) {
+										face[3] = polysArrays[str][i+nOffset];
+										face[4] = polysArrays[str][i+semanticCount+nOffset];
+										face[5] = polysArrays[str][i+semanticCount*2+nOffset];
+										
+										for (int e=3; e<6; e++) {
+											unsigned int normalIndice = face[e];
+											if(normalIndice >= verticesCount) {
+												for (unsigned int j=0; j<vPerFaces; j++) {
+													data->mesh[str]->vertices[face_tmp[e-3]*vPerFaces+j] = data->mesh[str]->vertices[face[j]*vPerFaces+e];
+												}
+												face_tmp[e-3] = normalIndice;
+											}
+										}
+										
+										for (unsigned int e=0; e<vPerFaces; e++) {
+											data->mesh[str]->normals[face_tmp[0]*vPerFaces+e] = floatArrays[normalSource][face[3]*vPerFaces+e];
+											data->mesh[str]->normals[face_tmp[1]*vPerFaces+e] = floatArrays[normalSource][face[4]*vPerFaces+e];
+											data->mesh[str]->normals[face_tmp[2]*vPerFaces+e] = floatArrays[normalSource][face[5]*vPerFaces+e];
+										}
+									}
+									
+									// TODO
+									if (inputSemantic["TEXCOORD"]) {
+										face[6] = polysArrays[str][i+tOffset];
+										face[7] = polysArrays[str][i+semanticCount+tOffset];
+										face[8] = polysArrays[str][i+semanticCount*2+tOffset];
+									}
+									
+									for (unsigned int e=0; e<vPerFaces; e++) {
+										data->mesh[str]->indices.push_back(face_tmp[e]);
+									}
+								}
 							} else {
-								log(str, " polylist <p> count does not match expected size");
+								log(str, " polylist <p> count does not match expected size, mesh ignored");
 							}
 						}
 					}
