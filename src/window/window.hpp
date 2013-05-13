@@ -16,6 +16,11 @@
 						log("glfwInit() failed.");
 						fail = true;
 					}
+					
+					frames = 0;
+					fpsTimer = getTime();
+					lastTime = getTime();
+					deltaTime = 0.0;
 				}
 				
 				~Window() {
@@ -42,6 +47,9 @@
 				const static std::string engineVersion;
 				
 				int windowWidth, windowHeight;
+				
+				int frames, fps;
+				double fpsTimer, deltaTime, lastTime;
 			
 				Window(const Window&);
 				void operator=(const Window&);
@@ -82,10 +90,36 @@
 			
 				void swapBuffers() {
 					glfwSwapBuffers();
+					
+					frames++;
+					if (getTime()-fpsTimer >= 1.0) {
+						fps = frames;
+						frames = 0;
+						fpsTimer = getTime();
+					}
+					
+					deltaTime = getTime() - lastTime;
+					lastTime = getTime();
+				}
+				
+				double getDeltaTime() {
+					return deltaTime;
+				}
+				
+				void displayMouseCursor(bool state) {
+					if (state) {
+						glfwEnable(GLFW_MOUSE_CURSOR);
+					} else {
+						glfwDisable(GLFW_MOUSE_CURSOR);
+					}
 				}
 				
 				double getTime() {
 					return glfwGetTime();
+				}
+				
+				int getFps() {
+					return fps;
 				}
 				
 				void setFSAA(int level) {
@@ -96,6 +130,17 @@
 					glfwOpenWindowHint(GLFW_FSAA_SAMPLES, level);
 				}
 				
+				bool isActive() {
+					if (glfwGetWindowParam(GLFW_ACTIVE) == GL_TRUE) {
+						return true;
+					}
+					return false;
+				}
+				
+				int getRefreshRate() {
+					return glfwGetWindowParam(GLFW_REFRESH_RATE);
+				}
+				
 				void setRefreshRate(int hz) {
 					glfwOpenWindowHint(GLFW_REFRESH_RATE, hz);
 				}
@@ -104,13 +149,16 @@
 					glfwSetWindowSizeCallback(cbfun);
 				}
 				
+				void sleep(double time = 0.25) {
+					glfwSleep(time);
+				}
+				
 				bool running() {
 					if (fail) { 
 						return false; 
-					} else {
-						return (glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS &&
-							glfwGetWindowParam(GLFW_OPENED));
 					}
+					return (glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS &&
+							glfwGetWindowParam(GLFW_OPENED));
 				}
 				
 				int getWidth() {

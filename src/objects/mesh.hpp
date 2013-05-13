@@ -18,6 +18,9 @@
 					normals = meshData->normals;
 					texcoords = meshData->texcoords;
 					
+					x = y = z = 0.0f;
+					sx = sy = sz = 1.0f;
+					
 					if (createBuffers() != 1) {
 						indices.resize(0);
 						vertices.resize(0);
@@ -37,12 +40,27 @@
 					this->mat = mat;
 				}
 				
+				void setPosition(float x, float y, float z) {
+					this->x = x;
+					this->y = y;
+					this->z = z;
+				}
+				
+				void setScale(float sx, float sy, float sz) {
+					this->sx = sx;
+					this->sy = sy;
+					this->sz = sz;
+				}
+				
 				int createBuffers();
 				
 				material::Material *mat;
 				
 				GLuint vbo, ibo;
 				unsigned int indicesCount;
+				
+				float x, y, z;
+				float sx, sy, sz;
 				
 				char indsType;
 

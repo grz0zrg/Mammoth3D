@@ -25,6 +25,7 @@ int main(int argc, char **argv) {
 	screen->openWindow(800, 600);
 	screen->onResize(windowResize);
 	screen->setVSync();
+	screen->displayMouseCursor(false);
 	
 	rndr = renderer::Renderer::getInstance();
 	
@@ -47,10 +48,18 @@ int main(int argc, char **argv) {
 	rndr->setViewport(screen->getWidth(), screen->getHeight());
 	
 	do {
-		rndr->clear();
+		double deltaTime = screen->getDeltaTime();
 		
-		rndr->render();
-
+		if (screen->isActive()) {
+			rndr->clear();
+			
+			monkey->x += 0.1f * deltaTime;
+			
+			rndr->render();
+		} else {
+			screen->sleep();
+		}
+		
 		screen->swapBuffers();
 	} while(screen->running());
 

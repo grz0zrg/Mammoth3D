@@ -37,6 +37,7 @@ void renderer::Renderer::render() {
 							} else {
 								glEnable(GL_CULL_FACE);
 								glCullFace(mat->cullMode);
+								glFrontFace(GL_CW);
 							}
 							break;
 							
@@ -71,6 +72,11 @@ void renderer::Renderer::render() {
 					}
 				}
 			}
+			
+			GLint offsetLocation = glGetUniformLocation(mat->program, "offset");
+			GLint scaleLocation = glGetUniformLocation(mat->program, "scale");
+			glUniform4f(offsetLocation, mesh->x, mesh->y, mesh->z, 0.0f);
+			glUniform4f(scaleLocation, mesh->sx, mesh->sy, mesh->sz, 1.0f);
 
 			glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
