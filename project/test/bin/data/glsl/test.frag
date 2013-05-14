@@ -1,9 +1,15 @@
 #version 330
 
 out vec4 outputColor;
+
+in vec3 fragmentColor;
+in float fragmentAlpha;
+
 void main()
 {
-	float lerpValue = gl_FragCoord.y / 600.0f;
-	outputColor = mix(vec4(1.0f, 1.0f, 1.0f, 1.0f), vec4(0.2f, 0.2f, 0.2f, 1.0f), lerpValue);
-	//outputColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    /*if(fragmentAlpha < 0.5f){
+        discard;
+    }*/
+	
+	outputColor = vec4(fragmentColor.x, fragmentColor.y, fragmentColor.z, fragmentAlpha);
 }

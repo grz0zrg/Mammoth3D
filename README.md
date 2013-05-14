@@ -1,6 +1,8 @@
 Mammoth3D
 =========
 
+![Alt text](http://garzul.tonsite.biz/mammoth3d/14_05_2013.png "mammoth3d")
+
 ### Simple OpenGL 3.x demos framework ###
 
 To use the entire framework just include "mammoth3d.hpp".

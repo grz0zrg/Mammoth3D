@@ -11,23 +11,28 @@
 
 material::Material *monkeyMat;
 object::Mesh *monkey = 0;
-renderer::Renderer *rndr;
+renderer::Renderer *rndr = 0;
 loader::Loader *ldr;
 
 void GLFWCALL windowResize(int width, int height)
 {
-	rndr->setViewport(width, height);
+	if (rndr) {
+		rndr->setViewport(width, height);
+	}
 }
 
 int main(int argc, char **argv) {
+	int screenWidth = 800;
+	int screenHeight = 600;
+	
 	window::Window *screen = window::Window::getInstance();
 	screen->setFSAA(4);
-	screen->openWindow(800, 600);
-	screen->onResize(windowResize);
+	screen->openWindow(screenWidth, screenHeight);
 	screen->setVSync();
 	screen->displayMouseCursor(false);
 	
 	rndr = renderer::Renderer::getInstance();
+	screen->onResize(windowResize);
 	
 	audio::Audio *audioManager = audio::Audio::getInstance();
 	audioManager->loadMusic("data/music/lithography.ogg");
@@ -35,17 +40,24 @@ int main(int argc, char **argv) {
 	
 	ldr = loader::Loader::getInstance();
 	
-	GLuint program = ldr->loadProgram("data/glsl/test.vert", "data/glsl/test.frag");
+	program::Program *prog = ldr->loadProgram("data/glsl/test.vert", "data/glsl/test.frag");
 	monkey = ldr->loadMesh("data/Cube.mm");
 	monkeyMat = new material::Material();
-	monkeyMat->setProgram(program);
+	monkeyMat->setProgram(prog);
+	//monkeyMat->setCullMode(GL_NONE);
+	monkeyMat->setDepthTest(true);
+	monkeyMat->setDepthWrite(true);
+	//monkeyMat->setBlending(true);
 	//monkeyMat->setPolyMode(GL_LINE);
 	if (monkey != 0) {
 		monkey->setMaterial(monkeyMat);
 	}
 	rndr->add(monkey);
 
-	rndr->setViewport(screen->getWidth(), screen->getHeight());
+	rndr->setViewport(screenWidth, screenHeight);
+	
+	camera::Camera *cam = new camera::Camera(camera::PERSPECTIVE, 75, screenWidth / screenHeight);
+	rndr->setCamera(cam);
 	
 	do {
 		double deltaTime = screen->getDeltaTime();
@@ -53,7 +65,7 @@ int main(int argc, char **argv) {
 		if (screen->isActive()) {
 			rndr->clear();
 			
-			monkey->x += 0.1f * deltaTime;
+			monkey->ry += 0.1f * deltaTime;
 			
 			rndr->render();
 		} else {
@@ -63,11 +75,14 @@ int main(int argc, char **argv) {
 		screen->swapBuffers();
 	} while(screen->running());
 
+	delete prog;
+	
 	audioManager->free();
 	ldr->free();
 	rndr->free();
 	screen->free();
 
+	delete cam;
 	delete monkey;
 	delete monkeyMat;
 }

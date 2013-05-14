@@ -7,7 +7,7 @@ void renderer::Renderer::render() {
 	for (unsigned int i = 0; i < rQueueLength; i++) {
 		unsigned int mQueueLength = render_queue[i].size();
 		for (unsigned int e = 0; e < mQueueLength; e++) {
-			const object::Mesh *mesh = 0;
+			object::Mesh *mesh = 0;
 			mesh = render_queue[i][e];
 			
 			if (!mesh) {
@@ -35,7 +35,8 @@ void renderer::Renderer::render() {
 							if (mat->cullMode == GL_NONE) {
 								glDisable(GL_CULL_FACE);
 							} else {
-								glEnable(GL_CULL_FACE);
+								glDisable(GL_CULL_FACE);
+								//glEnable(GL_CULL_FACE);
 								glCullFace(mat->cullMode);
 								glFrontFace(GL_CW);
 							}
@@ -52,7 +53,7 @@ void renderer::Renderer::render() {
 						case material::DEPTH_TEST:
 							if (mat->depthTest) {
 								glEnable(GL_DEPTH_TEST);
-								glDepthFunc(GL_LEQUAL);
+								glDepthFunc(GL_LESS);//GL_LEQUAL
 							} else {
 								if (mat->depthWrite) {
 									glEnable(GL_DEPTH_TEST);
@@ -64,7 +65,26 @@ void renderer::Renderer::render() {
 							break;
 							
 						case material::PROGRAM:
-							glUseProgram(mat->program);
+							glUseProgram(mat->prog->prog);
+							break;
+							
+						case material::BLENDING:
+							if (mat->blending) {
+								glEnable(GL_BLEND);
+								//alpha
+								glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+								glBlendEquation(GL_FUNC_ADD);
+								
+								//add
+								//glBlendFunc(GL_ONE, GL_ONE);
+								//glBlendEquation(GL_FUNC_ADD);
+								
+								//sub
+								//glBlendFunc(GL_ONE, GL_ONE);
+								//glBlendEquation(GL_FUNC_SUBTRACT);
+							} else {
+								glDisable(GL_BLEND);
+							}
 							break;
 							
 						default:
@@ -72,18 +92,25 @@ void renderer::Renderer::render() {
 					}
 				}
 			}
-			
-			GLint offsetLocation = glGetUniformLocation(mat->program, "offset");
-			GLint scaleLocation = glGetUniformLocation(mat->program, "scale");
-			glUniform4f(offsetLocation, mesh->x, mesh->y, mesh->z, 0.0f);
-			glUniform4f(scaleLocation, mesh->sx, mesh->sy, mesh->sz, 1.0f);
+
+			mesh->updateMatrix();
+
+			core::Matrix4 mvp = currCamera->projMatrix * 
+								currCamera->viewMatrix * 
+								mesh->modelMatrix;
+								
+			glUniform1f(mat->prog->getUniformLocation("alpha"), mesh->alpha);
+			glUniformMatrix4fv(mat->prog->getUniformLocation("mvp"), 1, GL_FALSE, mvp.m);
+			//mesh->sortTriangles(mvp);
 
 			glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glEnableVertexAttribArray(1);
+			glBindBuffer(GL_ARRAY_BUFFER, mesh->cbo);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-			//glDrawArrays(GL_TRIANGLES, 0, 3);
 			glDrawElements(GL_TRIANGLES, mesh->indicesCount, 
 								GL_UNSIGNED_INT, (void*)0);
 				

@@ -6,6 +6,7 @@
 	#include <string>
 	#include <iostream>
 	
+	#include "../cameras/camera.hpp"
 	#include "../objects/mesh.hpp"
 
 	namespace renderer {
@@ -26,6 +27,8 @@
 							}
 						}
 					}
+					
+					currCamera = 0;
 				}
 				
 				~Renderer() {
@@ -50,24 +53,34 @@
 				void operator=(const Renderer&);
 				static Renderer *_singleton;
 				
-				std::vector<std::vector<const object::Mesh *> > render_queue;
-				std::vector<const material::Material *> mats; // all mats
+				std::vector<std::vector<object::Mesh *> > render_queue;
+				std::vector<material::Material *> mats; // all mats
 				
-				const material::Material *previousMat;
-	
+				material::Material *previousMat;
+				camera::Camera *currCamera;
+
 			public:
 				void setViewport(GLsizei w, GLsizei h) {
+					if (currCamera) {
+						currCamera->aspect = w / h;
+						currCamera->update();
+					}
+					
 					glViewport(0, 0, w, h);
 				}
 				
 				void clear() {
 					glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-					glClear(GL_COLOR_BUFFER_BIT);
+					glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+				}
+				
+				void setCamera(camera::Camera *camera) {
+					currCamera = camera;
 				}
 				
 				// add to render queue
 				// TODO: remove() and ignore multiples adds
-				void add(const object::Mesh *mesh) {
+				void add(object::Mesh *mesh) {
 					bool found = false;
 					for (unsigned int i = 0; i < mats.size(); i++) {
 						if (mats[i] == mesh->mat) {
@@ -79,7 +92,7 @@
 					
 					if (!found || mats.empty()) {
 						mats.push_back(mesh->mat);
-						std::vector<const object::Mesh *> mlist;
+						std::vector<object::Mesh *> mlist;
 						render_queue.push_back(mlist);
 						render_queue[mats.size()-1].push_back(mesh);
 					}

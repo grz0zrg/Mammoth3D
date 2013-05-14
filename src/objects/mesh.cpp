@@ -2,7 +2,8 @@
 
 int object::Mesh::createBuffers() {
 	GLenum err;
-	
+
+	glGenBuffers(1, &cbo);
 	glGenBuffers(1, &ibo);
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -12,6 +13,9 @@ int object::Mesh::createBuffers() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), 
 		&indices.front(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, cbo);
+	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), 
+		&colors.front(), GL_STATIC_DRAW);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	

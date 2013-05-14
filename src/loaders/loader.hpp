@@ -45,7 +45,7 @@
 					}
 				}
 				
-				GLuint loadProgram(const std::string &vertexShader, 
+				program::Program *loadProgram(const std::string &vertexShader, 
 									const std::string &fragmentShader) {
 					shaderloader = loader::ShaderLoader::getInstance();
 					shaderloader->compileShaderFile(GL_VERTEX_SHADER, vertexShader);

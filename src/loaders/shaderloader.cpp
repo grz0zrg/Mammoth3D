@@ -53,50 +53,50 @@ void loader::ShaderLoader::compileShaderFile(GLenum eShaderType,
 	}
 }
 
-GLuint loader::ShaderLoader::buildProgram() {
-	GLuint program = glCreateProgram();
+program::Program *loader::ShaderLoader::buildProgram() {
+	GLuint prog = glCreateProgram();
 
-	if (program == 0) {
+	if (prog == 0) {
 		log("glCreateProgram failed");
 		return 0;
 	}
 	
 	for(size_t i = 0; i < shaderList.size(); i++) {
-		glAttachShader(program, shaderList[i]);
+		glAttachShader(prog, shaderList[i]);
 		if (glGetError() == GL_INVALID_VALUE || 
 			glGetError() == GL_INVALID_OPERATION) {
 			log("glAttachShader failed");
 		}
 	}
 		
-	glLinkProgram(program);
+	glLinkProgram(prog);
 
 	GLint status;
-	glGetProgramiv(program, GL_LINK_STATUS, &status);
+	glGetProgramiv(prog, GL_LINK_STATUS, &status);
 	if (status == GL_FALSE)
 	{
 		GLint infoLogLength;
-		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
+		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &infoLogLength);
 
 		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
-		glGetProgramInfoLog(program, infoLogLength, NULL, strInfoLog);
+		glGetProgramInfoLog(prog, infoLogLength, NULL, strInfoLog);
 		log("Linker failure: ", strInfoLog);
 		delete[] strInfoLog;
 		
-		glDeleteProgram(program);
+		glDeleteProgram(prog);
 		
 		return 0;
 	}
 	
-	programList.push_back(program);
+	programList.push_back(prog);
 
 	for(size_t i = 0; i < shaderList.size(); i++) {
 		GLuint shader = shaderList[i];
-		glDetachShader(program, shader);
+		glDetachShader(prog, shader);
 		glDeleteShader(shader);
 	}
 
 	shaderList.clear();
 	
-	return program;
+	return new program::Program(prog);
 }

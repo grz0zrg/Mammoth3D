@@ -4,13 +4,16 @@
 	#include <stack>
 	#include <GL/glew.h>
 	
+	#include "../programs/program.hpp"
+	
 	namespace material {
 		typedef enum {
 			POLY_MODE,
 			CULL_MODE,
 			DEPTH_WRITE,
 			DEPTH_TEST,
-			PROGRAM
+			PROGRAM,
+			BLENDING
 		}StateChangeType;
 		
 		class Material {
@@ -18,18 +21,21 @@
 				Material() { 
 					polyMode = GL_FILL;
 					cullMode = GL_BACK;
-					depthWrite = false;
+					depthWrite = true;
 					depthTest = false;
-					program = 0;	
+					blending = false;
+					prog = 0;	
 				}
 				
 				~Material() { 
 
 				}
 				
-				void setProgram(GLuint program) {
-					if (program != 0) {
-						this->program = program;
+				void setProgram(program::Program *prog) {
+					if (prog != 0) {
+						this->prog = prog;
+						this->prog->registerUniform("alpha");
+						this->prog->registerUniform("mvp");
 					}
 				}
 				
@@ -49,6 +55,10 @@
 					this->depthTest = depthTest;
 				}
 				
+				void setBlending(bool blending) {
+					this->blending = blending;
+				}
+				
 				void update() {
 					while (!states.empty())
 						states.pop();
@@ -58,11 +68,12 @@
 					states.push(CULL_MODE);
 					states.push(DEPTH_WRITE);
 					states.push(DEPTH_TEST);
+					states.push(BLENDING);
 				}
 			
-				GLuint program;
+				program::Program *prog;
 				GLenum polyMode, cullMode;
-				bool depthWrite, depthTest;
+				bool depthWrite, depthTest, blending;
 				
 				std::stack<StateChangeType> states;
 

@@ -8,6 +8,8 @@
 	#include <sstream>
 	#include <fstream>
 	#include <algorithm>
+	
+	#include "../programs/program.hpp"
 
 	namespace loader {
 		class ShaderLoader {
@@ -44,7 +46,7 @@
 			public:
 				void compileShader(GLenum eShaderType, const std::string &strShader);
 				void compileShaderFile(GLenum eShaderType, const std::string &filename);
-				GLuint buildProgram();
+				program::Program *buildProgram();
 				
 				static ShaderLoader *getInstance()
 				{

@@ -1,6 +1,8 @@
 #ifndef VECTOR3_HPP
 #define VECTOR3_HPP
 
+	#include <cmath>
+	
 	namespace core
 	{
 		class Vector3 {
@@ -61,6 +63,10 @@
 				
 				inline float length( const Vector3& A ) const {
 					return sqrt(A.x * A.x + A.y * A.y + A.z * A.z);
+				}
+				
+				inline float length() {
+					return sqrt(x * x + y * y + z * z);
 				}
 				
 				inline float distance(const Vector3 &A, const Vector3 &B) {
