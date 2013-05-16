@@ -107,9 +107,12 @@ void renderer::Renderer::render() {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-			glEnableVertexAttribArray(1);
-			glBindBuffer(GL_ARRAY_BUFFER, mesh->cbo);
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			
+			if (mesh->vertexColors) {
+				glEnableVertexAttribArray(1);
+				glBindBuffer(GL_ARRAY_BUFFER, mesh->cbo);
+				glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			}
 
 			glDrawElements(GL_TRIANGLES, mesh->indicesCount, 
 								GL_UNSIGNED_INT, (void*)0);

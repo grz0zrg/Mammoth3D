@@ -33,6 +33,12 @@
 				}
 		};
 		
+		typedef enum {
+			INDICE_BUFFER,
+			VERTICE_BUFFER,
+			COLOR_BUFFER
+		}bufferType;
+		
 		class Mesh {
 			public:
 				Mesh(loader::MeshLoader *meshData = 0, 
@@ -40,6 +46,7 @@
 					this->mat = mat;
 					
 					matrixAutoUpdate = true;
+					vertexColors = false;
 					
 					indsType = meshData->indsType;
 					indicesCount = meshData->indicesCount;
@@ -47,20 +54,6 @@
 					vertices = meshData->vertices;
 					normals = meshData->normals;
 					texcoords = meshData->texcoords;
-					
-					colors.resize(vertices.size(), 0.0f);
-					
-					for (unsigned int i=0; i<colors.size(); i+=3) {
-						float rcolor = (float)rand()/(float)RAND_MAX;
-						float gcolor = (float)rand()/(float)RAND_MAX;
-						float bcolor = (float)rand()/(float)RAND_MAX;
-						rcolor = sin(vertices[i]);
-						gcolor = cos(vertices[i+1]);
-						bcolor = sin(vertices[i+2]);
-						colors[i] = rcolor;
-						colors[i+1] = gcolor;
-						colors[i+2] = bcolor;
-					}
 					
 					core::Matrix4 m;
 					modelMatrix = m;
@@ -71,22 +64,13 @@
 					sx = sy = sz = 1.0f;
 					rx = ry = rz = 0.0f;
 					
-					rx = core::math::deg2rad(-80);
-					/*ry = core::math::deg2rad(-90);
-					rz = core::math::deg2rad(10);*/
-					x = 0.0f;
-					y = 0.0f;
-					z = -4.0f;
-					
-					if (createBuffers() != 1) {
+					if (createIndicesBuffer() != 1 || createVerticesBuffer() != 1) {
 						indices.resize(0);
 						vertices.resize(0);
 						normals.resize(0);
 						texcoords.resize(0);
 						colors.resize(0);
 						indicesCount = 0;
-						
-						log("Mesh buffers creations failures.");
 					}
 				}
 				
@@ -129,16 +113,12 @@
 						indices.push_back(triangles[i][1]);
 						indices.push_back(triangles[i][2]);
 					}
-					//std::cout << "done " << std::endl;
 					
 					for (unsigned int i=0; i<triangles.size(); i++) {
 						delete[] triangles[i];
 					}
 
-					glGenBuffers(1, &ibo);
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-					glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), 
-						&indices.front(), GL_STATIC_DRAW);
+					createIndicesBuffer();
 				}
 				
 				void log(const char *str) {
@@ -155,6 +135,12 @@
 					this->z = z;
 				}
 				
+				void setRotation(float rx, float ry, float rz) {
+					this->rx = rx;
+					this->ry = ry;
+					this->rz = rz;
+				}
+				
 				void setScale(float sx, float sy, float sz) {
 					this->sx = sx;
 					this->sy = sy;
@@ -169,7 +155,19 @@
 					}
 				}
 				
-				int createBuffers();
+				void update(bufferType btype) {
+					if (btype == COLOR_BUFFER) {
+						if (vertexColors) {
+							createColorsBuffer();
+						} else {
+							glDeleteBuffers(1, &cbo);
+						}
+					}
+				}
+				
+				int createIndicesBuffer();
+				int createVerticesBuffer();
+				int createColorsBuffer();
 				
 				material::Material *mat;
 				
@@ -185,7 +183,7 @@
 				
 				char indsType;
 				
-				bool matrixAutoUpdate;
+				bool matrixAutoUpdate, vertexColors;
 
 				std::vector<unsigned int> indices;
 				std::vector<float> vertices;

@@ -52,12 +52,33 @@ int main(int argc, char **argv) {
 	if (monkey != 0) {
 		monkey->setMaterial(monkeyMat);
 	}
+	
+	// setup per vertex colors
+	monkey->vertexColors = true;
+	monkey->colors.resize(monkey->vertices.size(), 0.0f);
+					
+	for (unsigned int i=0; i<monkey->colors.size(); i+=3) {
+		float rcolor = (float)rand()/(float)RAND_MAX;
+		float gcolor = (float)rand()/(float)RAND_MAX;
+		float bcolor = (float)rand()/(float)RAND_MAX;
+		rcolor = sin(monkey->vertices[i]);
+		gcolor = cos(monkey->vertices[i+1]);
+		bcolor = sin(monkey->vertices[i+2]);
+		monkey->colors[i] = rcolor;
+		monkey->colors[i+1] = gcolor;
+		monkey->colors[i+2] = bcolor;
+	}
+	monkey->update(object::COLOR_BUFFER); // update color buffer
+	
 	rndr->add(monkey);
 
 	rndr->setViewport(screenWidth, screenHeight);
 	
 	camera::Camera *cam = new camera::Camera(camera::PERSPECTIVE, 75, screenWidth / screenHeight);
 	rndr->setCamera(cam);
+	
+	monkey->rx = core::math::deg2rad(-80);
+	monkey->z = -4.0f;
 	
 	do {
 		double deltaTime = screen->getDeltaTime();

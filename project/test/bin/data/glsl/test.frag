@@ -11,5 +11,5 @@ void main()
         discard;
     }*/
 	
-	outputColor = vec4(fragmentColor.x, fragmentColor.y, fragmentColor.z, fragmentAlpha);
+	outputColor = vec4(fragmentColor.r, fragmentColor.g, fragmentColor.b, fragmentAlpha);
 }
