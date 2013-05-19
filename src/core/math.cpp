@@ -9,3 +9,8 @@ float core::math::deg2rad(float deg) {
 float core::math::rad2deg(float rad) {
 	return rad * 180 / PI;
 }
+
+float core::math::clamp(float x, float a, float b)
+{
+    return x < a ? a : (x > b ? b : x);
+}

@@ -8,7 +8,8 @@
 		class Vector3 {
 			public:
 				inline Vector3() { };
-				inline Vector3(const float x, const float y = 0.0f, const float z = 0.0f) {
+				inline Vector3(const float x, const float y = 0.0f, 
+												const float z = 0.0f) {
 					this->x = x;
 					this->y = y;
 					this->z = z;
@@ -74,14 +75,20 @@
 				}
 				
 				inline void normalize() {
-					float norm = sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
-					this->x /= norm;
-					this->y /= norm;
-					this->z /= norm;
+					float norm = sqrt(this->x * this->x + this->y * 
+										this->y + this->z * this->z);
+					if (norm != 0) {
+						this->x /= norm;
+						this->y /= norm;
+						this->z /= norm;
+					} else {
+						this->x = this->y = this->z = 0.0f;
+					}
 				}
 				
 				inline float norm() {
-					return sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
+					return sqrt(this->x * this->x + this->y * this->y + 
+														this->z * this->z);
 				}
 				
 				float x, y, z;

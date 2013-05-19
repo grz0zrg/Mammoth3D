@@ -107,6 +107,8 @@
 					if(err < 0) {
 						log("ov_fopen error code: ", err);
 						delete music;
+					
+						return;
 					}
 					
 					unsigned long length = (long)ov_pcm_total(&vf, -1);

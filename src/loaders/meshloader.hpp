@@ -4,18 +4,39 @@
 	#include <fstream>
 	#include <iostream>
 	#include <vector>
+	#include <map>
 	
 	#include <GL/glew.h>
+	
+	#include "../objects/mesh.hpp"
+	#include "collada/collada.hpp"
 	
 	namespace loader {
 		class MeshLoader {
 			public:
 				MeshLoader() { 
-					indsType = sizeof(unsigned int);
-					loaded = false;
 				}
 			
 				~MeshLoader() { 
+					std::map<std::string, std::vector<object::Mesh *> >::iterator meshsIt 
+																= meshs.begin();
+					for (meshsIt; meshsIt != meshs.end(); ++meshsIt) {
+						if (!meshsIt->second.empty()) {
+							for (unsigned int i = 0; i < meshsIt->second.size(); i++) {
+								delete meshsIt->second[i];
+							}
+							meshsIt->second.clear();
+						}
+					}
+					
+					std::map<std::string, core::Geometry *>::iterator meshsGeomIt 
+															= meshsGeom.begin();
+					for (meshsGeomIt; meshsGeomIt != meshsGeom.end(); ++meshsGeomIt) {
+						if (meshsGeomIt->second) {
+							delete meshsGeomIt->second;
+						}
+						meshsGeomIt->second = 0;
+					}
 				}
 				
 				static MeshLoader *getInstance()
@@ -36,20 +57,10 @@
 					}
 				}
 
-				GLuint vbo, ibo;
-				unsigned int indicesCount;
+				object::Mesh *loadMesh(const std::string &fileName);
 				
-				void loadMesh(const std::string &fileName);
-
-				char indsType;
-				
-				std::string name;
-				std::vector<unsigned int> indices;
-				std::vector<float> vertices;
-				std::vector<float> normals;
-				std::vector<float> texcoords;
-				
-				bool loaded;
+				std::map<std::string, core::Geometry *> meshsGeom;
+				std::map<std::string, std::vector<object::Mesh *> > meshs;
 			
 			private:
 				template <typename T>

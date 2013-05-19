@@ -4,6 +4,7 @@
 	#include <string>
 	#include <map>
 
+	#include "../loaders/materialloader.hpp"
 	#include "../loaders/meshloader.hpp"
 	#include "../loaders/shaderloader.hpp"
 	#include "../objects/mesh.hpp"
@@ -12,19 +13,24 @@
 		class Loader {
 			private:
 				Loader() { 
+					shaderLoader   = loader::ShaderLoader::getInstance();
+					meshLoader     = loader::MeshLoader::getInstance();
+					materialLoader = loader::MaterialLoader::getInstance();
 				}
 				
 				~Loader() {
-					shaderloader->free();
-					meshloader->free();
+					shaderLoader->free();
+					meshLoader->free();
+					materialLoader->free();
 				}
 				
 				Loader(const Loader&);
 				void operator=(const Loader&);
 				static Loader *_singleton;
 				
-				loader::ShaderLoader *shaderloader;
-				loader::MeshLoader *meshloader;
+				loader::ShaderLoader *shaderLoader;
+				loader::MeshLoader *meshLoader;
+				loader::MaterialLoader *materialLoader;
 
 			public:
 				static Loader *getInstance()
@@ -45,22 +51,21 @@
 					}
 				}
 				
-				program::Program *loadProgram(const std::string &vertexShader, 
+				program::Program *getProgram(const std::string &vertexShader, 
 									const std::string &fragmentShader) {
-					shaderloader = loader::ShaderLoader::getInstance();
-					shaderloader->compileShaderFile(GL_VERTEX_SHADER, vertexShader);
-					shaderloader->compileShaderFile(GL_FRAGMENT_SHADER, fragmentShader);
-					return shaderloader->buildProgram();
+					shaderLoader->compileShaderFile(GL_VERTEX_SHADER, 
+																vertexShader);
+					shaderLoader->compileShaderFile(GL_FRAGMENT_SHADER, 
+																fragmentShader);
+					return shaderLoader->buildProgram();
 				}
 				
-				object::Mesh *loadMesh(const std::string &fileName) {
-					meshloader = loader::MeshLoader::getInstance();
-					meshloader->loadMesh(fileName);
-					if (meshloader->loaded) {
-						return (new object::Mesh(meshloader));
-					} else {
-						return 0;
-					}
+				object::Mesh *getMesh(const std::string &fileName) {
+					return meshLoader->loadMesh(fileName);
+				}
+				
+				material::Material *getNewMaterial() {
+					return materialLoader->createMaterial();
 				}
 		};
 	}

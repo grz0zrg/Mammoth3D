@@ -56,14 +56,17 @@
 				static Window *_singleton;
 	
 			public:
-				void openWindow(int width, int height, bool fullscreen = false, const char *title = "") {
+				void openWindow(int width, int height, bool fullscreen = false, 
+													const char *title = "") {
 					if (fail) return;
 					
 					int ret = GL_FALSE;
 					if (fullscreen) {
-						ret = glfwOpenWindow(width, height, 5, 6, 5, 0, 0, 0, GLFW_FULLSCREEN);
+						ret = glfwOpenWindow(width, height, 5, 6, 5, 24, 24, 24, 
+															GLFW_FULLSCREEN);
 					} else {
-						ret = glfwOpenWindow(width, height, 5, 6, 5, 0, 0, 0, GLFW_WINDOW);
+						ret = glfwOpenWindow(width, height, 5, 6, 5, 24, 24, 24, 
+															GLFW_WINDOW);
 					}
 					
 					if (ret != GL_TRUE) {
@@ -86,7 +89,7 @@
 				
 				void unsetVSync() {
 					glfwSwapInterval(0);
-				}	
+				}
 			
 				void swapBuffers() {
 					glfwSwapBuffers();
@@ -124,7 +127,7 @@
 				
 				void setFSAA(int level) {
 					if (glfwGetWindowParam(GLFW_OPENED)) {
-						log("FSAA cannot be applied, the window is already opened");
+						log("FSAA cannot be applied, window already opened");
 						return;
 					}
 					glfwOpenWindowHint(GLFW_FSAA_SAMPLES, level);

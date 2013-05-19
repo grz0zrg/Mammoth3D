@@ -19,16 +19,22 @@
       <File Name="../src/core/vector3.hpp"/>
       <File Name="../src/core/matrix4.hpp"/>
       <File Name="../src/core/math.cpp"/>
+      <File Name="../src/core/geometry.hpp"/>
+      <File Name="../src/core/vbo.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="loaders">
       <File Name="../src/loaders/meshloader.cpp"/>
       <File Name="../src/loaders/meshloader.hpp"/>
       <File Name="../src/loaders/shaderloader.cpp"/>
       <File Name="../src/loaders/shaderloader.hpp"/>
-      <File Name="../src/loaders/collada/collada.cpp"/>
-      <File Name="../src/loaders/collada/collada.hpp"/>
       <File Name="../src/loaders/loader.cpp"/>
       <File Name="../src/loaders/loader.hpp"/>
+      <VirtualDirectory Name="collada">
+        <File Name="../src/loaders/collada/collada.cpp"/>
+        <File Name="../src/loaders/collada/collada.hpp"/>
+      </VirtualDirectory>
+      <File Name="../src/loaders/materialloader.cpp"/>
+      <File Name="../src/loaders/materialloader.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="audio">
       <File Name="../src/audio/audio.cpp"/>

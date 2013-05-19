@@ -40,35 +40,30 @@ int main(int argc, char **argv) {
 	
 	ldr = loader::Loader::getInstance();
 	
-	program::Program *prog = ldr->loadProgram("data/glsl/test.vert", "data/glsl/test.frag");
-	monkey = ldr->loadMesh("data/Cube.mm");
-	monkeyMat = new material::Material();
+	program::Program *prog = ldr->getProgram("data/glsl/test.vert", 
+												"data/glsl/test.frag");
+
+	monkey = ldr->getMesh("data/Cube.mm");
+	monkeyMat = ldr->getNewMaterial();
 	monkeyMat->setProgram(prog);
 	//monkeyMat->setCullMode(GL_NONE);
 	monkeyMat->setDepthTest(true);
 	monkeyMat->setDepthWrite(true);
 	//monkeyMat->setBlending(true);
 	//monkeyMat->setPolyMode(GL_LINE);
+	//monkey->opacity = 0.5f;
 	if (monkey != 0) {
 		monkey->setMaterial(monkeyMat);
 	}
 	
 	// setup per vertex colors
 	monkey->vertexColors = true;
-	monkey->colors.resize(monkey->vertices.size(), 0.0f);
-					
-	for (unsigned int i=0; i<monkey->colors.size(); i+=3) {
-		float rcolor = (float)rand()/(float)RAND_MAX;
-		float gcolor = (float)rand()/(float)RAND_MAX;
-		float bcolor = (float)rand()/(float)RAND_MAX;
-		rcolor = sin(monkey->vertices[i]);
-		gcolor = cos(monkey->vertices[i+1]);
-		bcolor = sin(monkey->vertices[i+2]);
-		monkey->colors[i] = rcolor;
-		monkey->colors[i+1] = gcolor;
-		monkey->colors[i+2] = bcolor;
-	}
-	monkey->update(object::COLOR_BUFFER); // update color buffer
+	
+	// should be deleted when app end
+	core::Geometry *monkeyGeom = monkey->cloneGeometry(); 
+	monkey->setGeometry(monkeyGeom);
+	//monkeyGeom->setDynamic(core::GEOMETRY_VERTICE);
+	monkeyGeom->setDynamic(core::GEOMETRY_COLOR);
 	
 	rndr->add(monkey);
 
@@ -78,7 +73,11 @@ int main(int argc, char **argv) {
 	rndr->setCamera(cam);
 	
 	monkey->rx = core::math::deg2rad(-80);
-	monkey->z = -4.0f;
+	monkey->z = -3.5f;
+	
+	float colorChange = 0.0f;
+	float verticeChange = 0.0;
+	float colorVelocity = 1.0f;
 	
 	do {
 		double deltaTime = screen->getDeltaTime();
@@ -86,7 +85,36 @@ int main(int argc, char **argv) {
 		if (screen->isActive()) {
 			rndr->clear();
 			
-			monkey->ry += 0.1f * deltaTime;
+			colorChange += colorVelocity * deltaTime;
+			verticeChange += 1.0f * deltaTime;
+			if (colorChange >= 1.0f || colorChange <= -1.0f)
+				colorVelocity = -colorVelocity;
+				
+			monkey->ry +=colorChange/200;
+			monkey->rz +=colorChange/200;
+			monkey->z -= (-colorChange)/50;
+			
+			// change colors
+			monkeyGeom->colors.clear();
+			for (unsigned int i=0; i<monkeyGeom->vertices.size(); i+=3) {
+				float v1 = monkeyGeom->vertices[i];
+				float v2 = monkeyGeom->vertices[i+1];
+				float v3 = monkeyGeom->vertices[i+2];
+				float rcolor = sinf(v1+colorChange/2);
+				float gcolor = cosf(v2+colorChange/2);
+				float bcolor = sinf(v3+colorChange/2);
+				
+				rcolor = core::math::clamp(rcolor, 0.0, 1.0);
+				gcolor = core::math::clamp(gcolor, 0.0, 1.0);
+				bcolor = core::math::clamp(bcolor, 0.0, 1.0);
+				//monkeyGeom->vertices[i] += sinf(v1+verticeChange)/200;
+				//monkeyGeom->vertices[i+1] += cosf(monkeyGeom->vertices[i+1]+verticeChange)/200;
+				//monkeyGeom->vertices[i+2] += sinf(monkeyGeom->vertices[i+2]+verticeChange)/200;
+				
+				monkeyGeom->colors.push_back(rcolor);
+				monkeyGeom->colors.push_back(gcolor);
+				monkeyGeom->colors.push_back(bcolor);
+			}
 			
 			rndr->render();
 		} else {
@@ -96,14 +124,12 @@ int main(int argc, char **argv) {
 		screen->swapBuffers();
 	} while(screen->running());
 
-	delete prog;
+	delete monkeyGeom;
 	
 	audioManager->free();
 	ldr->free();
 	rndr->free();
 	screen->free();
-
+	
 	delete cam;
-	delete monkey;
-	delete monkeyMat;
 }

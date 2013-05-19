@@ -10,6 +10,8 @@
 			extern float deg2rad(float deg);
 			
 			extern float rad2deg(float rad);
+			
+			extern float clamp(float x, float a, float b);
 		}
 	}
 

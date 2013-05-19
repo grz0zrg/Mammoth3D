@@ -53,7 +53,9 @@ void renderer::Renderer::render() {
 						case material::DEPTH_TEST:
 							if (mat->depthTest) {
 								glEnable(GL_DEPTH_TEST);
-								glDepthFunc(GL_LESS);//GL_LEQUAL
+								glDepthMask(GL_TRUE);
+								glDepthFunc(GL_LEQUAL);
+								glDepthRange(0.0f, 1.0f);
 							} else {
 								if (mat->depthWrite) {
 									glEnable(GL_DEPTH_TEST);
@@ -99,25 +101,35 @@ void renderer::Renderer::render() {
 								currCamera->viewMatrix * 
 								mesh->modelMatrix;
 								
-			glUniform1f(mat->prog->getUniformLocation("alpha"), mesh->alpha);
-			glUniformMatrix4fv(mat->prog->getUniformLocation("mvp"), 1, GL_FALSE, mvp.m);
+			glUniform1f(mat->prog->getUniformLocation("alpha"), mesh->opacity);
+			glUniformMatrix4fv(mat->prog->getUniformLocation("mvp"), 1, 
+															GL_FALSE, mvp.m);
 			//mesh->sortTriangles(mvp);
-
-			glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
+			if (mesh->geom->vbo->verticeBufferUsage == GL_DYNAMIC_DRAW) {
+				mesh->geom->updateVertices();
+			}
+			
+			glBindBuffer(GL_ARRAY_BUFFER, mesh->geom->vbo->verticeBufferId);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 
+											mesh->geom->vbo->indiceBufferId);
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			
 			if (mesh->vertexColors) {
+				if (mesh->geom->vbo->colorBufferUsage == GL_DYNAMIC_DRAW) {
+					mesh->geom->updateColors();
+				}
+
 				glEnableVertexAttribArray(1);
-				glBindBuffer(GL_ARRAY_BUFFER, mesh->cbo);
+				glBindBuffer(GL_ARRAY_BUFFER, mesh->geom->vbo->colorBufferId);
 				glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			}
 
-			glDrawElements(GL_TRIANGLES, mesh->indicesCount, 
+			glDrawElements(GL_TRIANGLES, mesh->geom->indicesCount, 
 								GL_UNSIGNED_INT, (void*)0);
 				
-			glDisableVertexAttribArray(0);
+			//glDisableVertexAttribArray(0);
+			//glDisableVertexAttribArray(1);
 			
 			previousMat = mat;
 		}

@@ -17,8 +17,14 @@
 				ShaderLoader() { };
 			
 				~ShaderLoader() {
-					std::for_each(programList.begin(), programList.end(), glDeleteProgram);
-					std::for_each(shaderList.begin(), shaderList.end(), glDeleteShader);
+					std::for_each(programList.begin(), programList.end(), 
+															glDeleteProgram);
+					std::for_each(shaderList.begin(), shaderList.end(), 
+															glDeleteShader);
+					
+					for (unsigned int i = 0; i < programs.size(); i++) {
+						delete programs[i];
+					}				
 				};
 			
 				template <typename T>
@@ -42,10 +48,13 @@
 				
 				std::vector<GLuint> shaderList;
 				std::vector<GLuint> programList;
+				std::vector<program::Program *> programs;
 			
 			public:
-				void compileShader(GLenum eShaderType, const std::string &strShader);
-				void compileShaderFile(GLenum eShaderType, const std::string &filename);
+				void compileShader(GLenum eShaderType, 
+												const std::string &strShader);
+				void compileShaderFile(GLenum eShaderType, 
+												const std::string &filename);
 				program::Program *buildProgram();
 				
 				static ShaderLoader *getInstance()

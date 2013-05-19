@@ -1,13 +1,14 @@
 #ifndef MESH_OBJECT_HPP
 #define MESH_OBJECT_HPP
 
-	#include <cstdlib>
+	#include <iostream>
 	#include <algorithm>
-	
-	#include "../loaders/meshloader.hpp"
-	#include "../materials/material.hpp"
+
 	#include "../core/math.hpp"
 	#include "../core/matrix4.hpp"
+	#include "../core/geometry.hpp"
+	#include "../core/vbo.hpp"
+	#include "../materials/material.hpp"
 
 	namespace object {
 		class Sorting {
@@ -33,71 +34,44 @@
 				}
 		};
 		
-		typedef enum {
-			INDICE_BUFFER,
-			VERTICE_BUFFER,
-			COLOR_BUFFER
-		}bufferType;
-		
 		class Mesh {
 			public:
-				Mesh(loader::MeshLoader *meshData = 0, 
-					 material::Material *mat = 0) { 
-					this->mat = mat;
+				Mesh() { 
+					geom = 0;
+					mat = 0;
 					
 					matrixAutoUpdate = true;
 					vertexColors = false;
 					
-					indsType = meshData->indsType;
-					indicesCount = meshData->indicesCount;
-					indices = meshData->indices;
-					vertices = meshData->vertices;
-					normals = meshData->normals;
-					texcoords = meshData->texcoords;
-					
 					core::Matrix4 m;
 					modelMatrix = m;
 					
-					alpha = 1.0f;
+					opacity = 1.0f;
 					
 					x = y = z = 0.0f;
 					sx = sy = sz = 1.0f;
 					rx = ry = rz = 0.0f;
-					
-					if (createIndicesBuffer() != 1 || createVerticesBuffer() != 1) {
-						indices.resize(0);
-						vertices.resize(0);
-						normals.resize(0);
-						texcoords.resize(0);
-						colors.resize(0);
-						indicesCount = 0;
-					}
 				}
 				
 				~Mesh() { 
-					glDeleteBuffers(1, &ibo);
-					glDeleteBuffers(1, &vbo);
-					glDeleteBuffers(1, &cbo);
 				}
 				
 				void sortTriangles(core::Matrix4 matrix) {
-					glDeleteBuffers(1, &ibo);
+					//glDeleteBuffers(1, &ibo);
 					
-					verticesTransformed = vertices;
-					for (unsigned int i=0; i<indices.size(); i++) {
-						float x = verticesTransformed[indices[i]], y = verticesTransformed[indices[i]+1], z = verticesTransformed[indices[i]+2];
+					std::vector<float> verticesTransformed = geom->vertices;
+					for (unsigned int i=0; i<geom->indices.size(); i++) {
+						float x = verticesTransformed[geom->indices[i]], y = verticesTransformed[geom->indices[i]+1], z = verticesTransformed[geom->indices[i]+2];
 
-						//verticesTransformed[indices[i]+2]   = matrix.m[0] * x + matrix.m[4] * y + matrix.m[8 ] * z + matrix.m[12];
-						//verticesTransformed[i+1] = matrix.m[1] * x + matrix.m[5] * y + matrix.m[9 ] * z + matrix.m[13];
-						verticesTransformed[indices[i]+2] = matrix.m[2] * x + matrix.m[6] * y + matrix.m[10] * z + matrix.m[14];
+						verticesTransformed[geom->indices[i]+2] = matrix.m[2] * x + matrix.m[6] * y + matrix.m[10] * z + matrix.m[14];
 					}
 					
 					std::vector<unsigned int *> triangles;
-					for (unsigned int i=0; i<indices.size(); i+=3) {
+					for (unsigned int i=0; i<geom->indices.size(); i+=3) {
 						unsigned int *tri = new unsigned int[3];
-						tri[0] = indices[i];
-						tri[1] = indices[i+1];
-						tri[2] = indices[i+2];
+						tri[0] = geom->indices[i];
+						tri[1] = geom->indices[i+1];
+						tri[2] = geom->indices[i+2];
 						triangles.push_back(tri);
 					}
 					
@@ -106,19 +80,19 @@
 					
 					std::sort(triangles.begin(), triangles.end(), sort);
 					
-					indices.clear();
+					geom->indices.clear();
 					
 					for (unsigned int i=0; i<triangles.size(); i++) {
-						indices.push_back(triangles[i][0]);
-						indices.push_back(triangles[i][1]);
-						indices.push_back(triangles[i][2]);
+						geom->indices.push_back(triangles[i][0]);
+						geom->indices.push_back(triangles[i][1]);
+						geom->indices.push_back(triangles[i][2]);
 					}
 					
 					for (unsigned int i=0; i<triangles.size(); i++) {
 						delete[] triangles[i];
 					}
 
-					createIndicesBuffer();
+					//createIndicesBuffer();
 				}
 				
 				void log(const char *str) {
@@ -155,42 +129,30 @@
 					}
 				}
 				
-				void update(bufferType btype) {
-					if (btype == COLOR_BUFFER) {
-						if (vertexColors) {
-							createColorsBuffer();
-						} else {
-							glDeleteBuffers(1, &cbo);
-						}
-					}
+				void setGeometry(core::Geometry *geom) {
+					this->geom = geom;
 				}
 				
-				int createIndicesBuffer();
-				int createVerticesBuffer();
-				int createColorsBuffer();
+				core::Geometry *cloneGeometry() {
+					if (geom) {
+						return geom->clone();
+					}
+					
+					return 0;
+				}
 				
 				material::Material *mat;
 				
 				core::Matrix4 modelMatrix;
-				
-				GLuint vbo, cbo, ibo;
-				unsigned int indicesCount;
-				
+
 				float x, y, z;
 				float sx, sy, sz;
 				float rx, ry, rz;
-				float alpha;
-				
-				char indsType;
-				
-				bool matrixAutoUpdate, vertexColors;
+				float opacity;
 
-				std::vector<unsigned int> indices;
-				std::vector<float> vertices;
-				std::vector<float> verticesTransformed;
-				std::vector<float> normals;
-				std::vector<float> texcoords;
-				std::vector<float> colors;
+				bool matrixAutoUpdate, vertexColors;
+				
+				core::Geometry *geom;
 		};
 	}
 	

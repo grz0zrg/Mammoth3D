@@ -98,5 +98,8 @@ program::Program *loader::ShaderLoader::buildProgram() {
 
 	shaderList.clear();
 	
-	return new program::Program(prog);
+	program::Program *p = new program::Program(prog);
+	programs.push_back(p);
+	
+	return p;
 }
