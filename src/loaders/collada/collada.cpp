@@ -539,7 +539,7 @@ void loader::Collada::parseMeshData(const std::string &str,
 								vPerFaces = 2; // hacky <lines> support
 							}
 							
-							// parse data, maximum ugliness begin here :)
+							// parse data, maximum ugliness start here :)
 							if(expectedSize == realSize) {
 								data->mesh[str]->vertices = floatArrays[inputSemantic["POSITION"]->source];
 								
@@ -550,34 +550,116 @@ void loader::Collada::parseMeshData(const std::string &str,
 								if(inputSemantic["TEXCOORD"]) {
 									tOffset = inputSemantic["TEXCOORD"]->offset;
 									texcoordSource = inputSemantic["TEXCOORD"]->source;
-									//data->mesh[str]->texcoord = floatArrays[inputSemantic["TEXCOORD"]->source];
+									data->mesh[str]->texcoord = floatArrays[inputSemantic["TEXCOORD"]->source];
 								}
 								std::string normalSource;
 								if(inputSemantic["NORMAL"]) {
 									nOffset = inputSemantic["NORMAL"]->offset;
 									normalSource = inputSemantic["NORMAL"]->source;
-									//data->mesh[str]->normals = floatArrays[inputSemantic["NORMAL"]->source];
-									data->mesh[str]->vertices.reserve(floatArrays[normalSource].size());
+									data->mesh[str]->normals = floatArrays[inputSemantic["NORMAL"]->source];
+									/*data->mesh[str]->vertices.reserve(floatArrays[normalSource].size());
 									if(inputSemantic["TEXCOORD"]) {
 										data->mesh[str]->texcoord.resize(floatArrays[normalSource].size(), 0.0f);
 									}
 									data->mesh[str]->normals.resize(floatArrays[normalSource].size(), 0.0f);
-									data->mesh[str]->vertices.resize(floatArrays[normalSource].size(), 0.0f);
+									data->mesh[str]->vertices.resize(floatArrays[normalSource].size(), 0.0f);*/
 								}
 	
 								unsigned long int face[9] = {0,0,0,
 															 0,0,0,
 															 0,0,0};
 															 
-								unsigned long int face_tmp[3] = {0,0,0};
+								//unsigned long int face_tmp[3] = {0,0,0};
 								
-								unsigned int verticesCount = data->mesh[str]->vertices.size()/vPerFaces;
+								std::vector<float> vertices;
+								std::vector<float> normals;
+								std::vector<float> texcoord;
+								std::vector<unsigned int> indices;
+					
+								//unsigned int verticesCount = data->mesh[str]->vertices.size()/vPerFaces;
 								for(unsigned int i=0; i<realSize; i+=(semanticCount*vPerFaces)) {
 									// indices
 									face[0] = polysArrays[str][i+vOffset];
 									face[1] = polysArrays[str][i+semanticCount+vOffset];
 									face[2] = polysArrays[str][i+semanticCount*2+vOffset];
 									
+									if (inputSemantic["NORMAL"]) {
+										face[3] = polysArrays[str][i+nOffset];
+										face[4] = polysArrays[str][i+semanticCount+nOffset];
+										face[5] = polysArrays[str][i+semanticCount*2+nOffset];
+									}
+									
+									if (inputSemantic["TEXCOORD"]) {
+										face[6] = polysArrays[str][i+tOffset];
+										face[7] = polysArrays[str][i+semanticCount+tOffset];
+										face[8] = polysArrays[str][i+semanticCount*2+tOffset];
+									}
+									
+									for (unsigned int e=0; e<vPerFaces; e++) {
+										int indicesSize = indices.size();
+										int indv = -1;
+										int indn = -1;
+										int indt = -1;
+										for (int j=0; j<indicesSize; j++) {
+											if (vertices.size() > (indices[j]*vPerFaces+1)) {
+												if (vertices[indices[j]*vPerFaces] == data->mesh[str]->vertices[face[e]*vPerFaces] &&
+													vertices[indices[j]*vPerFaces+1] == data->mesh[str]->vertices[face[e]*vPerFaces+1] &&
+													vertices[indices[j]*vPerFaces+2] == data->mesh[str]->vertices[face[e]*vPerFaces+2]) {
+													indv = j;
+								
+													if (inputSemantic["NORMAL"]) {
+														if (normals.size() > (indices[j]*vPerFaces+1)) {
+															if (normals[indices[j]*vPerFaces] == data->mesh[str]->normals[face[e+3]*vPerFaces] &&
+																normals[indices[j]*vPerFaces+1] == data->mesh[str]->normals[face[e+3]*vPerFaces+1] &&
+																normals[indices[j]*vPerFaces+2] == data->mesh[str]->normals[face[e+3]*vPerFaces+2]) {
+																indn = j;
+															} else {
+																indn = -1;
+															}
+														}
+													} else {
+														indn = 0;
+													}
+													
+													if (inputSemantic["TEXCOORD"]) {
+														if (texcoord.size() > (indices[j]*vPerFaces)) {
+															if (texcoord[indices[j]*vPerFaces] == data->mesh[str]->texcoord[face[e+6]*vPerFaces] &&
+																texcoord[indices[j]*vPerFaces+1] == data->mesh[str]->texcoord[face[e+6]*vPerFaces+1]) {
+																indt = j;
+															} else {
+																indt = -1;
+															}
+														}
+													} else {
+														indt = 0;
+													}
+												}
+												
+												if (indv != -1 && indn != -1 && indt != -1) break; else indv = -1;
+											}
+										}
+										
+										if (indv == -1 || indn == -1 || indt == -1) {
+											vertices.push_back(data->mesh[str]->vertices[face[e]*vPerFaces]);
+											vertices.push_back(data->mesh[str]->vertices[face[e]*vPerFaces+1]);
+											vertices.push_back(data->mesh[str]->vertices[face[e]*vPerFaces+2]);
+											
+											if (inputSemantic["NORMAL"]) {
+												normals.push_back(data->mesh[str]->normals[face[e]*vPerFaces]);
+												normals.push_back(data->mesh[str]->normals[face[e]*vPerFaces+1]);
+												normals.push_back(data->mesh[str]->normals[face[e]*vPerFaces+2]);
+											}
+											if (inputSemantic["TEXCOORD"]) {
+												texcoord.push_back(data->mesh[str]->texcoord[face[e]*vPerFaces]);
+												texcoord.push_back(data->mesh[str]->texcoord[face[e]*vPerFaces+1]);
+											}
+											indices.push_back((vertices.size()/vPerFaces)-1);
+										} else {
+											indices.push_back(indices[indv]);
+										}
+									}
+									
+									/*
 									face_tmp[0] = face[0];
 									face_tmp[1] = face[1];
 									face_tmp[2] = face[2];
@@ -613,8 +695,13 @@ void loader::Collada::parseMeshData(const std::string &str,
 									
 									for (unsigned int e=0; e<vPerFaces; e++) {
 										data->mesh[str]->indices.push_back(face_tmp[e]);
-									}
+									}*/
 								}
+								
+								data->mesh[str]->normals = normals;
+								data->mesh[str]->vertices = vertices;
+								data->mesh[str]->texcoord = texcoord;
+								data->mesh[str]->indices = indices;
 							} else {
 								log(str, " polylist <p> count does not match expected size, mesh ignored");
 							}

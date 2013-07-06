@@ -4,10 +4,13 @@
 	#include <iostream>
 	#include <algorithm>
 
+	#include "../include/glm/glm.hpp"
+	#include "../include/glm/gtc/matrix_transform.hpp"
+	
 	#include "../core/math.hpp"
-	#include "../core/matrix4.hpp"
 	#include "../core/geometry.hpp"
 	#include "../core/vbo.hpp"
+	#include "../core/texture.hpp"
 	#include "../materials/material.hpp"
 
 	namespace object {
@@ -43,8 +46,7 @@
 					matrixAutoUpdate = true;
 					vertexColors = false;
 					
-					core::Matrix4 m;
-					modelMatrix = m;
+					modelMatrix = glm::mat4(1.0f);
 					
 					opacity = 1.0f;
 					
@@ -56,14 +58,14 @@
 				~Mesh() { 
 				}
 				
-				void sortTriangles(core::Matrix4 matrix) {
+				void sortTriangles(glm::mat4 matrix) {
 					//glDeleteBuffers(1, &ibo);
 					
 					std::vector<float> verticesTransformed = geom->vertices;
 					for (unsigned int i=0; i<geom->indices.size(); i++) {
 						float x = verticesTransformed[geom->indices[i]], y = verticesTransformed[geom->indices[i]+1], z = verticesTransformed[geom->indices[i]+2];
 
-						verticesTransformed[geom->indices[i]+2] = matrix.m[2] * x + matrix.m[6] * y + matrix.m[10] * z + matrix.m[14];
+						//verticesTransformed[geom->indices[i]+2] = matrix.m[2] * x + matrix.m[6] * y + matrix.m[10] * z + matrix.m[14];
 					}
 					
 					std::vector<unsigned int *> triangles;
@@ -123,9 +125,12 @@
 				
 				inline void updateMatrix() {
 					if (matrixAutoUpdate == true) {
-						modelMatrix.makeRotationFromEuler(rx, ry, rz);
-						modelMatrix.scale(sx, sy, sz);
-						modelMatrix.setPosition(x, y, z);
+						glm::mat4 identity = glm::mat4(1.0f);
+						modelMatrix = glm::scale(identity, glm::vec3(sx, sy, sz));
+						modelMatrix *= glm::translate(identity, glm::vec3(x, y, z));
+						modelMatrix *= glm::rotate(identity, rx, glm::vec3(1, 0, 0));
+						modelMatrix *= glm::rotate(identity, ry, glm::vec3(0, 1, 0));
+						modelMatrix *= glm::rotate(identity, rz, glm::vec3(0, 0, 1));
 					}
 				}
 				
@@ -141,9 +146,11 @@
 					return 0;
 				}
 				
+				core::Geometry *geom;
+
 				material::Material *mat;
-				
-				core::Matrix4 modelMatrix;
+		
+				glm::mat4 modelMatrix;
 
 				float x, y, z;
 				float sx, sy, sz;
@@ -151,8 +158,6 @@
 				float opacity;
 
 				bool matrixAutoUpdate, vertexColors;
-				
-				core::Geometry *geom;
 		};
 	}
 	

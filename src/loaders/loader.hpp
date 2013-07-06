@@ -7,6 +7,8 @@
 	#include "../loaders/materialloader.hpp"
 	#include "../loaders/meshloader.hpp"
 	#include "../loaders/shaderloader.hpp"
+	#include "../loaders/imageloader.hpp"
+	#include "../loaders/textureloader.hpp"
 	#include "../objects/mesh.hpp"
 
 	namespace loader {
@@ -16,12 +18,16 @@
 					shaderLoader   = loader::ShaderLoader::getInstance();
 					meshLoader     = loader::MeshLoader::getInstance();
 					materialLoader = loader::MaterialLoader::getInstance();
+					imageLoader = loader::ImageLoader::getInstance();
+					textureLoader = loader::TextureLoader::getInstance();
 				}
 				
 				~Loader() {
 					shaderLoader->free();
 					meshLoader->free();
 					materialLoader->free();
+					imageLoader->free();
+					textureLoader->free();
 				}
 				
 				Loader(const Loader&);
@@ -31,6 +37,8 @@
 				loader::ShaderLoader *shaderLoader;
 				loader::MeshLoader *meshLoader;
 				loader::MaterialLoader *materialLoader;
+				loader::ImageLoader *imageLoader;
+				loader::TextureLoader *textureLoader;
 
 			public:
 				static Loader *getInstance()
@@ -66,6 +74,10 @@
 				
 				material::Material *getNewMaterial() {
 					return materialLoader->createMaterial();
+				}
+				
+				core::Texture *createTexture(const std::string &fileName) {
+					return textureLoader->loadTexture(imageLoader->loadImage(fileName));
 				}
 		};
 	}

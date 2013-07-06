@@ -12,15 +12,16 @@
       <File Name="../lib/tinyxml2/tinyxml2.cpp"/>
       <File Name="../lib/tinyxml2/tinyxml2.h"/>
       <File Name="../lib/glew/glew.c"/>
+      <File Name="../lib/lodepng/lodepng.cpp"/>
+      <File Name="../lib/lodepng/lodepng.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="core">
       <File Name="../src/core/math.hpp"/>
-      <File Name="../src/core/vector2.hpp"/>
-      <File Name="../src/core/vector3.hpp"/>
-      <File Name="../src/core/matrix4.hpp"/>
       <File Name="../src/core/math.cpp"/>
       <File Name="../src/core/geometry.hpp"/>
       <File Name="../src/core/vbo.hpp"/>
+      <File Name="../src/core/image.hpp"/>
+      <File Name="../src/core/texture.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="loaders">
       <File Name="../src/loaders/meshloader.cpp"/>
@@ -35,6 +36,10 @@
       </VirtualDirectory>
       <File Name="../src/loaders/materialloader.cpp"/>
       <File Name="../src/loaders/materialloader.hpp"/>
+      <File Name="../src/loaders/textureloader.cpp"/>
+      <File Name="../src/loaders/textureloader.hpp"/>
+      <File Name="../src/loaders/imageloader.cpp"/>
+      <File Name="../src/loaders/imageloader.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="audio">
       <File Name="../src/audio/audio.cpp"/>

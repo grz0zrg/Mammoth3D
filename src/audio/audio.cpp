@@ -1,5 +1,5 @@
 #include "audio.hpp"
-
+#include <cmath>
 audio::Audio *audio::Audio::_singleton = 0;
 
 int audio::Audio::paCallback( const void *inputBuffer, void *outputBuffer,

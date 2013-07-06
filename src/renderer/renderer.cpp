@@ -97,13 +97,13 @@ void renderer::Renderer::render() {
 
 			mesh->updateMatrix();
 
-			core::Matrix4 mvp = currCamera->projMatrix * 
-								currCamera->viewMatrix * 
-								mesh->modelMatrix;
+			glm::mat4 mvp = currCamera->projMatrix * 
+							currCamera->viewMatrix * 
+							mesh->modelMatrix;
 								
 			glUniform1f(mat->prog->getUniformLocation("alpha"), mesh->opacity);
 			glUniformMatrix4fv(mat->prog->getUniformLocation("mvp"), 1, 
-															GL_FALSE, mvp.m);
+												GL_FALSE, glm::value_ptr(mvp));
 			//mesh->sortTriangles(mvp);
 			if (mesh->geom->vbo->verticeBufferUsage == GL_DYNAMIC_DRAW) {
 				mesh->geom->updateVertices();
@@ -114,15 +114,27 @@ void renderer::Renderer::render() {
 											mesh->geom->vbo->indiceBufferId);
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+			if (mat->texture) {
+				if (mesh->geom->vbo->uvBufferId) {
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_2D,mat->texture->id);
+					glUniform1i(glGetUniformLocation(mat->prog->prog, 
+													"myTextureSampler"), 0);
+					glBindBuffer(GL_ARRAY_BUFFER, mesh->geom->vbo->uvBufferId);
+					glEnableVertexAttribArray(1);
+					glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+				}
+			}
 			
 			if (mesh->vertexColors) {
 				if (mesh->geom->vbo->colorBufferUsage == GL_DYNAMIC_DRAW) {
 					mesh->geom->updateColors();
 				}
 
-				glEnableVertexAttribArray(1);
+				glEnableVertexAttribArray(2);
 				glBindBuffer(GL_ARRAY_BUFFER, mesh->geom->vbo->colorBufferId);
-				glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+				glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			}
 
 			glDrawElements(GL_TRIANGLES, mesh->geom->indicesCount, 

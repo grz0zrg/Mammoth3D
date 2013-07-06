@@ -13,7 +13,7 @@
 					fail = false;
 
 					if (glfwInit() != GL_TRUE) {
-						log("glfwInit() failed.");
+						log("glfwInit() failed");
 						fail = true;
 					}
 					
@@ -70,7 +70,7 @@
 					}
 					
 					if (ret != GL_TRUE) {
-						log("glfwOpenWindow(...) failed.");
+						log("glfwOpenWindow(...) failed");
 						fail = true;
 						return;
 					}
@@ -79,8 +79,6 @@
 					windowHeight = height;
 
 					glfwSetWindowTitle(title);
-					
-					log("Created.");
 				}
 				
 				void setVSync() {

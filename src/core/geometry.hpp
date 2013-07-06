@@ -53,6 +53,8 @@
 								sizeof(unsigned int), &indices.front());
 					vbo->buildVerticeBuffer(vertices.size() * 
 								sizeof(float), &vertices.front());
+					vbo->buildUvBuffer(uvs.size() * 
+								sizeof(float), &uvs.front());
 					if (!colors.empty()) {
 						vbo->buildColorBuffer(colors.size() * 
 									sizeof(float), &colors.front());

@@ -43,14 +43,17 @@ int main(int argc, char **argv) {
 	program::Program *prog = ldr->getProgram("data/glsl/test.vert", 
 												"data/glsl/test.frag");
 
+	core::Texture *texture = ldr->createTexture("test_texture.png");
+	
 	monkey = ldr->getMesh("data/Cube.mm");
 	monkeyMat = ldr->getNewMaterial();
 	monkeyMat->setProgram(prog);
 	//monkeyMat->setCullMode(GL_NONE);
 	monkeyMat->setDepthTest(true);
 	monkeyMat->setDepthWrite(true);
-	//monkeyMat->setBlending(true);
+	monkeyMat->setBlending(true);
 	//monkeyMat->setPolyMode(GL_LINE);
+	monkeyMat->setTexture(texture);
 	//monkey->opacity = 0.5f;
 	if (monkey != 0) {
 		monkey->setMaterial(monkeyMat);
@@ -72,7 +75,7 @@ int main(int argc, char **argv) {
 	camera::Camera *cam = new camera::Camera(camera::PERSPECTIVE, 75, screenWidth / screenHeight);
 	rndr->setCamera(cam);
 	
-	monkey->rx = core::math::deg2rad(-80);
+	//monkey->rx = core::math::deg2rad(-80);
 	monkey->z = -3.5f;
 	
 	float colorChange = 0.0f;
@@ -89,11 +92,13 @@ int main(int argc, char **argv) {
 			verticeChange += 1.0f * deltaTime;
 			if (colorChange >= 1.0f || colorChange <= -1.0f)
 				colorVelocity = -colorVelocity;
-				
-			monkey->ry +=colorChange/200;
+			
+			monkey->rx +=1.4f* deltaTime;	
+			monkey->ry +=2.4f* deltaTime;	
+			/*monkey->ry +=colorChange/200;
 			monkey->rz +=colorChange/200;
 			monkey->z -= (-colorChange)/50;
-			
+			*/
 			// change colors
 			monkeyGeom->colors.clear();
 			for (unsigned int i=0; i<monkeyGeom->vertices.size(); i+=3) {

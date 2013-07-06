@@ -20,7 +20,6 @@
 					music_stream = 0;
 					
 					log("", Pa_GetVersionText());
-					log("Initialized");
 				};
 				
 				~Audio() {
@@ -29,8 +28,6 @@
 						paErr = Pa_Terminate();
 						logPaError();
 					}
-					
-					log("Terminated");
 				};
 				
 				void logPaError() {
@@ -93,7 +90,7 @@
 					music = new musicData;
 					if(!music) {
 						music = 0;
-						log("Music alloc error.");
+						log("alloc error");
 						return;
 					}
 					music->left = music->right = 0;
@@ -116,7 +113,7 @@
 					music->right = new float[length];
 					music->frames = length;
 					if( !music->left || !music->right ) {
-						log("Music alloc error.");
+						log("alloc error");
 						ov_clear( &vf );
 						freeMusic();
 						
@@ -139,7 +136,7 @@
 								music->right[frame + offset] =samples[1][frame];
 								total_in += 2;
 								if(frame + offset > length) {
-									log("Error reading music data: (offset + frame) = ", (offset + frame));
+									log("error reading music data: (offset + frame) = ", (offset + frame));
 									ov_clear( &vf );
 									freeMusic();
 									
@@ -197,8 +194,6 @@
 						}
 						delete music;
 						music = 0;
-						
-						log("Music freed");
 					}
 				}
 				

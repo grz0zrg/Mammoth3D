@@ -12,6 +12,8 @@
 			extern float rad2deg(float rad);
 			
 			extern float clamp(float x, float a, float b);
+			
+			extern bool isPowerOfTwo(int x);
 		}
 	}
 

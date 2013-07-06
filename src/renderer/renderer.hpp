@@ -65,7 +65,7 @@
 				void setViewport(GLsizei w, GLsizei h) {
 					if (currCamera) {
 						currCamera->aspect = w / h;
-						currCamera->update();
+						currCamera->buildProjection();
 					}
 					
 					glViewport(0, 0, w, h);

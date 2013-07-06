@@ -14,3 +14,7 @@ float core::math::clamp(float x, float a, float b)
 {
     return x < a ? a : (x > b ? b : x);
 }
+
+bool core::math::isPowerOfTwo(int x) {
+	return (!(x & (x - 1)) && x);
+}

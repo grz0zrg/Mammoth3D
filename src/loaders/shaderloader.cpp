@@ -93,7 +93,7 @@ program::Program *loader::ShaderLoader::buildProgram() {
 	for(size_t i = 0; i < shaderList.size(); i++) {
 		GLuint shader = shaderList[i];
 		glDetachShader(prog, shader);
-		glDeleteShader(shader);
+		//glDeleteShader(shader);
 	}
 
 	shaderList.clear();

@@ -1,8 +1,10 @@
 #ifndef MAMMOTH3D_HPP
 #define MAMMOTH3D_HPP
 
+	#include "../include/glm/glm.hpp"
+
 	#include "core/math.hpp"
-	#include "core/vector3.hpp"
+	#include "core/texture.hpp"
 	#include "renderer/renderer.hpp"
 	#include "window/window.hpp"
 	#include "audio/audio.hpp"

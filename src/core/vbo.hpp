@@ -9,13 +9,14 @@
 				Vbo() {
 					verticeBufferUsage = colorBufferUsage = GL_STATIC_DRAW;
 					
-					indiceBufferId = verticeBufferId = colorBufferId = 0;
+					indiceBufferId = verticeBufferId = colorBufferId = uvBufferId = 0;
 				}
 				
 				~Vbo() {
 					glDeleteBuffers(1, &indiceBufferId);
 					glDeleteBuffers(1, &verticeBufferId);
 					glDeleteBuffers(1, &colorBufferId);
+					glDeleteBuffers(1, &uvBufferId);
 				}
 				
 				bool buildBuffer(GLuint *bufferId, GLsizeiptr size, 
@@ -53,6 +54,16 @@
 					if (!buildBuffer(&verticeBufferId, size, data, 
 										GL_ARRAY_BUFFER, verticeBufferUsage)) {
 						log("Vertice buffer creation failed.");
+						return false;
+					}
+					
+					return true;
+				}
+				
+				bool buildUvBuffer(GLsizeiptr size, const GLvoid *data) {
+					if (!buildBuffer(&uvBufferId, size, data, 
+										GL_ARRAY_BUFFER)) {
+						log("UV buffer creation failed.");
 						return false;
 					}
 					
@@ -99,7 +110,7 @@
 					std::cout << "[Vbo] " << str << std::endl;
 				}
 				
-				GLuint indiceBufferId, verticeBufferId, colorBufferId;
+				GLuint indiceBufferId, verticeBufferId, colorBufferId, uvBufferId;
 				GLenum verticeBufferUsage, colorBufferUsage;
 		};
 	}

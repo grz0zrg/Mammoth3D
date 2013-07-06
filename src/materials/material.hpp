@@ -5,7 +5,8 @@
 	#include <GL/glew.h>
 	
 	#include "../programs/program.hpp"
-	
+	#include "../core/texture.hpp"
+
 	namespace material {
 		typedef enum {
 			POLY_MODE,
@@ -25,6 +26,7 @@
 					depthTest = false;
 					blending = false;
 					prog = 0;	
+					texture = 0;
 				}
 				
 				~Material() { 
@@ -59,6 +61,10 @@
 					this->blending = blending;
 				}
 				
+				void setTexture(core::Texture *texture) {
+					this->texture = texture;
+				}
+				
 				void update() {
 					while (!states.empty())
 						states.pop();
@@ -74,6 +80,8 @@
 				program::Program *prog;
 				GLenum polyMode, cullMode;
 				bool depthWrite, depthTest, blending;
+				
+				core::Texture *texture;
 				
 				std::stack<StateChangeType> states;
 
