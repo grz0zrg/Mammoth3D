@@ -31,8 +31,8 @@
       <File Name="../src/loaders/loader.cpp"/>
       <File Name="../src/loaders/loader.hpp"/>
       <VirtualDirectory Name="collada">
-        <File Name="../src/loaders/collada/collada.cpp"/>
-        <File Name="../src/loaders/collada/collada.hpp"/>
+        <File Name="../src/loaders/collada/collada.cpp" Flags="1"/>
+        <File Name="../src/loaders/collada/collada.hpp" Flags="1"/>
       </VirtualDirectory>
       <File Name="../src/loaders/materialloader.cpp"/>
       <File Name="../src/loaders/materialloader.hpp"/>

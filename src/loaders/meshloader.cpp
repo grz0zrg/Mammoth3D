@@ -20,7 +20,7 @@ object::Mesh *loader::MeshLoader::loadMesh(const std::string &fileName) {
 	//size_t dae = fileName.rfind(".dae");
 	
 	size_t lastSlash = fileName.rfind("/");
-	std::string name;
+	std::string name, folder = fileName.substr(0, lastSlash+1);
 	if (lastSlash != std::string::npos) {
 		name = fileName.substr(lastSlash+1, fileName.length());
 	} else { name = fileName; }
@@ -36,6 +36,7 @@ object::Mesh *loader::MeshLoader::loadMesh(const std::string &fileName) {
 		file.open(fileName.c_str(), std::ios::in|std::ios::binary);
 		try {
 			if (file.is_open()) {
+				logPretty("loading: ", name);
 				
 				meshGeom = new core::Geometry();
 				
@@ -83,18 +84,43 @@ object::Mesh *loader::MeshLoader::loadMesh(const std::string &fileName) {
 					file.read((char*)&uv, sizeof(uv));
 					meshGeom->uvs.push_back(uv);
 				}
-		
-				file.close();
 				
 				meshGeom->generateVbo();
 								
 				mesh = new object::Mesh();
 				mesh->setGeometry(meshGeom);
+				
+				// material
+				unsigned int diffuse_length = 0;
+				file.read((char*)&diffuse_length, sizeof(diffuse_length));
+	
+				MaterialLoader *mat_ldr = MaterialLoader::getInstance();
+				material::Material *material = mat_ldr->createMaterial();
+				
+				ImageLoader *img_loader = ImageLoader::getInstance();
+				TextureLoader *tex_loader = TextureLoader::getInstance();
+				
+				if (diffuse_length > 0) {
+					char *diffuse_filename = new char[diffuse_length];
+					file.read(diffuse_filename, sizeof(char)*diffuse_length);
+					
+					std::string texture_path = folder;
+					texture_path += std::string(diffuse_filename);
+					
+					delete[] diffuse_filename;
+
+					core::Texture *diffuse_texture = 
+							tex_loader->loadTexture(img_loader->loadImage(texture_path));
+
+					material->setTexture(diffuse_texture);
+				}
+				
+				mesh->setMaterial(material);
 								
 				meshsGeom[fileName] = meshGeom;
 				meshs[fileName].push_back(mesh);
-
-				logPretty("loaded: ", name);
+				
+				file.close();
 			} else { 
 				logPretty("Failed to import Mesh: ", fileName);
 			}

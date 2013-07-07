@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Workspace Name="Mammoth3D" Database="./Mammoth3D.tags">
-  <Project Name="test" Path="project/test.project" Active="Yes"/>
+  <Project Name="test" Path="project/test.project" Active="No"/>
   <Environment>
     <![CDATA[]]>
   </Environment>
   <Project Name="dae2bin" Path="tools/dae2bin/dae2bin.project" Active="No"/>
+  <Project Name="assimp2bin" Path="tools/assimp2bin/assimp2bin.project" Active="Yes"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Main" Selected="yes">
+      <Project Name="assimp2bin" ConfigName="Release"/>
+      <Project Name="dae2bin" ConfigName="Release"/>
       <Project Name="test" ConfigName="Debug_x86"/>
-      <Project Name="dae2bin" ConfigName="Debug"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

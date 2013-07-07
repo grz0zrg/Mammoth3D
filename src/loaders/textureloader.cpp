@@ -4,7 +4,7 @@ loader::TextureLoader *loader::TextureLoader::_singleton = 0;
 
 core::Texture *loader::TextureLoader::loadTexture(core::Image *image) {
 	if (!image) {
-		log("Invalid data.");
+		log("invalid image");
 		return 0;
 	}
 

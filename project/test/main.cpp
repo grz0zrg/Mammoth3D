@@ -43,10 +43,10 @@ int main(int argc, char **argv) {
 	program::Program *prog = ldr->getProgram("data/glsl/test.vert", 
 												"data/glsl/test.frag");
 
-	core::Texture *texture = ldr->createTexture("test_texture.png");
+	core::Texture *texture = ldr->createTexture("data/Bench_2K_Diffuse.png");
 	
-	monkey = ldr->getMesh("data/Cube.mm");
-	monkeyMat = ldr->getNewMaterial();
+	monkey = ldr->getMesh("data/bench.mm");
+	monkeyMat = monkey->mat;//ldr->getNewMaterial();
 	monkeyMat->setProgram(prog);
 	//monkeyMat->setCullMode(GL_NONE);
 	monkeyMat->setDepthTest(true);
@@ -55,18 +55,18 @@ int main(int argc, char **argv) {
 	//monkeyMat->setPolyMode(GL_LINE);
 	monkeyMat->setTexture(texture);
 	//monkey->opacity = 0.5f;
-	if (monkey != 0) {
+	/*if (monkey != 0) {
 		monkey->setMaterial(monkeyMat);
-	}
+	}*/
 	
 	// setup per vertex colors
-	monkey->vertexColors = true;
+	monkey->vertexColors = false;
 	
 	// should be deleted when app end
 	core::Geometry *monkeyGeom = monkey->cloneGeometry(); 
 	monkey->setGeometry(monkeyGeom);
 	//monkeyGeom->setDynamic(core::GEOMETRY_VERTICE);
-	monkeyGeom->setDynamic(core::GEOMETRY_COLOR);
+	//monkeyGeom->setDynamic(core::GEOMETRY_COLOR);
 	
 	rndr->add(monkey);
 
@@ -76,7 +76,8 @@ int main(int argc, char **argv) {
 	rndr->setCamera(cam);
 	
 	//monkey->rx = core::math::deg2rad(-80);
-	monkey->z = -3.5f;
+	monkey->z = -300.5f;
+	monkey->y = -150.5f;
 	
 	float colorChange = 0.0f;
 	float verticeChange = 0.0;
@@ -93,12 +94,12 @@ int main(int argc, char **argv) {
 			if (colorChange >= 1.0f || colorChange <= -1.0f)
 				colorVelocity = -colorVelocity;
 			
-			monkey->rx +=1.4f* deltaTime;	
-			monkey->ry +=2.4f* deltaTime;	
-			/*monkey->ry +=colorChange/200;
+			//monkey->rx +=1.4f* deltaTime;	
+			//monkey->ry +=2.4f* deltaTime;	
+			monkey->ry +=colorChange/200;
 			monkey->rz +=colorChange/200;
-			monkey->z -= (-colorChange)/50;
-			*/
+			//monkey->z -= (-colorChange)/50;
+			
 			// change colors
 			monkeyGeom->colors.clear();
 			for (unsigned int i=0; i<monkeyGeom->vertices.size(); i+=3) {

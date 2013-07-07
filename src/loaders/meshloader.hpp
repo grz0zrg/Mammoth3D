@@ -8,8 +8,10 @@
 	
 	#include <GL/glew.h>
 	
+	#include "../loaders/materialloader.hpp"	
+	#include "../loaders/imageloader.hpp"
+	#include "../loaders/textureloader.hpp"
 	#include "../objects/mesh.hpp"
-	#include "collada/collada.hpp"
 	
 	namespace loader {
 		class MeshLoader {

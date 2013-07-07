@@ -1,4 +1,6 @@
 /**
+ * DEPRECATED... now use the assimp library (assimb2bin)...
+ * 
  * This program load a .dae (Collada) file and export it to a binary format
  * usable directly within the Mammoth3D engine.
  * 

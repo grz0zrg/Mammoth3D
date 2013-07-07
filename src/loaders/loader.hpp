@@ -18,8 +18,8 @@
 					shaderLoader   = loader::ShaderLoader::getInstance();
 					meshLoader     = loader::MeshLoader::getInstance();
 					materialLoader = loader::MaterialLoader::getInstance();
-					imageLoader = loader::ImageLoader::getInstance();
-					textureLoader = loader::TextureLoader::getInstance();
+					imageLoader    = loader::ImageLoader::getInstance();
+					textureLoader  = loader::TextureLoader::getInstance();
 				}
 				
 				~Loader() {
