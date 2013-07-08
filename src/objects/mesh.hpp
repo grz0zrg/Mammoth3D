@@ -37,6 +37,12 @@
 				}
 		};
 		
+		typedef enum {
+			DEFAULT,
+			QUAD,
+			QUAD_ALIGNED
+		}MeshType;
+		
 		class Mesh {
 			public:
 				Mesh() { 
@@ -49,6 +55,8 @@
 					modelMatrix = glm::mat4(1.0f);
 					
 					opacity = 1.0f;
+					
+					type = DEFAULT;
 					
 					x = y = z = 0.0f;
 					sx = sy = sz = 1.0f;
@@ -156,6 +164,8 @@
 				float sx, sy, sz;
 				float rx, ry, rz;
 				float opacity;
+				
+				unsigned int type;
 
 				bool matrixAutoUpdate, vertexColors;
 		};

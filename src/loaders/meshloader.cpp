@@ -47,6 +47,7 @@ object::Mesh *loader::MeshLoader::loadMesh(const std::string &fileName) {
 				unsigned int verticesCount = 0;
 				unsigned int normalsCount = 0;
 				unsigned int uvsCount = 0;
+				unsigned int vColorsCount = 0;
 				
 				file.read((char*)&indicesCount, sizeof(indicesCount));
 				file.read((char*)&verticesCount, sizeof(verticesCount));
@@ -62,6 +63,7 @@ object::Mesh *loader::MeshLoader::loadMesh(const std::string &fileName) {
 				float vertice = 0;
 				float normal = 0;
 				float uv = 0;
+				float color = 0;
 				
 				meshGeom->indicesCount = indicesCount;
 				
@@ -83,6 +85,14 @@ object::Mesh *loader::MeshLoader::loadMesh(const std::string &fileName) {
 				for (unsigned int i = 0; i < uvsCount; i++) {
 					file.read((char*)&uv, sizeof(uv));
 					meshGeom->uvs.push_back(uv);
+				}
+				
+				file.read((char*)&vColorsCount, sizeof(vColorsCount));
+				meshGeom->colors.reserve(vColorsCount);
+				
+				for (unsigned int i = 0; i < vColorsCount; i++) {
+					file.read((char*)&color, sizeof(color));
+					meshGeom->colors.push_back(color);
 				}
 				
 				meshGeom->generateVbo();

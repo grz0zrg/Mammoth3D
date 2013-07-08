@@ -9,7 +9,7 @@
 				Vbo() {
 					verticeBufferUsage = colorBufferUsage = GL_STATIC_DRAW;
 					
-					indiceBufferId = verticeBufferId = colorBufferId = uvBufferId = 0;
+					indiceBufferId = verticeBufferId = colorBufferId = uvBufferId = normalBufferId = 0;
 				}
 				
 				~Vbo() {
@@ -17,6 +17,7 @@
 					glDeleteBuffers(1, &verticeBufferId);
 					glDeleteBuffers(1, &colorBufferId);
 					glDeleteBuffers(1, &uvBufferId);
+					glDeleteBuffers(1, &normalBufferId);
 				}
 				
 				bool buildBuffer(GLuint *bufferId, GLsizeiptr size, 
@@ -69,6 +70,16 @@
 					
 					return true;
 				}
+				
+				bool buildNormalBuffer(GLsizeiptr size, const GLvoid *data) {
+					if (!buildBuffer(&uvBufferId, size, data, 
+										GL_ARRAY_BUFFER)) {
+						log("Normal buffer creation failed.");
+						return false;
+					}
+					
+					return true;
+				}
 
 				bool buildColorBuffer(GLsizeiptr size, const GLvoid *data) {
 					if (!buildBuffer(&colorBufferId, size, data, GL_ARRAY_BUFFER,
@@ -110,7 +121,7 @@
 					std::cout << "[Vbo] " << str << std::endl;
 				}
 				
-				GLuint indiceBufferId, verticeBufferId, colorBufferId, uvBufferId;
+				GLuint indiceBufferId, verticeBufferId, colorBufferId, uvBufferId, normalBufferId;
 				GLenum verticeBufferUsage, colorBufferUsage;
 		};
 	}

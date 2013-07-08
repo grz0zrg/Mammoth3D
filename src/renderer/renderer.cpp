@@ -95,6 +95,22 @@ void renderer::Renderer::render() {
 				}
 			}
 
+			if (mesh->type == object::QUAD_ALIGNED) {
+				glBindBuffer(GL_ARRAY_BUFFER, mesh->geom->vbo->verticeBufferId);
+				glEnableVertexAttribArray(0);
+				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+				
+				glBindBuffer(GL_ARRAY_BUFFER, mesh->geom->vbo->uvBufferId);
+				glEnableVertexAttribArray(1);
+				glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+					
+				glDrawArrays(GL_QUADS, 0, 4);
+			
+				previousMat = mat;
+				
+				continue;
+			}
+			
 			mesh->updateMatrix();
 
 			glm::mat4 mvp = currCamera->projMatrix * 
@@ -134,7 +150,7 @@ void renderer::Renderer::render() {
 
 				glEnableVertexAttribArray(2);
 				glBindBuffer(GL_ARRAY_BUFFER, mesh->geom->vbo->colorBufferId);
-				glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);
+				glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, 0);
 			}
 
 			glDrawElements(GL_TRIANGLES, mesh->geom->indicesCount, 

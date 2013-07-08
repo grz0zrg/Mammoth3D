@@ -49,12 +49,26 @@
 					}
 
 					vbo = new Vbo();
-					vbo->buildIndiceBuffer(indices.size() * 
+					if (!indices.empty()) {
+						vbo->buildIndiceBuffer(indices.size() * 
 								sizeof(unsigned int), &indices.front());
-					vbo->buildVerticeBuffer(vertices.size() * 
-								sizeof(float), &vertices.front());
-					vbo->buildUvBuffer(uvs.size() * 
-								sizeof(float), &uvs.front());
+					}
+					
+					if (!vertices.empty()) {
+						vbo->buildVerticeBuffer(vertices.size() * 
+									sizeof(float), &vertices.front());
+					}
+								
+					if (!normals.empty()) {
+						vbo->buildNormalBuffer(normals.size() * 
+									sizeof(float), &normals.front());
+					}
+					
+					if (!uvs.empty()) {
+						vbo->buildUvBuffer(uvs.size() * 
+									sizeof(float), &uvs.front());
+					}
+
 					if (!colors.empty()) {
 						vbo->buildColorBuffer(colors.size() * 
 									sizeof(float), &colors.front());

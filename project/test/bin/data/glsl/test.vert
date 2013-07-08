@@ -1,12 +1,12 @@
 #version 330
-layout(location = 0) in vec4 vertexPosition;
+layout(location = 0) in vec3 vertexPosition;
 layout(location = 1) in vec2 vertexUv;
-layout(location = 2) in vec3 vertexColor;
+layout(location = 2) in vec4 vertexColor;
 
 uniform mat4 mvp;
 uniform float alpha;
 
-smooth out vec3 fragmentColor;
+smooth out vec4 fragmentColor;
 out float fragmentAlpha;
 out vec2 UV;
 
@@ -16,5 +16,5 @@ void main()
 	
 	fragmentColor = vertexColor;
 	fragmentAlpha = alpha;
-	gl_Position = mvp * vertexPosition;
+	gl_Position = mvp * vec4(vertexPosition, 1.0f);
 }

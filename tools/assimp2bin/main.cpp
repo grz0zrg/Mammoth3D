@@ -4,7 +4,7 @@
  * 
  * Usage: assimb2bin input_file
  * 
- * Note: only a small subset of data is exported, indices/vertices/normals/uvs
+ * Note: only a small subset of data is exported, indices/vertices/normals/uvs/colors
  *       and the geometry is always assumed to be made of triangles (assimp triangulate anyway)
  * */
 
@@ -69,9 +69,11 @@ std::string doExport(const aiScene* scene) {
 			unsigned int verticesCount = 0;
 			unsigned int normalsCount = 0;
 			unsigned int texcoordsCount = 0;
+			unsigned int vColorsCount = 0;
 			
 			unsigned int numNormals = 0;
 			unsigned int numUvs = 0;
+			unsigned int numVColors = 0;
 			
 			if (aimesh->HasFaces()) {
 				indicesCount = aimesh->mNumFaces * 3; // only triangles
@@ -86,9 +88,14 @@ std::string doExport(const aiScene* scene) {
 				normalsCount = verticesCount;
 			}
 			
-			if (aimesh->HasTextureCoords(0) && aimesh->mTextureCoords != NULL) {
+			if (aimesh->HasTextureCoords(0) && aimesh->mTextureCoords[0] != NULL) {
 				numUvs = aimesh->mNumVertices;
 				texcoordsCount = numUvs * 2;
+			}
+			
+			if (aimesh->HasVertexColors(0) && aimesh->mColors[0] != NULL) {
+				numVColors = aimesh->mNumVertices;
+				vColorsCount = numVColors * 4;
 			}
 
 			file.write((char*)&indicesCount, sizeof(indicesCount));
@@ -118,6 +125,18 @@ std::string doExport(const aiScene* scene) {
 				file.write((char*)&normal->x, sizeof(float));
 				file.write((char*)&normal->y, sizeof(float));
 				file.write((char*)&normal->z, sizeof(float));
+			}
+
+			// this is done here so the format remain compatible with the old dae2bin tool
+			file.write((char*)&vColorsCount, sizeof(vColorsCount));
+
+			for (unsigned int i = 0; i < numVColors; i++) {
+				const aiColor4D *color = &aimesh->mColors[0][i];
+				
+				file.write((char*)&color->r, sizeof(float));
+				file.write((char*)&color->g, sizeof(float));
+				file.write((char*)&color->b, sizeof(float));
+				file.write((char*)&color->a, sizeof(float));
 			}
 
 			for (unsigned int i = 0; i < numUvs; i++) {

@@ -12,5 +12,6 @@
 	#include "loaders/loader.hpp"
 	#include "cameras/camera.hpp"
 	#include "programs/program.hpp"
+	#include "objects/quad.hpp"
 	
 #endif

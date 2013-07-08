@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
 	int screenHeight = 600;
 	
 	window::Window *screen = window::Window::getInstance();
-	screen->setFSAA(4);
+	screen->setFSAA(2);
 	screen->openWindow(screenWidth, screenHeight);
 	screen->setVSync();
 	screen->displayMouseCursor(false);
@@ -43,24 +43,31 @@ int main(int argc, char **argv) {
 	program::Program *prog = ldr->getProgram("data/glsl/test.vert", 
 												"data/glsl/test.frag");
 
+	program::Program *post_process = ldr->getProgram("data/glsl/postprocess.vert", 
+												"data/glsl/postprocess.frag");
+
 	core::Texture *texture = ldr->createTexture("data/Bench_2K_Diffuse.png");
 	
-	monkey = ldr->getMesh("data/bench.mm");
+	object::Quad *screen_aligned_quad = new object::Quad(true);
+	screen_aligned_quad->mat->setProgram(post_process);
+	rndr->add(screen_aligned_quad);
+
+	monkey = ldr->getMesh("data/monkey_colored.mm");
 	monkeyMat = monkey->mat;//ldr->getNewMaterial();
 	monkeyMat->setProgram(prog);
 	//monkeyMat->setCullMode(GL_NONE);
 	monkeyMat->setDepthTest(true);
 	monkeyMat->setDepthWrite(true);
-	monkeyMat->setBlending(true);
+	monkeyMat->setBlending(false);
 	//monkeyMat->setPolyMode(GL_LINE);
-	monkeyMat->setTexture(texture);
+	//monkeyMat->setTexture(texture);
 	//monkey->opacity = 0.5f;
 	/*if (monkey != 0) {
 		monkey->setMaterial(monkeyMat);
 	}*/
 	
 	// setup per vertex colors
-	monkey->vertexColors = false;
+	monkey->vertexColors = true;
 	
 	// should be deleted when app end
 	core::Geometry *monkeyGeom = monkey->cloneGeometry(); 
@@ -76,8 +83,7 @@ int main(int argc, char **argv) {
 	rndr->setCamera(cam);
 	
 	//monkey->rx = core::math::deg2rad(-80);
-	monkey->z = -300.5f;
-	monkey->y = -150.5f;
+	monkey->z = -5.5f;
 	
 	float colorChange = 0.0f;
 	float verticeChange = 0.0;
@@ -120,6 +126,7 @@ int main(int argc, char **argv) {
 				monkeyGeom->colors.push_back(rcolor);
 				monkeyGeom->colors.push_back(gcolor);
 				monkeyGeom->colors.push_back(bcolor);
+				monkeyGeom->colors.push_back(bcolor);
 			}
 			
 			rndr->render();
@@ -130,6 +137,7 @@ int main(int argc, char **argv) {
 		screen->swapBuffers();
 	} while(screen->running());
 
+	delete screen_aligned_quad;
 	delete monkeyGeom;
 	
 	audioManager->free();

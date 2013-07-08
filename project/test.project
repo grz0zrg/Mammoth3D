@@ -61,6 +61,8 @@
     <VirtualDirectory Name="objects">
       <File Name="../src/objects/mesh.cpp"/>
       <File Name="../src/objects/mesh.hpp"/>
+      <File Name="../src/objects/quad.cpp"/>
+      <File Name="../src/objects/quad.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="cameras">
       <File Name="../src/cameras/camera.hpp"/>
