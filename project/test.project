@@ -22,6 +22,7 @@
       <File Name="../src/core/vbo.hpp"/>
       <File Name="../src/core/image.hpp"/>
       <File Name="../src/core/texture.hpp"/>
+      <File Name="../src/core/fbo.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="loaders">
       <File Name="../src/loaders/meshloader.cpp"/>

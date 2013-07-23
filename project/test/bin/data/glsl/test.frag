@@ -1,6 +1,8 @@
 #version 330
 
-out vec4 outputColor;
+layout(location = 0) out vec3 outputColor;
+
+//out vec4 outputColor;
 
 smooth in vec4 fragmentColor;
 in float fragmentAlpha;

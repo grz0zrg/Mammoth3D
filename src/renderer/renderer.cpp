@@ -3,12 +3,18 @@
 renderer::Renderer *renderer::Renderer::_singleton = 0;
 
 void renderer::Renderer::render() {
+	lastFbo = 0;
+	
 	unsigned int rQueueLength = render_queue.size();
 	for (unsigned int i = 0; i < rQueueLength; i++) {
-		unsigned int mQueueLength = render_queue[i].size();
-		for (unsigned int e = 0; e < mQueueLength; e++) {
+		unsigned int rosQueueLength = render_queue[i].size();
+		for (unsigned int e = 0; e < rosQueueLength; e++) {
+		RenderObjects *ros = render_queue[i][e];
+		
+		unsigned int mQueueLength = ros->meshs.size();
+		for (unsigned int j = 0; j < mQueueLength; j++) {
 			object::Mesh *mesh = 0;
-			mesh = render_queue[i][e];
+			mesh = ros->meshs[j];
 			
 			if (!mesh) {
 				continue;
@@ -94,16 +100,37 @@ void renderer::Renderer::render() {
 					}
 				}
 			}
-
+			
+			if (ros->fbo != lastFbo) {
+				if (ros->fbo != 0) {
+					glBindFramebuffer(GL_FRAMEBUFFER, ros->fbo->id);
+					glViewport(0,0,ros->fbo->texture->width,ros->fbo->texture->height);
+					//glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+					//glClearDepth(1.0f);
+					glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+				} else {
+					glBindFramebuffer(GL_FRAMEBUFFER, 0);
+					glViewport(0, 0, viewportWidth, viewportHeight);
+				}
+			}
+				
 			if (mesh->type == object::QUAD_ALIGNED) {
 				glBindBuffer(GL_ARRAY_BUFFER, mesh->geom->vbo->verticeBufferId);
 				glEnableVertexAttribArray(0);
 				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 				
-				glBindBuffer(GL_ARRAY_BUFFER, mesh->geom->vbo->uvBufferId);
-				glEnableVertexAttribArray(1);
-				glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
-					
+				if (mat->texture) {
+					if (mesh->geom->vbo->uvBufferId) {
+						glActiveTexture(GL_TEXTURE0);
+						glBindTexture(GL_TEXTURE_2D,mat->texture->id);
+						glUniform1i(glGetUniformLocation(mat->prog->prog, 
+														"myTextureSampler"), 0);
+						glBindBuffer(GL_ARRAY_BUFFER, mesh->geom->vbo->uvBufferId);
+						glEnableVertexAttribArray(1);
+						glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+					}
+				}
+			
 				glDrawArrays(GL_QUADS, 0, 4);
 			
 				previousMat = mat;
@@ -161,5 +188,8 @@ void renderer::Renderer::render() {
 			
 			previousMat = mat;
 		}
+		
+		lastFbo = ros->fbo;
+	}
 	}
 }

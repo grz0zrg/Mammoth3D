@@ -3,7 +3,9 @@
 out vec4 outputColor;
 in vec2 UV;
 
+uniform sampler2D myTextureSampler;
+
 void main()
 {
-	outputColor = vec4(sin(UV.x), sin(UV.x), sin(UV.y), 1.0f);
+	outputColor = texture(myTextureSampler, UV+ 0.005*vec2( sin(UV.x+1024.0*UV.x),cos(UV.x+768.0*UV.y)));
 }

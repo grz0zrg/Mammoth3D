@@ -12,6 +12,11 @@
 					this->data = data;
 				}
 				
+				Image(int width, int height) {
+					this->width = width;
+					this->height = height;
+				}
+				
 				~Image() {
 					
 				}

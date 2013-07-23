@@ -21,6 +21,8 @@
 					fpsTimer = getTime();
 					lastTime = getTime();
 					deltaTime = 0.0;
+					
+					aa = 0;
 				}
 				
 				~Window() {
@@ -46,7 +48,7 @@
 				
 				const static std::string engineVersion;
 				
-				int windowWidth, windowHeight;
+				int windowWidth, windowHeight, aa;
 				
 				int frames, fps;
 				double fpsTimer, deltaTime, lastTime;
@@ -129,6 +131,8 @@
 						return;
 					}
 					glfwOpenWindowHint(GLFW_FSAA_SAMPLES, level);
+					
+					aa = level;
 				}
 				
 				bool isActive() {
@@ -152,6 +156,10 @@
 				
 				void sleep(double time = 0.25) {
 					glfwSleep(time);
+				}
+				
+				int getAASamples() {
+					return aa;
 				}
 				
 				bool running() {

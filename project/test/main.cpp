@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
 	int screenHeight = 600;
 	
 	window::Window *screen = window::Window::getInstance();
-	screen->setFSAA(2);
+	screen->setFSAA(4);
 	screen->openWindow(screenWidth, screenHeight);
 	screen->setVSync();
 	screen->displayMouseCursor(false);
@@ -47,10 +47,6 @@ int main(int argc, char **argv) {
 												"data/glsl/postprocess.frag");
 
 	core::Texture *texture = ldr->createTexture("data/Bench_2K_Diffuse.png");
-	
-	object::Quad *screen_aligned_quad = new object::Quad(true);
-	screen_aligned_quad->mat->setProgram(post_process);
-	rndr->add(screen_aligned_quad);
 
 	monkey = ldr->getMesh("data/monkey_colored.mm");
 	monkeyMat = monkey->mat;//ldr->getNewMaterial();
@@ -74,8 +70,6 @@ int main(int argc, char **argv) {
 	monkey->setGeometry(monkeyGeom);
 	//monkeyGeom->setDynamic(core::GEOMETRY_VERTICE);
 	//monkeyGeom->setDynamic(core::GEOMETRY_COLOR);
-	
-	rndr->add(monkey);
 
 	rndr->setViewport(screenWidth, screenHeight);
 	
@@ -84,6 +78,16 @@ int main(int argc, char **argv) {
 	
 	//monkey->rx = core::math::deg2rad(-80);
 	monkey->z = -5.5f;
+	
+	object::Quad *screen_aligned_quad = new object::Quad(true);
+	core::Fbo *fbo = new core::Fbo(screen_aligned_quad->screen_aligned_texture);
+	screen_aligned_quad->mat->setProgram(post_process);
+	
+	rndr->setTarget(fbo);
+	rndr->add(monkey);
+	
+	rndr->setTarget(renderer::DEFAULT);
+	rndr->add(screen_aligned_quad);
 	
 	float colorChange = 0.0f;
 	float verticeChange = 0.0;
@@ -137,6 +141,7 @@ int main(int argc, char **argv) {
 		screen->swapBuffers();
 	} while(screen->running());
 
+	delete fbo;
 	delete screen_aligned_quad;
 	delete monkeyGeom;
 	
