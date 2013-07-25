@@ -27,6 +27,10 @@
 					blending = false;
 					prog = 0;	
 					texture = 0;
+					
+					blendFuncSrc = GL_SRC_ALPHA;
+					blendFuncDst = GL_ONE_MINUS_SRC_ALPHA;
+					blendEquation = GL_FUNC_ADD;
 				}
 				
 				~Material() { 
@@ -61,6 +65,15 @@
 					this->blending = blending;
 				}
 				
+				void setBlendFunc(GLenum src, GLenum dst) {
+					blendFuncSrc = src;
+					blendFuncDst = dst;
+				}
+				
+				void setBlendEquation(GLenum equation) {
+					blendEquation = equation;
+				}
+				
 				void setTexture(core::Texture *texture) {
 					this->texture = texture;
 				}
@@ -80,6 +93,8 @@
 				program::Program *prog;
 				GLenum polyMode, cullMode;
 				bool depthWrite, depthTest, blending;
+				
+				GLenum blendFuncSrc, blendFuncDst, blendEquation;
 				
 				core::Texture *texture;
 				

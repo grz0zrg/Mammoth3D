@@ -3,7 +3,7 @@
 
 	#include <vector>
 	#include <GL/glew.h>
-	
+#include <iostream>
 	#include "image.hpp"
 	
 	namespace core {
@@ -12,7 +12,7 @@
 				Texture(Image *image, bool linear_filtering = true, bool anisotropy = true, bool mipmaps = true) {
 					width = image->width;
 					height = image->height;
-					
+
 					glGenTextures(1, &id);
 					glBindTexture(GL_TEXTURE_2D, id);
 					/*
@@ -41,9 +41,9 @@
 					if (image->data.empty()) {
 						glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 					} else {
-						glTexImage2D(GL_TEXTURE_2D, 4, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image->data[0]);
+						glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image->data[0]);
 					}
-					
+
 					if (mipmaps) {
 						glGenerateMipmap(GL_TEXTURE_2D);
 					}

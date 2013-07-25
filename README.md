@@ -3,9 +3,11 @@ Mammoth3D
 
 ![Alt text](http://garzul.tonsite.biz/mammoth3d/14_05_2013.png "mammoth3d")
 
-### Simple OpenGL 3.x demos framework ###
+### OpenGL 3.x demos framework ###
 
 To use the entire framework just include "mammoth3d.hpp".
+
+I use it to do [demos](http://en.wikipedia.org/wiki/Demoscene)
 
 ### Usage ###
 
@@ -18,6 +20,7 @@ The "lib" folder contain all the libraries the engine use, some are mingw32 x86 
 The engine use its own binary meshes format, converters are availables in the "tools" folder:
 
 assimp2bin load any meshes files that the assimp library support [Assimp](http://assimp.sourceforge.net/)
+
 dae2bin is deprecated, export collada (.dae) only and only meshe vertices (UVs/normals are supported but does not export correctly)
 
 ### Others platforms ###

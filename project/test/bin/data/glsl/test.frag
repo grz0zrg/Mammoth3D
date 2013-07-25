@@ -15,5 +15,5 @@ void main()
     /*if(fragmentAlpha < 0.5f){
         discard;
     }*/
-	outputColor = /*texture(myTextureSampler, UV) **/vec4(fragmentColor.r, fragmentColor.g, fragmentColor.b, fragmentColor.a);
+	outputColor = /*texture(myTextureSampler, UV) **/vec4(fragmentColor.r, fragmentColor.g, fragmentColor.b, fragmentAlpha);
 }

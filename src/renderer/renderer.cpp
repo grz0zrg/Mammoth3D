@@ -79,17 +79,9 @@ void renderer::Renderer::render() {
 						case material::BLENDING:
 							if (mat->blending) {
 								glEnable(GL_BLEND);
-								//alpha
-								glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-								glBlendEquation(GL_FUNC_ADD);
-								
-								//add
-								//glBlendFunc(GL_ONE, GL_ONE);
-								//glBlendEquation(GL_FUNC_ADD);
-								
-								//sub
-								//glBlendFunc(GL_ONE, GL_ONE);
-								//glBlendEquation(GL_FUNC_SUBTRACT);
+
+								glBlendFunc(mat->blendFuncSrc, mat->blendFuncDst);
+								glBlendEquation(mat->blendEquation);
 							} else {
 								glDisable(GL_BLEND);
 							}
@@ -100,6 +92,8 @@ void renderer::Renderer::render() {
 					}
 				}
 			}
+			
+			mat->prog->updateDynamicUniforms();
 			
 			if (ros->fbo != lastFbo) {
 				if (ros->fbo != 0) {
@@ -118,6 +112,8 @@ void renderer::Renderer::render() {
 				glBindBuffer(GL_ARRAY_BUFFER, mesh->geom->vbo->verticeBufferId);
 				glEnableVertexAttribArray(0);
 				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+				
+				glUniform1f(mat->prog->getUniformLocation("alpha"), mesh->opacity);
 				
 				if (mat->texture) {
 					if (mesh->geom->vbo->uvBufferId) {

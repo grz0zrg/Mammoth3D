@@ -12,7 +12,7 @@
 					
 					glGenFramebuffers(1, &id);
 					glBindFramebuffer(GL_FRAMEBUFFER, id);
-					
+
 					if (depth_buffer) {
 						glGenRenderbuffers(1, &id_depthbuffer);
 						glBindRenderbuffer(GL_RENDERBUFFER, id_depthbuffer);

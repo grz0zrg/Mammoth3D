@@ -32,12 +32,13 @@
 					this->geom->generateVbo();
 					
 					this->mat = new material::Material();
-					this->mat->setCullMode(GL_NONE);
-					this->mat->setDepthWrite(false);
+					this->mat->setDepthWrite(true);
 
 					//this->mat->setBlending(true);
-
-					if (screen_aligned) {
+					
+					screen_aligned_texture = 0;
+					
+					if (screen_aligned) {	
 						window::Window *screen = window::Window::getInstance();
 						
 						core::Image *empty_image = new core::Image(screen->getWidth()*screen->getAASamples(), 
@@ -53,7 +54,10 @@
 				}
 				
 				~Quad() {
-					delete screen_aligned_texture;
+					if (screen_aligned_texture) {
+						delete screen_aligned_texture;
+					}
+					
 					delete this->mat;
 					delete this->geom;
 				}
