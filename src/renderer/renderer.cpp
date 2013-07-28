@@ -35,6 +35,9 @@ void renderer::Renderer::render() {
 					switch (state) {
 						case material::POLY_MODE:
 							glPolygonMode(GL_FRONT_AND_BACK, mat->polyMode);
+							if (mat->polyMode == GL_LINE) {
+								glLineWidth(mat->lineWidth);
+							}
 							break;
 						
 						case material::CULL_MODE:
@@ -95,6 +98,10 @@ void renderer::Renderer::render() {
 			
 			mat->prog->updateDynamicUniforms();
 			
+			if (ros->fbo == 0) {
+				glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			}
+			
 			if (ros->fbo != lastFbo) {
 				if (ros->fbo != 0) {
 					glBindFramebuffer(GL_FRAMEBUFFER, ros->fbo->id);
@@ -103,11 +110,10 @@ void renderer::Renderer::render() {
 					//glClearDepth(1.0f);
 					glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 				} else {
-					glBindFramebuffer(GL_FRAMEBUFFER, 0);
 					glViewport(0, 0, viewportWidth, viewportHeight);
 				}
 			}
-				
+	
 			if (mesh->type == object::QUAD_ALIGNED) {
 				glBindBuffer(GL_ARRAY_BUFFER, mesh->geom->vbo->verticeBufferId);
 				glEnableVertexAttribArray(0);
@@ -176,8 +182,12 @@ void renderer::Renderer::render() {
 				glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, 0);
 			}
 
-			glDrawElements(GL_TRIANGLES, mesh->geom->indicesCount, 
-								GL_UNSIGNED_INT, (void*)0);
+			if (mesh->type == object::QUAD) {
+				glDrawArrays(GL_QUADS, 0, 4);
+			} else {
+				glDrawElements(GL_TRIANGLES, mesh->geom->indicesCount, 
+									GL_UNSIGNED_INT, (void*)0);
+			}
 				
 			//glDisableVertexAttribArray(0);
 			//glDisableVertexAttribArray(1);

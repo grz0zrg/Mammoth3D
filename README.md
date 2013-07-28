@@ -25,7 +25,7 @@ dae2bin is deprecated, export collada (.dae) only and only meshe vertices (UVs/n
 
 ### Others platforms ###
 
-Just look at the .project settings in the project folder to compile the sample program, the framework require: [PortAudio](http://www.portaudio.com/) [libogg/libvorbis](http://xiph.org/downloads) [glfw](http://www.glfw.org/download.html)
+Just look at the .project settings in the project folder to compile the sample program, the framework require: [PortAudio](http://www.portaudio.com/) [libogg/libvorbis](http://xiph.org/downloads) [glfw](http://www.glfw.org/download.html), all others libs used can be found in the "lib" folder and can be compiled with your app (lodepng, glew, tinyxml2)
 
 The assimp2bin tool require the [Assimp](http://assimp.sourceforge.net/) library
 

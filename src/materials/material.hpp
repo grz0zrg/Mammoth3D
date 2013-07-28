@@ -27,6 +27,7 @@
 					blending = false;
 					prog = 0;	
 					texture = 0;
+					lineWidth = 1.0f;
 					
 					blendFuncSrc = GL_SRC_ALPHA;
 					blendFuncDst = GL_ONE_MINUS_SRC_ALPHA;
@@ -47,6 +48,10 @@
 				
 				void setPolyMode(GLenum polyMode) {
 					this->polyMode = polyMode;
+				}
+				
+				void setLineWidth(GLfloat width) {
+					lineWidth = width;
 				}
 				
 				void setCullMode(GLenum cullMode) {
@@ -92,6 +97,7 @@
 			
 				program::Program *prog;
 				GLenum polyMode, cullMode;
+				GLfloat lineWidth;
 				bool depthWrite, depthTest, blending;
 				
 				GLenum blendFuncSrc, blendFuncDst, blendEquation;

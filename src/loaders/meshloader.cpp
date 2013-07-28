@@ -9,6 +9,9 @@ object::Mesh *loader::MeshLoader::loadMesh(const std::string &fileName) {
 		if (meshsGeom[fileName] != 0) {
 			mesh = new object::Mesh();
 			mesh->setGeometry(meshsGeom[fileName]);
+			MaterialLoader *mat_ldr = MaterialLoader::getInstance();
+			material::Material *material = mat_ldr->createMaterial();
+			mesh->mat = material;
 			meshs[fileName].push_back(mesh);
 			return mesh;
 		}
@@ -42,12 +45,12 @@ object::Mesh *loader::MeshLoader::loadMesh(const std::string &fileName) {
 				
 				file.seekg(0);
 				file.read((char*)&meshGeom->indicesType, sizeof(meshGeom->indicesType));
-				
-				unsigned int indicesCount = 0;
+
+				unsigned int indicesCount  = 0;
 				unsigned int verticesCount = 0;
-				unsigned int normalsCount = 0;
-				unsigned int uvsCount = 0;
-				unsigned int vColorsCount = 0;
+				unsigned int normalsCount  = 0;
+				unsigned int uvsCount      = 0;
+				unsigned int vColorsCount  = 0;
 				
 				file.read((char*)&indicesCount, sizeof(indicesCount));
 				file.read((char*)&verticesCount, sizeof(verticesCount));
@@ -66,7 +69,7 @@ object::Mesh *loader::MeshLoader::loadMesh(const std::string &fileName) {
 				float color = 0;
 				
 				meshGeom->indicesCount = indicesCount;
-				
+
 				for (unsigned int i = 0; i < indicesCount; i++) {
 					file.read((char*)&indice, sizeof(indice));
 					meshGeom->indices.push_back(indice);
@@ -76,40 +79,41 @@ object::Mesh *loader::MeshLoader::loadMesh(const std::string &fileName) {
 					file.read((char*)&vertice, sizeof(vertice));
 					meshGeom->vertices.push_back(vertice);
 				}
-				
+
 				for (unsigned int i = 0; i < normalsCount; i++) {
 					file.read((char*)&normal, sizeof(normal));
 					meshGeom->normals.push_back(normal);
 				}
-	
-				for (unsigned int i = 0; i < uvsCount; i++) {
-					file.read((char*)&uv, sizeof(uv));
-					meshGeom->uvs.push_back(uv);
-				}
-				
+
 				file.read((char*)&vColorsCount, sizeof(vColorsCount));
+
 				meshGeom->colors.reserve(vColorsCount);
-				
+
 				for (unsigned int i = 0; i < vColorsCount; i++) {
 					file.read((char*)&color, sizeof(color));
 					meshGeom->colors.push_back(color);
 				}
 				
+				for (unsigned int i = 0; i < uvsCount; i++) {
+					file.read((char*)&uv, sizeof(uv));
+					meshGeom->uvs.push_back(uv);
+				}
+
 				meshGeom->generateVbo();
 								
 				mesh = new object::Mesh();
 				mesh->setGeometry(meshGeom);
-				
+
 				// material
 				unsigned int diffuse_length = 0;
 				file.read((char*)&diffuse_length, sizeof(diffuse_length));
 	
 				MaterialLoader *mat_ldr = MaterialLoader::getInstance();
 				material::Material *material = mat_ldr->createMaterial();
-				
+
 				ImageLoader *img_loader = ImageLoader::getInstance();
 				TextureLoader *tex_loader = TextureLoader::getInstance();
-				
+
 				if (diffuse_length > 0) {
 					char *diffuse_filename = new char[diffuse_length];
 					file.read(diffuse_filename, sizeof(char)*diffuse_length);

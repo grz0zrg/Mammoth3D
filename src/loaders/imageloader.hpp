@@ -46,7 +46,7 @@
 
 				std::map<std::string, core::Image *> images;
 				
-				core::Image *loadImage(const std::string &fileName);
+				core::Image *loadImage(const std::string &fileName, int mirrored_vertically = 0);
 			
 			private:
 				template <typename T>

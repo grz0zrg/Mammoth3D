@@ -1,5 +1,6 @@
 #include "audio.hpp"
 #include <cmath>
+
 audio::Audio *audio::Audio::_singleton = 0;
 
 int audio::Audio::paCallback( const void *inputBuffer, void *outputBuffer,
@@ -10,13 +11,20 @@ int audio::Audio::paCallback( const void *inputBuffer, void *outputBuffer,
 { 
     float *out = (float*)outputBuffer;
     unsigned int i;
-    (void) timeInfo;
+
     (void) statusFlags;
     (void) inputBuffer;
 	audio::Audio::musicData *data = (audio::Audio::musicData*)userData;
 
-	if(!data->left || !data->right || data->finished || data->paused) {
+	if(data->finished || data->paused) {
+		data->started = false;
+
 		return 0;
+	}
+	
+	if (!data->started) {
+		data->callbackStartTime = timeInfo->outputBufferDacTime;
+		data->started = true;
 	}
 
     unsigned long start = data->position;

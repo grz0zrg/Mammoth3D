@@ -50,7 +50,9 @@
 					float *right;
 					unsigned long frames;
 					unsigned long position;
+					double callbackStartTime;
 					float volume;
+					bool started;
 					bool loop;
 					bool paused;
 					bool finished;
@@ -98,7 +100,9 @@
 					music->loop = false;
 					music->paused = false;
 					music->finished = false;
+					music->started = false;
 					music->volume = 1.0;
+					music->callbackStartTime = 0.0f;
 					
 					int err = ov_fopen(fileName, &vf);
 					if(err < 0) {
@@ -158,6 +162,14 @@
 					logPaError();
 				}
 				
+				double getStreamTime() {
+					if (music->callbackStartTime <= 0.0) {
+						return 0.0;
+					}
+					
+					return Pa_GetStreamTime(music_stream)-music->callbackStartTime;
+				}
+				
 				void playMusic(bool loop = false) {
 					if(music ) {
 						music->loop = loop;
@@ -175,6 +187,14 @@
 						log("paused...");
 						music->paused = true;
 					}
+				}
+				
+				bool isMusicFinished() {
+					if (music->loop) {
+						return false;
+					}
+
+					return music->finished;
 				}
 				
 				void freeMusic() {

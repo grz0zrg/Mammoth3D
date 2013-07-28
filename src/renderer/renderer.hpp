@@ -48,6 +48,7 @@
 					}
 					
 					glEnable(GL_POLYGON_SMOOTH);
+					glEnable(GL_LINE_SMOOTH);
 					
 					currCamera = 0;
 					viewportWidth = viewportHeight = 0;

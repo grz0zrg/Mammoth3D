@@ -131,14 +131,21 @@
 					this->sz = sz;
 				}
 				
+				void setScale(float s) {
+					this->sx = s;
+					this->sy = s;
+					this->sz = s;
+				}
+				
 				inline void updateMatrix() {
 					if (matrixAutoUpdate == true) {
 						glm::mat4 identity = glm::mat4(1.0f);
-						modelMatrix = glm::scale(identity, glm::vec3(sx, sy, sz));
-						modelMatrix *= glm::translate(identity, glm::vec3(x, y, z));
+						
+						modelMatrix = glm::translate(identity, glm::vec3(x, y, z));
 						modelMatrix *= glm::rotate(identity, rx, glm::vec3(1, 0, 0));
 						modelMatrix *= glm::rotate(identity, ry, glm::vec3(0, 1, 0));
 						modelMatrix *= glm::rotate(identity, rz, glm::vec3(0, 0, 1));
+						modelMatrix *= glm::scale(identity, glm::vec3(sx, sy, sz));
 					}
 				}
 				
