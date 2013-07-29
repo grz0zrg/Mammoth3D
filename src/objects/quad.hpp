@@ -53,6 +53,20 @@
 					}
 				}
 				
+				void setTextureSize(int w, int h) {
+					if (this->type == QUAD_ALIGNED) {
+						if (screen_aligned_texture) {
+							delete screen_aligned_texture;
+						}
+						
+						core::Image *empty_image = new core::Image(w, h);
+						screen_aligned_texture = new core::Texture(empty_image, false, false, false);
+						delete empty_image;
+						
+						this->mat->setTexture(screen_aligned_texture);
+					}
+				}
+				
 				~Quad() {
 					if (screen_aligned_texture) {
 						delete screen_aligned_texture;

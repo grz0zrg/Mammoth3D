@@ -9,6 +9,14 @@
 				Fbo(Texture *texture, bool depth_buffer = true) {
 					id = 0;
 					id_depthbuffer = 0;
+					this->depth_buffer = depth_buffer;
+					
+					setTexture(texture);
+				}
+				
+				void setTexture(Texture *texture) {
+					glDeleteFramebuffers(1, &id);
+					glDeleteRenderbuffers(1, &id_depthbuffer);
 					
 					glGenFramebuffers(1, &id);
 					glBindFramebuffer(GL_FRAMEBUFFER, id);
@@ -41,6 +49,7 @@
 					std::cout << "[Fbo] " << str << std::endl;
 				}
 				
+				bool depth_buffer;
 				GLuint id, id_depthbuffer;
 				Texture *texture;
 		};
