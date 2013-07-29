@@ -6,6 +6,8 @@
 	#include "core/math.hpp"
 	#include "core/texture.hpp"
 	#include "renderer/renderer.hpp"
+	#include "scenegraph/node.hpp"
+	#include "scenegraph/meshnode.hpp"
 	#include "window/window.hpp"
 	#include "audio/audio.hpp"
 	#include "objects/mesh.hpp"

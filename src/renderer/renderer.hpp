@@ -10,6 +10,8 @@
 	
 	#include "../cameras/camera.hpp"
 	#include "../objects/mesh.hpp"
+	#include "../scenegraph/node.hpp"
+	#include "../scenegraph/meshnode.hpp"
 
 	namespace renderer {
 		typedef enum {
@@ -18,17 +20,38 @@
 
 		class Renderer {
 			private:
-				class RenderObjects {
+				class Renderable {
 					public:
-						RenderObjects() {fbo = (core::Fbo *)DEFAULT;}
+						Renderable() {
+							renderTarget = (core::Fbo *)DEFAULT;
+							
+							root = new scenegraph::Node("root");
+							
+							meshNode = new scenegraph::MeshNode();
+							addNode(meshNode);
+						}
+						
+						~Renderable() {
+							delete root;
+							delete meshNode;
+						}
 
-						void addMesh(object::Mesh *mesh) { meshs.push_back(mesh); }
+						void addNode(scenegraph::Node *node) { 
+							root->add(node); 
+						}
+						
+						void addMesh(object::Mesh *mesh) { 
+							meshNode->addMesh(mesh);
+						}
+						
+						scenegraph::Node *getRoot() {
+							return root;
+						}
 
-						void setFbo(core::Fbo *fbo) { this->fbo = fbo; }
+						core::Fbo *renderTarget;
 
-						core::Fbo *fbo;
-
-						std::vector<object::Mesh *> meshs;
+						scenegraph::MeshNode *meshNode;
+						scenegraph::Node *root;
 				};
 
 				Renderer() {
@@ -53,15 +76,12 @@
 					currCamera = 0;
 					viewportWidth = viewportHeight = 0;
 					
-					setTarget((core::Fbo *)DEFAULT);
-					lastFbo = (core::Fbo *)DEFAULT;
+					setRenderTarget((core::Fbo *)DEFAULT);
 				}
 				
 				~Renderer() {
 					for (unsigned int i = 0; i < render_queue.size(); i++) {
-						for (unsigned int e = 0; e < render_queue[i].size(); e++) {
-							delete render_queue[i][e];
-						}
+						delete render_queue[i];
 					}
 				}
 				
@@ -84,15 +104,11 @@
 				void operator=(const Renderer&);
 				static Renderer *_singleton;
 				
-				std::vector<std::vector<RenderObjects *> > render_queue;
-				std::vector<material::Material *> mats; // all mats
-				std::vector<core::Fbo *> fbos; // all render targets
+				std::vector<Renderable *> render_queue;
+				unsigned int currentRenderTargetId;
 				
 				material::Material *previousMat;
 				camera::Camera *currCamera;
-				unsigned int target;
-				
-				core::Fbo *lastFbo;
 				
 				int viewportWidth, viewportHeight;
 
@@ -109,60 +125,72 @@
 					glViewport(0, 0, viewportWidth, viewportHeight);
 				}
 				
-				void clear() {
-					glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-					glClearDepth(1.0f);
-					glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
-				}
-				
 				void setCamera(camera::Camera *camera) {
 					currCamera = camera;
 				}
 				
-				void setTarget(int fbo) {
-					setTarget((core::Fbo *) fbo);
+				void setRenderTarget(int fbo) {
+					setRenderTarget((core::Fbo *) fbo);
 				}
 				
-				void setTarget(core::Fbo *fbo) {
+				void setRenderTarget(core::Fbo *rt) {
 					bool found = false;
-					for (unsigned int i = 0; i < fbos.size(); i++) {
-						if (fbos[i] == fbo) {
-							target = i;
+					for (unsigned int i = 0; i < render_queue.size(); i++) {
+						if (render_queue[i]->renderTarget == rt) {
+							currentRenderTargetId = i;
 							return;
 						}
 					}
 					
-					fbos.push_back(fbo);
-					target = fbos.size()-1;
+					Renderable *renderable = new Renderable();
+					renderable->renderTarget = rt;
+					
+					render_queue.push_back(renderable);
+					
+					currentRenderTargetId = render_queue.size()-1;
 				}
 				
-				// add to render queue
-				// TODO: remove() and ignore multiples adds
+				void add(scenegraph::Node *node) {
+					render_queue[currentRenderTargetId]->addNode(node);
+				}
+				
 				void add(object::Mesh *mesh) {
-					bool found = false;
-					for (unsigned int i = 0; i < mats.size(); i++) {
-						if (mats[i] == mesh->mat) {
-							RenderObjects *ros = render_queue[i][render_queue[i].size()-1];
-							ros->setFbo(fbos[target]);
-							ros->addMesh(mesh);
-							found = true;
-							break;
-						}
-					}
+					render_queue[currentRenderTargetId]->addMesh(mesh);
+				}
+				
+				void remove(object::Mesh *mesh) {
+					Renderable *currentRenderTarget = render_queue[currentRenderTargetId];
+					scenegraph::MeshNode *meshNode = currentRenderTarget->meshNode;
+
+					meshNode->removeMesh(mesh);
+				}
+				
+				void remove(scenegraph::Node *node) {
+					Renderable *currentRenderTarget = render_queue[currentRenderTargetId];
+					scenegraph::Node *root = currentRenderTarget->getRoot();
 					
-					if (!found || mats.empty()) {
-						mats.push_back(mesh->mat);
-						std::vector<RenderObjects *> roslist;
-						render_queue.push_back(roslist);
+					root->findAndRemove(node);
+				}
+				
+				void removeAll(scenegraph::Node *node) {
+					for (unsigned int i = 0; i < render_queue.size(); i++) {
+						Renderable *renderTarget = render_queue[i];
+						scenegraph::Node *root = renderTarget->getRoot();
 						
-						render_queue[mats.size()-1].push_back(new RenderObjects());
-						RenderObjects *ros = render_queue[mats.size()-1][render_queue[mats.size()-1].size()-1];
-						ros->setFbo(fbos[target]);
-						ros->addMesh(mesh);
+						root->findAndRemove(node);
+					}
+				}
+				
+				void removeAll() {
+					for (unsigned int i = 0; i < render_queue.size(); i++) {
+						Renderable *renderTarget = render_queue[i];
+						renderTarget->getRoot()->clear();
 					}
 				}
 				
 				void render();
+				void render(scenegraph::Node *node);
+				void render(scenegraph::MeshNode *node);
 				
 				static Renderer *getInstance()
 				{

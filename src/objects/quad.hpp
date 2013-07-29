@@ -47,6 +47,7 @@
 						delete empty_image;
 					
 						this->type = QUAD_ALIGNED;
+						this->mat->setCullMode(GL_NONE);
 						this->mat->setTexture(screen_aligned_texture);
 					} else {
 						this->type = QUAD;
