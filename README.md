@@ -1,7 +1,7 @@
 Mammoth3D
 =========
 
-![Alt text](garzul.tonsite.biz/mammoth3d/30_07_2013.png "mammoth3d")
+![Alt text](http://garzul.tonsite.biz/mammoth3d/30_07_2013.png "mammoth3d")
 
 ### OpenGL 3.x demos framework ###
 
