@@ -1,31 +1,35 @@
 Mammoth3D
 =========
 
-![Alt text](http://garzul.tonsite.biz/mammoth3d/14_05_2013.png "mammoth3d")
+![Alt text](garzul.tonsite.biz/mammoth3d/30_07_2013.png "mammoth3d")
 
 ### OpenGL 3.x demos framework ###
 
 To use the entire framework just include "mammoth3d.hpp".
 
-I use it to do [demos](http://en.wikipedia.org/wiki/Demoscene)
+Made it to do [demos](http://en.wikipedia.org/wiki/Demoscene)
 
 ### Usage ###
 
 All projects should compile easily on Windows using the [codelite](http://www.codelite.org/) .workspace.
 
-The "lib" folder contain all the libraries the engine use, some are mingw32 x86 precompiled
+There is a sample project demonstrating some features in the "project" folder, this can be used as a starting point.
+
+The "lib" folder contain all the libraries the engine use, some are mingw32 x86 pre-compiled
 
 ### Tools ###
 
-The engine use its own binary meshes format, converters are availables in the "tools" folder:
+The engine use a binary format to load scenes/meshes, converters are available in the "tools" folder
 
-assimp2bin load any meshes files that the assimp library support [Assimp](http://assimp.sourceforge.net/)
+assimp2bin load any meshes files that the Assimp library support [Assimp](http://assimp.sourceforge.net/)
 
-dae2bin is deprecated, export collada (.dae) only and only meshe vertices (UVs/normals are supported but does not export correctly)
+dae2bin is deprecated, export Collada (.dae) only and only meshes vertices (UVs/normals exports are buggy)
 
 ### Others platforms ###
 
-Just look at the .project settings in the project folder to compile the sample program, the framework require: [PortAudio](http://www.portaudio.com/) [libogg/libvorbis](http://xiph.org/downloads) [glfw](http://www.glfw.org/download.html), all others libs used can be found in the "lib" folder and can be compiled with your app (lodepng, glew, tinyxml2)
+Just look at the .project settings in the project folder, the framework require: [PortAudio](http://www.portaudio.com/) [libogg/libvorbis](http://xiph.org/downloads) [glfw](http://www.glfw.org/download.html)
+
+Additionally some others libraries ([lodepng](http://lodev.org/lodepng/), [GLEW](http://glew.sourceforge.net/), [tinyxml2](http://www.grinninglizard.com/tinyxml2/)) are used and can be found in the "lib" folder, they can be compiled with your app 
 
 The assimp2bin tool require the [Assimp](http://assimp.sourceforge.net/) library
 
