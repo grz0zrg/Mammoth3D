@@ -10,6 +10,7 @@
 	
 	#include "../cameras/camera.hpp"
 	#include "../objects/mesh.hpp"
+	#include "../objects/bitmaptext.hpp"
 	#include "../scenegraph/node.hpp"
 	#include "../scenegraph/meshnode.hpp"
 

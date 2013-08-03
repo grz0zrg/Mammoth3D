@@ -3,7 +3,7 @@
 
 	#include <vector>
 	#include <GL/glew.h>
-#include <iostream>
+
 	#include "image.hpp"
 	
 	namespace core {

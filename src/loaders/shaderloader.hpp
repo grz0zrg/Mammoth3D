@@ -8,13 +8,17 @@
 	#include <sstream>
 	#include <fstream>
 	#include <algorithm>
+	#include <cstring>
 	
 	#include "../programs/program.hpp"
+	#include "../misc/builtinshaders.hpp"
 
 	namespace loader {
 		class ShaderLoader {
 			private:
-				ShaderLoader() { };
+				ShaderLoader() { 
+					bitmapFontsProgram = 0;
+				};
 			
 				~ShaderLoader() {
 					std::for_each(programList.begin(), programList.end(), 
@@ -24,7 +28,7 @@
 					
 					for (unsigned int i = 0; i < programs.size(); i++) {
 						delete programs[i];
-					}				
+					}
 				};
 			
 				template <typename T>
@@ -49,6 +53,8 @@
 				std::vector<GLuint> shaderList;
 				std::vector<GLuint> programList;
 				std::vector<program::Program *> programs;
+				
+				program::Program *bitmapFontsProgram;
 			
 			public:
 				void compileShader(GLenum eShaderType, 
@@ -56,6 +62,7 @@
 				void compileShaderFile(GLenum eShaderType, 
 												const std::string &filename);
 				program::Program *buildProgram();
+				program::Program *getBitmapFontsProgram();
 				
 				static ShaderLoader *getInstance()
 				{

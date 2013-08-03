@@ -94,7 +94,8 @@
 				void updateColorBuffer(GLsizeiptr size, const GLvoid *data) {
 					if (colorBufferId) {
 						glBindBuffer(GL_ARRAY_BUFFER, colorBufferId);
-						glBufferData(GL_ARRAY_BUFFER, size, data, colorBufferUsage);
+						glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
+						//glBufferData(GL_ARRAY_BUFFER, size, data, colorBufferUsage);
 					} else {
 						buildColorBuffer(size, data);
 					}
@@ -103,7 +104,8 @@
 				void updateVerticeBuffer(GLsizeiptr size, const GLvoid *data) {
 					if (verticeBufferId) {
 						glBindBuffer(GL_ARRAY_BUFFER, verticeBufferId);
-						glBufferData(GL_ARRAY_BUFFER, size, data, verticeBufferUsage);
+						glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
+						//glBufferData(GL_ARRAY_BUFFER, size, data, verticeBufferUsage);
 					} else {
 						buildVerticeBuffer(size, data);
 					}

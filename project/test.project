@@ -14,6 +14,16 @@
       <File Name="../lib/glew/glew.c"/>
       <File Name="../lib/lodepng/lodepng.cpp"/>
       <File Name="../lib/lodepng/lodepng.h"/>
+      <VirtualDirectory Name="rocket">
+        <File Name="../lib/rocket/base.h"/>
+        <File Name="../lib/rocket/data.c"/>
+        <File Name="../lib/rocket/data.h"/>
+        <File Name="../lib/rocket/device.c"/>
+        <File Name="../lib/rocket/device.h"/>
+        <File Name="../lib/rocket/sync.h"/>
+        <File Name="../lib/rocket/track.c"/>
+        <File Name="../lib/rocket/track.h"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="core">
       <File Name="../src/core/math.hpp"/>
@@ -23,6 +33,10 @@
       <File Name="../src/core/image.hpp"/>
       <File Name="../src/core/texture.hpp"/>
       <File Name="../src/core/fbo.hpp"/>
+      <File Name="../src/core/tbo.hpp"/>
+      <File Name="../src/core/uniform_block.hpp"/>
+      <File Name="../src/core/utils.hpp"/>
+      <File Name="../src/core/utils.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="loaders">
       <File Name="../src/loaders/meshloader.cpp"/>
@@ -64,12 +78,26 @@
       <File Name="../src/objects/mesh.hpp"/>
       <File Name="../src/objects/quad.cpp"/>
       <File Name="../src/objects/quad.hpp"/>
+      <File Name="../src/objects/bitmaptext.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="cameras">
       <File Name="../src/cameras/camera.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="programs">
       <File Name="../src/programs/program.hpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="scenegraph">
+      <File Name="../src/scenegraph/meshnode.hpp"/>
+      <File Name="../src/scenegraph/node.hpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="misc">
+      <File Name="../src/misc/builtinshaders.cpp"/>
+      <File Name="../src/misc/builtinshaders.hpp"/>
+      <File Name="../src/misc/builtingeometry.cpp"/>
+      <File Name="../src/misc/builtingeometry.hpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="font">
+      <File Name="../src/font/bitmapfont.hpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="src">
@@ -101,6 +129,7 @@
       <Linker Options="" Required="yes">
         <Library Value="opengl32"/>
         <Library Value="glfwdll"/>
+        <Library Value="ws2_32"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="./test/bin/$(ProjectName)" IntermediateDirectory="../obj/debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./test/bin" PauseExecWhenProcTerminates="yes"/>
@@ -145,6 +174,7 @@ G_DEBUG=gc-friendly]]>
         <Library Value="opengl32"/>
         <Library Value="glu32"/>
         <Library Value="glfwdll"/>
+        <Library Value="ws2_32"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="./test/bin/$(ProjectName)" IntermediateDirectory="../obj/release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./test/bin" PauseExecWhenProcTerminates="yes"/>

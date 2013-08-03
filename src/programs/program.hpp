@@ -4,44 +4,68 @@
 	#include <map>
 	#include <string>
 	#include <vector>
+	#include <iostream>
 
 	#include <GL/glew.h>
+	
+	#include "../core/uniform_block.hpp"
 
 	namespace program {
 		class Program {
 				public:
-					class Uniforms {
-						public:
-							Uniforms(GLint loc, float *value = 0) { 
-								location = loc; 
-								fv = value; 
-							}
-							
-							GLint location;
-							float *fv;
-					};
+				class Ubo {
+					public:
+						core::UniformBlock *block;
+						GLuint bindingPoint;
+						GLuint blockIndex;
+						GLuint id;
+				};
 				
 				Program(GLuint prog) {
 					this->prog = prog;
 				}
 				
 				~Program() {
+					for (unsigned int i = 0; i < ubos.size(); i++) {
+						delete ubos[i];
+					}
+				}
+				
+				void addUniformBlock(core::UniformBlock *ub) {
+					Ubo *ubo = new Ubo();
+					
+					ubo->block = ub;
+					ubo->bindingPoint = 0;
+					ubo->blockIndex = glGetUniformBlockIndex(prog, ub->name.c_str());
+					glUniformBlockBinding(prog, ubo->blockIndex, ubo->bindingPoint);
+					
+					glGenBuffers(1, &ubo->id);
+					glBindBuffer(GL_UNIFORM_BUFFER, ubo->id);
+					if (!ub->data.empty()) {
+						glBufferData(GL_UNIFORM_BUFFER, ub->data.size() * sizeof(float), &ub->data[0], GL_DYNAMIC_DRAW);
+					}
+					
+					glBindBufferBase(GL_UNIFORM_BUFFER, ubo->bindingPoint, ubo->id);
+				
+					GLenum err = glGetError();
+					if (err != GL_NO_ERROR) {
+						std::cout << "Ubo creation failed, error code: " << err << std::endl;
+					}
+					
+					ubos.push_back(ubo);
+				}
+				
+				void updateUniforms() {
+					for (unsigned int i = 0; i < ubos.size(); i++) {
+						glBindBufferBase(GL_UNIFORM_BUFFER, ubos[i]->bindingPoint, ubos[i]->id);
+						glBufferSubData(GL_UNIFORM_BUFFER, 0, ubos[i]->block->data.size() * sizeof(float), &ubos[i]->block->data[0]);
+					}
 				}
 				
 				void registerUniform(const std::string &name) {
 					uniforms[name] = glGetUniformLocation(prog, name.c_str());
 				}
-				
-				void registerDynamicUniform1f(const std::string &name, float *value) {
-					dynamicUniforms[name] = new Uniforms(glGetUniformLocation(prog, name.c_str()), value);
-				}
-				
-				void updateDynamicUniforms() {
-					for(std::map<std::string, Uniforms *>::iterator it=dynamicUniforms.begin(); it!=dynamicUniforms.end(); ++it) {
-						glUniform1f(it->second->location, *it->second->fv);
-					}
-				}
-				
+
 				GLint getUniformLocation(const std::string &name) {
 					return uniforms[name];
 				}
@@ -49,7 +73,8 @@
 				GLuint prog;
 				
 				std::map<std::string, GLint> uniforms;
-				std::map<std::string, Uniforms *> dynamicUniforms;
+					
+				std::vector<Ubo *> ubos;
 		};
 	}
 

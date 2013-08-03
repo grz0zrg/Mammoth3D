@@ -105,9 +105,6 @@
 				core::Texture *texture;
 				
 				std::stack<StateChangeType> states;
-
-			private:
-
 		};
 	}
 	

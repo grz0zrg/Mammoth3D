@@ -12,6 +12,7 @@
 	#include "../core/geometry.hpp"
 	#include "../core/vbo.hpp"
 	#include "../core/texture.hpp"
+	#include "../misc/builtingeometry.hpp"
 	#include "../materials/material.hpp"
 
 	namespace object {
@@ -41,7 +42,8 @@
 		typedef enum {
 			DEFAULT,
 			QUAD,
-			QUAD_ALIGNED
+			QUAD_ALIGNED,
+			BITMAP_TEXT
 		}MeshType;
 		
 		class Mesh {

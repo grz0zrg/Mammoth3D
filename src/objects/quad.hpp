@@ -10,29 +10,20 @@
 			public:
 				Quad(bool screen_aligned = false) {
 					this->geom = new core::Geometry();
-					
-					float v[] = {-1.0f, -1.0f, 0.0f,
-								 1.0f, -1.0f, 0.0f,
-								 1.0f, 1.0f, 0.0f,
-								 -1.0f, 1.0f, 0.0f};
-					
-					float c[] = {0.0f, 0.0f, 
-								 1.0f, 0.0f,
-								 1.0f, 1.0f,
-								 0.0f, 1.0f};
 								 
 					for (unsigned int i = 0; i < 12; i++) {
-						this->geom->vertices.push_back(v[i]);
+						this->geom->vertices.push_back(builtingeometry::quad[i]);
 					}
 									
 					for (unsigned int i = 0; i < 8; i++) {
-						this->geom->uvs.push_back(c[i]);
+						this->geom->uvs.push_back(builtingeometry::quadUV[i]);
 					}
 					
 					this->geom->generateVbo();
 					
 					this->mat = new material::Material();
 					this->mat->setDepthWrite(true);
+					this->mat->setCullMode(GL_NONE);
 
 					//this->mat->setBlending(true);
 					
@@ -47,7 +38,6 @@
 						delete empty_image;
 					
 						this->type = QUAD_ALIGNED;
-						this->mat->setCullMode(GL_NONE);
 						this->mat->setTexture(screen_aligned_texture);
 					} else {
 						this->type = QUAD;

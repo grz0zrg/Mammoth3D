@@ -16,21 +16,36 @@ void loader::ShaderLoader::compileShader(GLenum eShaderType,
 
 	glCompileShader(shader);
 
+	GLint infoLogLength;
+	
 	GLint status;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-	if (status == GL_FALSE)
-	{
-		GLint infoLogLength;
+	if (status == GL_FALSE) {
+		
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
 
 		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
-		glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
+		glGetShaderInfoLog(shader, infoLogLength, 0, strInfoLog);
 
 		log("Compile failure: ", strInfoLog);
+		
 		delete[] strInfoLog;
 		glDeleteShader(shader);
 		
 		return;
+	} else { // check log for warning
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
+		if (infoLogLength > 1) {
+			GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+			
+			if (strcmp(strInfoLog, "No errors.") != 0) {
+				glGetShaderInfoLog(shader, infoLogLength, 0, strInfoLog);
+				
+				log(strInfoLog);
+
+				delete[] strInfoLog;
+			}
+		}
 	}
 
 	shaderList.push_back(shader);
@@ -39,8 +54,7 @@ void loader::ShaderLoader::compileShader(GLenum eShaderType,
 void loader::ShaderLoader::compileShaderFile(GLenum eShaderType, 
 										const std::string &filename) {
 	std::fstream file(filename.c_str(), std::ios::in);
-	if (file.is_open())
-	{
+	if (file.is_open()) {
 		std::stringstream buffer;
 		buffer << file.rdbuf();
 		
@@ -73,8 +87,7 @@ program::Program *loader::ShaderLoader::buildProgram() {
 
 	GLint status;
 	glGetProgramiv(prog, GL_LINK_STATUS, &status);
-	if (status == GL_FALSE)
-	{
+	if (status == GL_FALSE) {
 		GLint infoLogLength;
 		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &infoLogLength);
 
@@ -93,7 +106,7 @@ program::Program *loader::ShaderLoader::buildProgram() {
 	for(size_t i = 0; i < shaderList.size(); i++) {
 		GLuint shader = shaderList[i];
 		glDetachShader(prog, shader);
-		//glDeleteShader(shader);
+		glDeleteShader(shader);
 	}
 
 	shaderList.clear();
@@ -102,4 +115,17 @@ program::Program *loader::ShaderLoader::buildProgram() {
 	programs.push_back(p);
 	
 	return p;
+}
+
+program::Program *loader::ShaderLoader::getBitmapFontsProgram() {
+	if (bitmapFontsProgram == 0) {
+		compileShader(GL_VERTEX_SHADER, builtinshaders::bitmapFontsVertexShader);
+		compileShader(GL_FRAGMENT_SHADER, builtinshaders::bitmapFontsFragmentShader);
+		
+		bitmapFontsProgram = buildProgram();
+		
+		bitmapFontsProgram->registerUniform("chars_pos");
+	}
+	
+	return bitmapFontsProgram;
 }

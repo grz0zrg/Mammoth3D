@@ -119,8 +119,6 @@ void renderer::Renderer::render(scenegraph::MeshNode *node) {
 			}
 		}
 				
-		mat->prog->updateDynamicUniforms();
-				
 		if (mesh->type != object::QUAD_ALIGNED) {
 			glm::mat4 mvp = currCamera->projMatrix * 
 							currCamera->viewMatrix *
@@ -130,6 +128,8 @@ void renderer::Renderer::render(scenegraph::MeshNode *node) {
 											GL_FALSE, glm::value_ptr(mvp));
 		}
 			
+		mat->prog->updateUniforms();
+
 		glUniform1f(mat->prog->getUniformLocation("alpha"), mesh->opacity);
 
 		//mesh->sortTriangles(mvp);
@@ -156,6 +156,13 @@ void renderer::Renderer::render(scenegraph::MeshNode *node) {
 				glEnableVertexAttribArray(1);
 				glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
 			}
+		}
+
+		if (mesh->type == object::BITMAP_TEXT) {
+			object::BitmapText *bt_mesh = (object::BitmapText *) mesh;
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_BUFFER, bt_mesh->tbo->id_texture);
+			glUniform1i(mat->prog->getUniformLocation("chars_pos"), 1);
 		}
 				
 		if (mesh->vertexColors) {
