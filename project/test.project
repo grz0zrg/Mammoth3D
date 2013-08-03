@@ -128,7 +128,7 @@
       </Compiler>
       <Linker Options="" Required="yes">
         <Library Value="opengl32"/>
-        <Library Value="glfwdll"/>
+        <Library Value="glfw3dll"/>
         <Library Value="ws2_32"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
@@ -138,6 +138,7 @@
 G_DEBUG=gc-friendly]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+        <DebuggerSearchPaths/>
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
@@ -172,8 +173,7 @@ G_DEBUG=gc-friendly]]>
       </Compiler>
       <Linker Options="" Required="yes">
         <Library Value="opengl32"/>
-        <Library Value="glu32"/>
-        <Library Value="glfwdll"/>
+        <Library Value="glfw3dll"/>
         <Library Value="ws2_32"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
@@ -182,6 +182,7 @@ G_DEBUG=gc-friendly]]>
         <![CDATA[]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+        <DebuggerSearchPaths/>
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>

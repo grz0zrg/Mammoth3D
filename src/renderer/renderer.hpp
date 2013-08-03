@@ -56,6 +56,7 @@
 				};
 
 				Renderer() {
+					glewExperimental = GL_TRUE; 
 					GLenum err = glewInit();
 					if (err != GLEW_OK) {
 						log((const char *)glewGetErrorString(err));

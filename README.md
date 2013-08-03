@@ -3,7 +3,7 @@ Mammoth3D
 
 ![Alt text](http://garzul.tonsite.biz/mammoth3d/30_07_2013.png "mammoth3d")
 
-### OpenGL 3.x demos framework ###
+### OpenGL 3.3+ demos framework ###
 
 To use the entire framework just include "mammoth3d.hpp".
 

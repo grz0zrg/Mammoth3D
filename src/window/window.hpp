@@ -1,7 +1,7 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
-	#include <GL/glfw.h>
+	#include <GLFW/glfw3.h>
 	
 	#include <string>
 	#include <iostream>
@@ -12,10 +12,14 @@
 				Window() {
 					fail = false;
 
-					if (glfwInit() != GL_TRUE) {
+					if (!glfwInit()) {
 						log("glfwInit() failed");
 						fail = true;
 					}
+					
+					primaryMonitor = 0;
+					glfw_window = 0;
+					glfwVidMode = 0;
 					
 					frames = 0;
 					fpsTimer = getTime();
@@ -52,6 +56,10 @@
 				
 				int frames, fps;
 				double fpsTimer, deltaTime, lastTime;
+				
+				GLFWmonitor *primaryMonitor;
+				const GLFWvidmode *glfwVidMode;
+				GLFWwindow *glfw_window;
 			
 				Window(const Window&);
 				void operator=(const Window&);
@@ -62,25 +70,41 @@
 													const char *title = "") {
 					if (fail) return;
 					
-					int ret = GL_FALSE;
+					glfwWindowHint(GLFW_RED_BITS, 8);
+					glfwWindowHint(GLFW_GREEN_BITS, 8);
+					glfwWindowHint(GLFW_BLUE_BITS, 8);
+					glfwWindowHint(GLFW_ALPHA_BITS, 8);
+					glfwWindowHint(GLFW_DEPTH_BITS, 24);
+					glfwWindowHint(GLFW_STENCIL_BITS, 8);
+					
+					glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+					// opengl 3.3
+					glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+					glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+					
+					
+					//glfwWindowHint(GLFW_STEREO, GL_TRUE);
+					
+					primaryMonitor = glfwGetPrimaryMonitor();
+					
+					glfwVidMode = glfwGetVideoMode(primaryMonitor);
+					
 					if (fullscreen) {
-						ret = glfwOpenWindow(width, height, 5, 6, 5, 24, 24, 24, 
-															GLFW_FULLSCREEN);
+						glfw_window = glfwCreateWindow(width, height, title, primaryMonitor, NULL);
 					} else {
-						ret = glfwOpenWindow(width, height, 5, 6, 5, 24, 24, 24, 
-															GLFW_WINDOW);
+						glfw_window = glfwCreateWindow(width, height, title, NULL, NULL);
 					}
 					
-					if (ret != GL_TRUE) {
+					if (!glfw_window) {
 						log("glfwOpenWindow(...) failed");
 						fail = true;
 						return;
 					}
 					
+					glfwMakeContextCurrent(glfw_window);
+					
 					windowWidth = width;
 					windowHeight = height;
-
-					glfwSetWindowTitle(title);
 				}
 				
 				void setVSync() {
@@ -92,7 +116,7 @@
 				}
 			
 				void swapBuffers() {
-					glfwSwapBuffers();
+					glfwSwapBuffers(glfw_window);
 					
 					frames++;
 					if (getTime()-fpsTimer >= 1.0) {
@@ -109,14 +133,14 @@
 					return deltaTime;
 				}
 				
-				void displayMouseCursor(bool state) {
-					if (state) {
-						glfwEnable(GLFW_MOUSE_CURSOR);
-					} else {
-						glfwDisable(GLFW_MOUSE_CURSOR);
-					}
+				void hideMouseCursor() {
+					glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 				}
 				
+				void showMouseCursor() {
+					glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+				}
+
 				double getTime() {
 					return glfwGetTime();
 				}
@@ -126,36 +150,40 @@
 				}
 				
 				void setFSAA(int level) {
-					if (glfwGetWindowParam(GLFW_OPENED)) {
+					if (glfw_window) {
 						log("FSAA cannot be applied, window already opened");
 						return;
 					}
-					glfwOpenWindowHint(GLFW_FSAA_SAMPLES, level);
+					glfwWindowHint(GLFW_SAMPLES, level);
 					
 					aa = level;
 				}
 				
-				bool isActive() {
-					if (glfwGetWindowParam(GLFW_ACTIVE) == GL_TRUE) {
+				bool isIconified() {
+					if (glfwGetWindowAttrib(glfw_window, GLFW_ICONIFIED) == GL_TRUE) {
 						return true;
 					}
 					return false;
 				}
 				
 				int getRefreshRate() {
-					return glfwGetWindowParam(GLFW_REFRESH_RATE);
+					if (glfwVidMode) {
+						return glfwVidMode->refreshRate;
+					}
+					
+					return 0;
 				}
 				
 				void setRefreshRate(int hz) {
-					glfwOpenWindowHint(GLFW_REFRESH_RATE, hz);
+					if (glfw_window) {
+						log("Refresh rate cannot be applied, window already opened");
+						return;
+					}
+					glfwWindowHint(GLFW_REFRESH_RATE, hz);
 				}
 
 				void onResize(GLFWwindowsizefun cbfun) {
-					glfwSetWindowSizeCallback(cbfun);
-				}
-				
-				void sleep(double time = 0.25) {
-					glfwSleep(time);
+					glfwSetWindowSizeCallback(glfw_window, cbfun);
 				}
 				
 				int getAASamples() {
@@ -166,8 +194,11 @@
 					if (fail) { 
 						return false; 
 					}
-					return (glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS &&
-							glfwGetWindowParam(GLFW_OPENED));
+					
+					glfwPollEvents();
+					
+					return (glfwGetKey(glfw_window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
+							!glfwWindowShouldClose(glfw_window));
 				}
 				
 				int getWidth() {
