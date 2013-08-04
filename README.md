@@ -9,6 +9,8 @@ To use the entire framework just include "mammoth3d.hpp".
 
 Made it to do [demos](http://en.wikipedia.org/wiki/Demoscene)
 
+Disclaimer: The framework is kinda messy, this is my first try at a 3D engine ever, the point has always been to get it up "quickly" to do demos. :)
+
 ### Usage ###
 
 All projects should compile easily on Windows using the [codelite](http://www.codelite.org/) .workspace.

@@ -1,6 +1,8 @@
 #ifndef TBO_HPP
 #define TBO_HPP
 
+	#include <iostream>
+	
 	#include "texture.hpp"
 	
 	namespace core {

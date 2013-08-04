@@ -33,14 +33,14 @@ const char builtinshaders::bitmapFontsFragmentShader[] = {
 			"uniform samplerBuffer chars_pos;\n"
 			"void main()\n"
 			"{\n"
-			" float lim_y = 1.0f-cell_height/font_height;\n"
+			" float lim_y = (1.0f-cell_height/font_height)-0.01;\n"
 			//" float off_x = abs(0.5f-text_length)/2.0f;\n"
 			//" float cell_height_d2 = (cell_height/2.0f)/font_width;\n"
 			//" float off_y = 0.5f - cell_height_d2;\n" // y centering
 			" int id = int((uv.x*font_width)/cell_width);\n"
 			" vec4 pos = texelFetch(chars_pos, id);\n"
 			" float uvx = min(uv.x, text_length);\n"
-			" vec4 tx = texture(myTextureSampler, vec2(pos.x+(uvx-((id*cell_width)/font_width)), max(uv.y, 0.9375f)-pos.y));\n" //off_y+clamp(uv.y, off_y, 0.498f + cell_height_d2) // y centering
+			" vec4 tx = texture(myTextureSampler, vec2(pos.x+(uvx-((id*cell_width)/font_width)), max(uv.y, lim_y)-pos.y));\n" //off_y+clamp(uv.y, off_y, 0.498f + cell_height_d2) // y centering
 			"    if(tx.a < 0.4f){\n"
 			"        discard;\n"
 			"    }\n"

@@ -19,6 +19,8 @@
 					music = 0;
 					music_stream = 0;
 					
+					sample_rate = 44100;
+					
 					log("", Pa_GetVersionText());
 				};
 				
@@ -71,6 +73,8 @@
 				PaError paErr;
 				PaStream *music_stream;
 				musicData *music;
+				
+				double sample_rate;
 
 				int _value;
 				static Audio *_singleton;
@@ -156,7 +160,7 @@
 
 					ov_clear(&vf);
 					
-					paErr = Pa_OpenDefaultStream( &music_stream, 0, 2, paFloat32, 44100, 
+					paErr = Pa_OpenDefaultStream( &music_stream, 0, 2, paFloat32, sample_rate, 
 												paFramesPerBufferUnspecified,
 												&Audio::paCallback, music);
 					logPaError();
@@ -167,7 +171,12 @@
 						return 0.0;
 					}
 					
-					return Pa_GetStreamTime(music_stream)-music->callbackStartTime;
+					double stream_time = Pa_GetStreamTime(music_stream)-music->callbackStartTime;
+					if (stream_time < 0.0) {
+						return 0.0;
+					}
+					
+					return stream_time;
 				}
 				
 				void playMusic(bool loop = false) {
@@ -195,6 +204,14 @@
 					}
 
 					return music->finished;
+				}
+				
+				double getSongLength() {
+					if(music) {
+						return (double)music->frames/sample_rate;
+					}
+					
+					return 0;
 				}
 				
 				void freeMusic() {

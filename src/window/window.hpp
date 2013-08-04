@@ -79,9 +79,8 @@
 					
 					glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 					// opengl 3.3
-					glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-					glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-					
+					//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+					//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 					
 					//glfwWindowHint(GLFW_STEREO, GL_TRUE);
 					
