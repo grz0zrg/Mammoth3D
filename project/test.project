@@ -14,16 +14,6 @@
       <File Name="../lib/glew/glew.c"/>
       <File Name="../lib/lodepng/lodepng.cpp"/>
       <File Name="../lib/lodepng/lodepng.h"/>
-      <VirtualDirectory Name="rocket">
-        <File Name="../lib/rocket/base.h"/>
-        <File Name="../lib/rocket/data.c"/>
-        <File Name="../lib/rocket/data.h"/>
-        <File Name="../lib/rocket/device.c"/>
-        <File Name="../lib/rocket/device.h"/>
-        <File Name="../lib/rocket/sync.h"/>
-        <File Name="../lib/rocket/track.c"/>
-        <File Name="../lib/rocket/track.h"/>
-      </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="core">
       <File Name="../src/core/math.hpp"/>
@@ -99,6 +89,15 @@
     <VirtualDirectory Name="font">
       <File Name="../src/font/bitmapfont.hpp"/>
     </VirtualDirectory>
+    <VirtualDirectory Name="synctracker">
+      <File Name="../src/synctracker/synctracker.cpp"/>
+      <File Name="../src/synctracker/synctracker.hpp"/>
+      <File Name="../src/synctracker/synctracker_controller.cpp"/>
+      <File Name="../src/synctracker/synctracker_controller.hpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="joystick">
+      <File Name="../src/joystick/joystick.hpp"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="src">
     <File Name="test/main.cpp"/>
@@ -125,11 +124,11 @@
         <IncludePath Value="../src"/>
         <Preprocessor Value="GLFW_DLL"/>
         <Preprocessor Value="GLEW_STATIC"/>
+        <Preprocessor Value="DEBUG"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <Library Value="opengl32"/>
         <Library Value="glfw3dll"/>
-        <Library Value="ws2_32"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="./test/bin/$(ProjectName)" IntermediateDirectory="../obj/debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./test/bin" PauseExecWhenProcTerminates="yes"/>
@@ -174,7 +173,6 @@ G_DEBUG=gc-friendly]]>
       <Linker Options="" Required="yes">
         <Library Value="opengl32"/>
         <Library Value="glfw3dll"/>
-        <Library Value="ws2_32"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="./test/bin/$(ProjectName)" IntermediateDirectory="../obj/release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./test/bin" PauseExecWhenProcTerminates="yes"/>

@@ -43,7 +43,14 @@
 					this->mat->setDepthWrite(true);
 					this->mat->setCullMode(GL_NONE);
 					
+					r = 1.0f; g = 1.0f; b = 1.0f;
+					alphaTreshold = 0.4f;
+					
 					uniforms = new core::UniformBlock("infosBlock");
+					uniforms->setUniform("r", r);
+					uniforms->setUniform("g", g);
+					uniforms->setUniform("b", b);
+					uniforms->setUniform("a", alphaTreshold);
 					uniforms->setUniform("text_length", 0.0f);
 					uniforms->setUniform("font_width", font->bitmap->width);
 					uniforms->setUniform("font_height", font->bitmap->height);
@@ -83,6 +90,8 @@
 					
 					this->text = text;
 				}
+				
+				float r, g, b, alphaTreshold;
 				
 				font::BitmapFont *font;
 				

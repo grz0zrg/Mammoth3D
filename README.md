@@ -1,8 +1,6 @@
 Mammoth3D
 =========
 
-![Alt text](http://garzul.tonsite.biz/mammoth3d/30_07_2013.png "mammoth3d")
-
 ### OpenGL 3.3+ demos framework ###
 
 To use the entire framework just include "mammoth3d.hpp".
@@ -38,3 +36,9 @@ The assimp2bin tool require the [Assimp](http://assimp.sourceforge.net/) library
 ### License ###
 
 Do what you want.
+
+### Screenshots ###
+
+![Alt text](http://garzul.tonsite.biz/mammoth3d/05_08_2013_small.png "mammoth3d")
+
+![Alt text](http://garzul.tonsite.biz/mammoth3d/30_07_2013.png "mammoth3d")

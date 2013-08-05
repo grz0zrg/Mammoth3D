@@ -49,7 +49,8 @@
 				
 					GLenum err = glGetError();
 					if (err != GL_NO_ERROR) {
-						std::cout << "Ubo creation failed, error code: " << err << std::endl;
+						std::cout << "Ubo creation failed while adding \"" << ub->name << "\" block, error code: " << err << std::endl;
+						std::cout << "Check if the uniform is used..." << std::endl;
 					}
 					
 					ubos.push_back(ubo);

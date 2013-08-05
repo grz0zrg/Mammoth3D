@@ -58,6 +58,7 @@
 					bool loop;
 					bool paused;
 					bool finished;
+					bool backward;
 				};
 		
 				static int paCallback( const void *inputBuffer,
@@ -166,17 +167,25 @@
 					logPaError();
 				}
 				
-				double getStreamTime() {
-					if (music->callbackStartTime <= 0.0) {
+				void setSongPosition(unsigned long position) {
+					music->position = position * sample_rate;
+				}
+				
+				unsigned long getSongPosition() {
+					return music->position;
+				}
+				
+				double getSongTime() {
+					/*if (music->callbackStartTime <= 0.0) {
 						return 0.0;
 					}
 					
 					double stream_time = Pa_GetStreamTime(music_stream)-music->callbackStartTime;
 					if (stream_time < 0.0) {
 						return 0.0;
-					}
+					}*/
 					
-					return stream_time;
+					return ((double)music->position)/sample_rate;//stream_time;
 				}
 				
 				void playMusic(bool loop = false) {

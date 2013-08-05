@@ -1,7 +1,12 @@
 #ifndef MAMMOTH3D_HPP
 #define MAMMOTH3D_HPP
 
+	#ifndef GLFW_INCLUDE_GL3
+		#define GLFW_INCLUDE_GL3
+	#endif
+
 	#include "../include/glm/glm.hpp"
+	#include "../include/glm/gtx/random.hpp"
 
 	#include "core/math.hpp"
 	#include "core/utils.hpp"
@@ -19,5 +24,8 @@
 	#include "font/bitmapfont.hpp"
 	#include "objects/quad.hpp"
 	#include "objects/bitmaptext.hpp"
+	#include "joystick/joystick.hpp"
+	#include "synctracker/synctracker.hpp"
+	#include "synctracker/synctracker_controller.hpp"
 	
 #endif

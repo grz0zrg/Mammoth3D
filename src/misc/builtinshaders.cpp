@@ -22,6 +22,7 @@ const char builtinshaders::bitmapFontsFragmentShader[] = {
 			"in float fragmentAlpha;\n"
 			"in vec2 uv;\n"
 			"layout (std140) uniform infosBlock {\n"
+			"   vec4 color;\n"
 			"	float text_length;\n"
 			"	float font_width;\n"
 			"	float font_height;\n"
@@ -41,10 +42,11 @@ const char builtinshaders::bitmapFontsFragmentShader[] = {
 			" vec4 pos = texelFetch(chars_pos, id);\n"
 			" float uvx = min(uv.x, text_length);\n"
 			" vec4 tx = texture(myTextureSampler, vec2(pos.x+(uvx-((id*cell_width)/font_width)), max(uv.y, lim_y)-pos.y));\n" //off_y+clamp(uv.y, off_y, 0.498f + cell_height_d2) // y centering
-			"    if(tx.a < 0.4f){\n"
+			"    if(tx.a < color.a){\n"
 			"        discard;\n"
 			"    }\n"
 			" tx.a *= fragmentAlpha;\n"
+			" tx.rgb *= color.rgb;\n"
 			"	outputColor = tx;\n"
 			"}\n"
 		};

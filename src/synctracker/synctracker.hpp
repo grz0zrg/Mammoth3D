@@ -9,6 +9,7 @@
 	#include <cmath>
 	#include <iostream>
 	#include <algorithm>
+	#include <fstream>
 
 	namespace sync {
 		enum InterpolationType {
@@ -81,6 +82,13 @@
 							rows[index]->setValue(value, type);
 						}
 						
+						void deleteRow(int index) {
+							delete rows[index];
+							
+							rows.erase(rows.begin()+index);
+							sort();
+						}
+						
 						float linear(int row_index, double row) {
 							Row *row1 = rows[row_index];
 							Row *row2 = rows[row_index+1];
@@ -132,8 +140,10 @@
 					this->lpb = lpb;
 				}
 				
-				void addTrack(const std::string& name, float *linked_value) {
-					if (findTrack(name) >= 0) {
+				void setTrack(const std::string& name, float *linked_value) {
+					int track_id = findTrack(name);
+					if (track_id >= 0) {
+						tracks[track_id]->linked_value = linked_value;
 						return;
 					}
 
@@ -174,6 +184,24 @@
 					return -lo - 1;
 				}
 				
+				int deleteRow(const std::string& track_name, int row_index) {
+					int track_index = findTrack(track_name);
+					if (track_index < 0) {
+						return 0;
+					}
+					
+					Track *track = tracks[track_index];
+
+					int id_row = findRow(track, row_index);
+					if (id_row < 0) {
+						return 0;
+					}
+					
+					track->deleteRow(id_row);
+					
+					return 1;
+				}
+				
 				void setRow(const std::string& track_name, 
 							int row_index, float value, 
 							InterpolationType type = STEP) {
@@ -195,11 +223,15 @@
 				
 				void update(double music_time) {
 					const float default_value = 0.0f;
-					double row_d = music_time * (bpm/60) * lpb;
+					double row_d = getRow(music_time);
 					unsigned int row_index = (int)floor(row_d);
 					
 					for (unsigned int i = 0; i < tracks.size(); i++) {
 						Track *track = tracks[i];
+						
+						if (track->linked_value == 0) {
+							continue;
+						}
 						
 						int id_row = findRow(track, row_index);
 						if (id_row < 0) {
@@ -239,6 +271,106 @@
 								break;
 						}
 					}
+				}
+				
+				void save() {
+					std::ofstream file("sync.mms", std::ios::out | std::ios::binary);
+					if (!file.good() || !file.is_open()) {
+						std::cout << "[SyncTracker] Failed to save \"sync.mms\"" << std::endl;
+						return;
+					}
+
+					file.write((char*)&bpm, sizeof(bpm));
+					file.write((char*)&lpb, sizeof(lpb));
+					
+					unsigned int numTracks = tracks.size();
+					file.write((char*)&numTracks, sizeof(numTracks));
+					
+					for (unsigned int i = 0; i < tracks.size(); i++) {
+						Track *track = tracks[i];
+						
+						unsigned int nameLength = track->name.length()+1;
+						file.write((char*)&nameLength, sizeof(nameLength));
+						file.write(track->name.c_str(), sizeof(char)*nameLength);
+						
+						unsigned int numRows = track->rows.size();
+						file.write((char*)&numRows, sizeof(numRows));
+						
+						for (unsigned int j = 0; j < track->rows.size(); j++) {
+							Track::Row *row = track->rows[j];
+							
+							file.write((char*)&row->row, sizeof(row->row));
+							file.write((char*)&row->value, sizeof(row->value));
+							file.write((char*)&row->type, sizeof(row->type));
+						}
+					}
+			
+					file.close();
+					
+					std::cout << "[SyncTracker] \"sync.mms\" saved" << std::endl;
+				}
+				
+				void load(const std::string& filename) {
+					std::ifstream file;
+					file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+					
+					try {
+						file.open(filename.c_str(), std::ios::in|std::ios::binary);
+
+						if (!file.is_open()) {
+							std::cout << "[SyncTracker] Failed to load " << filename << std::endl;
+							return;
+						} 
+						
+						std::cout << "[SyncTracker] loading " << filename << std::endl;
+						
+						freeTracks();
+						
+						file.read((char*)&bpm, sizeof(bpm));
+						file.read((char*)&lpb, sizeof(lpb));
+						
+						unsigned int numTracks = 0;
+						file.read((char*)&numTracks, sizeof(numTracks));
+						
+						for (unsigned int i = 0; i < numTracks; i++) {
+							unsigned int nameLength = 0;
+							file.read((char*)&nameLength, sizeof(nameLength));
+							
+							char *c_name = new char[nameLength];
+							file.read(c_name, sizeof(char)*nameLength);
+							std::string track_name(c_name);
+							
+							delete[] c_name;
+							
+							unsigned int numRows = 0;
+							file.read((char*)&numRows, sizeof(numRows));
+							
+							Track *track = new Track(track_name, 0);
+							tracks.push_back(track);
+							
+							for (unsigned int j = 0; j < numRows; j++) {
+								Track::Row *row = new Track::Row(0.0f, STEP);
+								
+								file.read((char*)&row->row, sizeof(row->row));
+								file.read((char*)&row->value, sizeof(row->value));
+								file.read((char*)&row->type, sizeof(row->type));
+								
+								track->rows.push_back(row);
+							}
+						}
+						
+						file.close();
+					} catch (std::ifstream::failure e) {
+						std::cout << "[SyncTracker] Failed to load " << filename << std::endl;
+					}
+				}
+				
+				double getRow(double music_time) {
+					return (music_time * (bpm/60) * lpb);
+				}
+				
+				unsigned long getSongPosition(double row) {
+					return (unsigned long)(row / (bpm/60) / lpb);
 				}
 			
 				static SyncTracker *getInstance()

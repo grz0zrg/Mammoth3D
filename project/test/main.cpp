@@ -1,20 +1,8 @@
-#define GLFW_INCLUDE_GL3
-
-#include <cmath>
-#include <algorithm>
-#include <string>
-#include <vector>
-#include <iostream>
-#include <stdio.h>
-
 #include "mammoth3d.hpp"
 
-material::Material *monkeyMat;
-object::Mesh *monkey = 0;
 renderer::Renderer *rndr = 0;
-loader::Loader *ldr;
 
-void GLFWCALL windowResize(int width, int height)
+void windowResize(GLFWwindow* window, int width, int height)
 {
 	if (rndr) {
 		rndr->setViewport(width, height);
@@ -26,180 +14,164 @@ int main(int argc, char **argv) {
 	int screenHeight = 600;
 	
 	window::Window *screen = window::Window::getInstance();
-	screen->setFSAA(4);
+	screen->setFSAA(2);
 	screen->openWindow(screenWidth, screenHeight);
 	screen->setVSync();
-	screen->displayMouseCursor(false);
+	screen->hideMouseCursor();
 	
 	rndr = renderer::Renderer::getInstance();
 	screen->onResize(windowResize);
 	
 	audio::Audio *audioManager = audio::Audio::getInstance();
-	audioManager->loadMusic("data/music/lithography.ogg");
-	//audioManager->playMusic();
-	
-	ldr = loader::Loader::getInstance();
-	
-	program::Program *prog = ldr->getProgram("data/glsl/test.vert", 
-												"data/glsl/test.frag");
-												
-	program::Program *prog_textured = ldr->getProgram("data/glsl/textured.vert", 
-												"data/glsl/textured.frag");
-												
-	program::Program *post_process = ldr->getProgram("data/glsl/postprocess.vert", 
-												"data/glsl/postprocess.frag");
-												
-	program::Program *post_process2 = ldr->getProgram("data/glsl/postprocess2.vert", 
-												"data/glsl/postprocess2.frag");
+	audioManager->loadMusic("data/music/Hear_the_voices_from_outer_space.ogg");
 
-	core::Texture *texture = ldr->createTexture("data/texture2.png");
-	core::Texture *texture2 = ldr->createTexture("data/texture.png");
-	core::Texture *mammothtexture = ldr->createTexture("data/mammoth3d.png");
-
-	monkey = ldr->getMesh("data/monkey_colored.mm");
-	monkeyMat = monkey->mat;//ldr->getNewMaterial();
-	monkeyMat->setProgram(prog);
-	monkeyMat->setCullMode(GL_NONE);
-	monkeyMat->setDepthTest(true);
-	monkeyMat->setDepthWrite(true);
-	monkeyMat->setBlending(true);
-	//monkeyMat->setPolyMode(GL_LINE);
-	//monkeyMat->setTexture(texture);
-	monkey->opacity = 0.05f;
-	/*if (monkey != 0) {
-		monkey->setMaterial(monkeyMat);
-	}*/
+	loader::Loader *ldr = loader::Loader::getInstance();
 	
-	// setup per vertex colors
-	monkey->vertexColors = true;
+	program::Program *cloud_p = ldr->getProgram("data/glsl/cloud.vert", 
+												"data/glsl/cloud.frag");
+												
+	program::Program *background_p = ldr->getProgram("data/glsl/background.vert", 
+												"data/glsl/background.frag");
+												
+	program::Program *kaleido_p = ldr->getProgram("data/glsl/kaleido.vert", 
+												"data/glsl/kaleido.frag");
+									
+	core::Texture *cloud_t = ldr->createTexture("data/cloud10.png");
+	core::Texture *gradient_t = ldr->createTexture("data/gradient.png");
+	core::Texture *fbo_t = ldr->createTexture("data/texture.png");
 	
-	// should be deleted when app end
-	core::Geometry *monkeyGeom = monkey->cloneGeometry(); 
-	//monkey->setGeometry(monkeyGeom);
-	//monkeyGeom->setDynamic(core::GEOMETRY_VERTICE);
-	//monkeyGeom->setDynamic(core::GEOMETRY_COLOR);
+	scenegraph::MeshNode *cloud_n = new scenegraph::MeshNode();
+	
+	object::Quad *background_m = new object::Quad(true);
+	background_m->mat->setProgram(background_p);
+	background_m->mat->setTexture(gradient_t);
+	
+	core::UniformBlock *ublock1 = new core::UniformBlock("fx");
+	ublock1->setUniform("uv_multiplier", 1.0f);
+	ublock1->setUniform("time", 0.0f);
+	
+	kaleido_p->addUniformBlock(ublock1);
+	
+	object::Quad *kaleido_m = new object::Quad(true);
+	kaleido_m->mat->setProgram(kaleido_p);
+	/*kaleido_m->mat->setBlending(true);
+	kaleido_m->mat->setDepthTest(false);
+	kaleido_m->mat->setDepthWrite(false);
+	kaleido_m->opacity = 0.75f;
+		*/
+	core::Fbo *fbo = new core::Fbo(kaleido_m->screen_aligned_texture);
+	
+	unsigned int cloud_count = 512;
+	object::Quad *clouds_m[cloud_count];
+	for (unsigned int i = 0; i < cloud_count; i++) {
+		object::Quad *cloud_m = new object::Quad();
+		cloud_m->mat->setTexture(cloud_t);
+		cloud_m->mat->setProgram(cloud_p);
+		cloud_m->x = glm::linearRand(-10.0f, 10.0f);
+		cloud_m->y = glm::linearRand(-0.95f, -2.75f);
+		cloud_m->z = -(float)i/32.0f;
+		cloud_m->rz = (glm::linearRand(-1.0f, 1.0f) * M_PI) * 90;
+		
+		cloud_m->sx = cloud_m->sy = glm::linearRand(0.0f, 1.0f) * glm::linearRand(0.0f, 1.0f) * 1.5f + 0.5f;
+		
+		cloud_m->mat->setBlending(true);
+		cloud_m->mat->setDepthTest(false);
+		cloud_m->mat->setDepthWrite(false);
+		cloud_m->opacity = glm::linearRand(0.0f, 0.85f);
+		
+		cloud_n->addMesh(cloud_m);
+		
+		clouds_m[i] = cloud_m;
+	}
 
 	rndr->setViewport(screenWidth, screenHeight);
 	
 	camera::Camera *cam = new camera::Camera(camera::PERSPECTIVE, 75, screenWidth / screenHeight);
 	rndr->setCamera(cam);
+
+	rndr->setRenderTarget(fbo);
+	rndr->add(background_m);
+	rndr->add(cloud_n);
 	
-	//monkey->rx = core::math::deg2rad(-80);
-	monkey->z = -5.5f;
+	rndr->setRenderTarget(renderer::DEFAULT);
+	rndr->add(kaleido_m);
+
+	audioManager->playMusic();
+
+	float aperture = 0.75;
+	float uv_multiplier = 1.0f;
+	float time = 0.0f;
 	
-	object::Quad *screen_aligned_quad = new object::Quad(true);
-	core::Fbo *fbo = new core::Fbo(screen_aligned_quad->screen_aligned_texture);
-	screen_aligned_quad->mat->setProgram(post_process);
+	sync::SyncTracker *stracker = sync::SyncTracker::getInstance();
+	stracker->setBPM(115);
+	stracker->setLPB(4);
+	//stracker->load("sync.mms");
+	stracker->setTrack("time", &time);
+	stracker->setTrack("aperture", &aperture);
+	stracker->setTrack("uv_multiplier", &uv_multiplier);
 	
-	object::Quad *screen_aligned_quad4 = new object::Quad(true);
-	core::Fbo *fbo2 = new core::Fbo(screen_aligned_quad4->screen_aligned_texture);
-	screen_aligned_quad4->mat->setProgram(post_process2);
-	screen_aligned_quad4->mat->setDepthWrite(false);
-	screen_aligned_quad4->mat->setBlending(true);
-	screen_aligned_quad4->mat->setBlendFunc(GL_ONE_MINUS_CONSTANT_COLOR, GL_ONE);
-	screen_aligned_quad4->opacity = 1.0f;
+	sync::SyncTrackerController *ctracker = sync::SyncTrackerController::getInstance();
 	
-	float uv = 0.0f;
-	post_process2->registerDynamicUniform1f("uv_add", &uv);
-	
-	object::Quad *screen_aligned_quad2 = new object::Quad(true);
-	screen_aligned_quad2->mat->setProgram(post_process);
-	screen_aligned_quad2->mat->setTexture(texture2);
-	screen_aligned_quad2->mat->setDepthWrite(false);
-	screen_aligned_quad2->mat->setBlending(true);
-	screen_aligned_quad2->opacity = 0.5f;
-	
-	object::Quad *screen_aligned_quad3 = new object::Quad(true);
-	screen_aligned_quad3->mat->setProgram(post_process2);
-	screen_aligned_quad3->mat->setTexture(texture);
-	screen_aligned_quad3->mat->setDepthWrite(false);
-	screen_aligned_quad3->mat->setBlending(true);
-	screen_aligned_quad3->mat->setBlendFunc(GL_ONE_MINUS_CONSTANT_COLOR, GL_ONE_MINUS_SRC_COLOR);
-	screen_aligned_quad3->mat->setBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
-	screen_aligned_quad3->opacity = 1.0f;
-	
-	object::Quad *quad1 = new object::Quad();
-	quad1->mat->setProgram(prog_textured);
-	quad1->mat->setTexture(mammothtexture);
-	quad1->mat->setCullMode(GL_NONE);
-	quad1->z = -100.0f;
-	
-	post_process->registerDynamicUniform1f("uv_add", &uv);
-	
-	rndr->setTarget(fbo);
-	rndr->add(monkey);
-	
-	rndr->setTarget(fbo2);
-	rndr->add(screen_aligned_quad);
-	rndr->add(screen_aligned_quad2);
-	
-	rndr->setTarget(renderer::DEFAULT);
-	rndr->add(screen_aligned_quad4);
-	rndr->add(screen_aligned_quad3);
-	rndr->add(quad1);
-	
-	float colorChange = 0.0f;
-	float verticeChange = 0.0;
-	float colorVelocity = 1.0f;
+	float abc = 0.0f;
 	
 	do {
 		double deltaTime = screen->getDeltaTime();
 		
-		if (screen->isActive()) {
-			rndr->clear();
+		ublock1->setUniform("uv_multiplier", uv_multiplier);
+		ublock1->setUniform("time", deltaTime);
+
+		for (unsigned int i = 0; i < cloud_count; i++) {
+			clouds_m[i]->z += 0.5f * deltaTime;
+			clouds_m[i]->opacity += 0.09f * deltaTime;
 			
-			colorChange += colorVelocity * deltaTime;
-			verticeChange += 1.0f * deltaTime;
-			if (colorChange >= 1.0f || colorChange <= -1.0f)
-				colorVelocity = -colorVelocity;
-			
-			//monkey->rx +=1.4f* deltaTime;	
-			//monkey->ry +=2.4f* deltaTime;	
-			monkey->ry +=colorChange;
-			monkey->rz +=colorChange;
-			//monkey->z -= (-colorChange)/50;
-			
-			uv += colorChange/200;
-			
-			// change colors
-			monkeyGeom->colors.clear();
-			for (unsigned int i=0; i<monkeyGeom->vertices.size(); i+=3) {
-				float v1 = monkeyGeom->vertices[i];
-				float v2 = monkeyGeom->vertices[i+1];
-				float v3 = monkeyGeom->vertices[i+2];
-				float rcolor = sinf(v1+colorChange/2);
-				float gcolor = cosf(v2+colorChange/2);
-				float bcolor = sinf(v3+colorChange/2);
-				
-				rcolor = core::math::clamp(rcolor, 0.0, 1.0);
-				gcolor = core::math::clamp(gcolor, 0.0, 1.0);
-				bcolor = core::math::clamp(bcolor, 0.0, 1.0);
-				//monkeyGeom->vertices[i] += sinf(v1+verticeChange)/200;
-				//monkeyGeom->vertices[i+1] += cosf(monkeyGeom->vertices[i+1]+verticeChange)/200;
-				//monkeyGeom->vertices[i+2] += sinf(monkeyGeom->vertices[i+2]+verticeChange)/200;
-				
-				monkeyGeom->colors.push_back(rcolor);
-				monkeyGeom->colors.push_back(gcolor);
-				monkeyGeom->colors.push_back(bcolor);
-				monkeyGeom->colors.push_back(bcolor);
+			if (clouds_m[i]->opacity > 0.85f) {
+				clouds_m[i]->opacity = 0.85f;
 			}
 			
-			rndr->render();
-		} else {
-			screen->sleep();
+			if (clouds_m[i]->z > 0) {
+				clouds_m[i]->x = glm::linearRand(-10.0f, 10.0f);
+				clouds_m[i]->y = glm::linearRand(-0.75f, -2.0f);
+				clouds_m[i]->z = glm::linearRand(-10.0f, -30.0f);
+				clouds_m[i]->rz = (glm::linearRand(-1.0f, 1.0f) * M_PI) * 90;
+				clouds_m[i]->sx = clouds_m[i]->sy = glm::linearRand(0.0f, 1.0f) * glm::linearRand(0.0f, 1.0f) * 2.5f + 0.5f;
+		
+				clouds_m[i]->opacity = 0.0f;
+			}
 		}
 		
-		screen->swapBuffers();
-	} while(screen->running());
-
-	//delete fbo;
-	//delete screen_aligned_quad;
-	delete monkeyGeom;
+		abc+=0.09f*deltaTime;
+		
+		cam->lookAt(cos(abc), -2.5f+sin(abc)*5, -3.0+cos(abc)*3, 0.0f, -0.25f+sin(abc), -10.0f, -1.15f+cos(abc)*1.75f, 1.0f, sin(abc)*1.25f);
 	
+		stracker->update(audioManager->getSongTime());
+		
+		#ifdef DEBUG
+		ctracker->update();
+		#endif
+		
+		rndr->render();
+		
+		screen->swapBuffers();
+	} while(screen->running() && !audioManager->isMusicFinished());
+
+	for (unsigned int i = 0; i < cloud_count; i++) {
+		delete clouds_m[i];
+	}
+	
+	delete ublock1;
+	delete fbo;
+	delete kaleido_m;
+	delete background_m;
+	delete cloud_n;
+
+	stracker->free();
+	ctracker->free();
 	audioManager->free();
 	ldr->free();
 	rndr->free();
 	screen->free();
 	
 	delete cam;
+	
+	return 0;
 }

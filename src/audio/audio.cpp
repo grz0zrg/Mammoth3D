@@ -16,7 +16,7 @@ int audio::Audio::paCallback( const void *inputBuffer, void *outputBuffer,
     (void) inputBuffer;
 	audio::Audio::musicData *data = (audio::Audio::musicData*)userData;
 
-	if(data->finished || data->paused) {
+	/*if(data->finished || data->paused) {
 		data->started = false;
 
 		return 0;
@@ -25,7 +25,7 @@ int audio::Audio::paCallback( const void *inputBuffer, void *outputBuffer,
 	if (!data->started) {
 		data->callbackStartTime = timeInfo->outputBufferDacTime;
 		data->started = true;
-	}
+	}*/
 
     unsigned long start = data->position;
     float *left = data->left;
