@@ -44,6 +44,10 @@ const float max_distort = 1.4;
 const int num_iter = 16;
 const float reci_num_iter_f = 1.0 / float(num_iter);
 
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
 void main()
 {
 	vec4 tex = texture(myTextureSampler, UV*uv_multiplier);
@@ -62,6 +66,9 @@ void main()
 
 	float dist = distance(UV, vec2(0.5, 0.5));
 	tex.rgb *= smoothstep(0.755f, 0.755f-0.5, dist);
+	
+	float grain = rand(UV);
+	tex.rgb *= max(0.1075f+grain, 1.0f);
   
 	outputColor = vec4(tex.rgb, alpha);
 }
