@@ -44,6 +44,11 @@ void renderer::Renderer::render(scenegraph::Node *node) {
 void renderer::Renderer::render(scenegraph::MeshNode *node) {
 	for (unsigned int i = 0; i < node->meshs.size(); i++) {
 		object::Mesh *mesh = node->meshs[i];
+		
+		core::Geometry *geom = mesh->geom;
+		if (!geom) {
+			continue;
+		}
 				
 		material::Material *mat = mesh->mat;
 				
@@ -133,26 +138,29 @@ void renderer::Renderer::render(scenegraph::MeshNode *node) {
 		glUniform1f(mat->prog->getUniformLocation("alpha"), mesh->opacity);
 
 		//mesh->sortTriangles(mvp);
-		if (mesh->geom->vbo->verticeBufferUsage == GL_DYNAMIC_DRAW) {
-			mesh->geom->updateVertices();
+		if (geom->vbo->verticeBufferUsage == GL_DYNAMIC_DRAW) {
+			geom->updateVertices();
 		}
 				
-		glBindBuffer(GL_ARRAY_BUFFER, mesh->geom->vbo->verticeBufferId);
+		glBindBuffer(GL_ARRAY_BUFFER, geom->vbo->verticeBufferId);
 				
-		if (mesh->geom->vbo->indiceBufferId != 0) {
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->geom->vbo->indiceBufferId);
+		if (geom->vbo->indiceBufferId != 0) {
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geom->vbo->indiceBufferId);
 		}
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-		if (mat->texture) {
-			if (mesh->geom->vbo->uvBufferId) {
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, mat->texture->id);
-				glUniform1i(glGetUniformLocation(mat->prog->prog, 
-												"myTextureSampler"), 0);
-				glBindBuffer(GL_ARRAY_BUFFER, mesh->geom->vbo->uvBufferId);
+		if (!mat->textures.empty()) {
+			
+			unsigned int textures_count = mat->textures.size();
+			for (unsigned int j = 0; j < textures_count; j++) {
+				glActiveTexture(GL_TEXTURE0+j);
+				glBindTexture(GL_TEXTURE_2D, mat->textures[j]->id);
+			}
+			
+			if (geom->vbo->uvBufferId) {
+				glBindBuffer(GL_ARRAY_BUFFER, geom->vbo->uvBufferId);
 				glEnableVertexAttribArray(1);
 				glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
 			}
@@ -166,21 +174,16 @@ void renderer::Renderer::render(scenegraph::MeshNode *node) {
 		}
 				
 		if (mesh->vertexColors) {
-			if (mesh->geom->vbo->colorBufferUsage == GL_DYNAMIC_DRAW) {
-				mesh->geom->updateColors();
+			if (geom->vbo->colorBufferUsage == GL_DYNAMIC_DRAW) {
+				geom->updateColors();
 			}
 
 			glEnableVertexAttribArray(2);
-			glBindBuffer(GL_ARRAY_BUFFER, mesh->geom->vbo->colorBufferId);
+			glBindBuffer(GL_ARRAY_BUFFER, geom->vbo->colorBufferId);
 			glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, 0);
 		}
 
-		if (mesh->type == object::DEFAULT) {
-			glDrawElements(GL_TRIANGLES, mesh->geom->indicesCount, 
-								GL_UNSIGNED_INT, (void*)0);
-		} else {
-			glDrawArrays(GL_QUADS, 0, 4);
-		}
+		glDrawElements(geom->type, geom->indicesCount, GL_UNSIGNED_INT, (void*)0);
 				
 		previousMat = mat;
 	}	

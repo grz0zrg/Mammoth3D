@@ -26,7 +26,6 @@
 					depthTest = false;
 					blending = false;
 					prog = 0;	
-					texture = 0;
 					lineWidth = 1.0f;
 					
 					blendFuncSrc = GL_SRC_ALPHA;
@@ -43,6 +42,8 @@
 						this->prog = prog;
 						this->prog->registerUniform("alpha");
 						this->prog->registerUniform("mvp");
+						
+						bindTextures();
 					}
 				}
 				
@@ -79,8 +80,19 @@
 					blendEquation = equation;
 				}
 				
-				void setTexture(core::Texture *texture) {
-					this->texture = texture;
+				void setTexture(core::Texture *texture, unsigned int id = 0) {
+					textures.resize(id+1);
+					textures[id] = texture;
+					
+					bindTextures();
+				}
+				
+				void bindTextures() {
+					if (prog) {
+						for (unsigned int i = 0; i < textures.size(); i++) {
+							glUniform1i(glGetUniformLocation(prog->prog, "t"+i), i);
+						}
+					}
 				}
 				
 				void update() {
@@ -102,7 +114,7 @@
 				
 				GLenum blendFuncSrc, blendFuncDst, blendEquation;
 				
-				core::Texture *texture;
+				std::vector<core::Texture *> textures;
 				
 				std::stack<StateChangeType> states;
 		};

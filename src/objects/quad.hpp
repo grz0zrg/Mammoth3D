@@ -10,16 +10,20 @@
 			public:
 				Quad(bool screen_aligned = false) {
 					this->geom = new core::Geometry();
-								 
+					
+					for (unsigned int i = 0; i < 6; i++) {
+						this->geom->indices.push_back(builtingeometry::quadIndice[i]);
+					}
+				 
 					for (unsigned int i = 0; i < 12; i++) {
-						this->geom->vertices.push_back(builtingeometry::quad[i]);
+						this->geom->vertices.push_back(builtingeometry::quadVertice[i]);
 					}
 									
 					for (unsigned int i = 0; i < 8; i++) {
 						this->geom->uvs.push_back(builtingeometry::quadUV[i]);
 					}
 					
-					this->geom->generateVbo();
+					this->geom->update();
 					
 					this->mat = new material::Material();
 					this->mat->setDepthWrite(true);

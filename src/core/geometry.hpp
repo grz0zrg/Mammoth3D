@@ -15,11 +15,15 @@
 		class Geometry {
 			public:
 				Geometry() {
-					indicesType = sizeof(unsigned int);
-					
 					indicesCount = 0;
+					verticesCount = 0;
+					normalsCount = 0;
+					uvsCount = 0;
+					colorsCount = 0;
 					
 					vbo = 0;
+					
+					type = GL_TRIANGLES;
 				}
 				
 				~Geometry() {
@@ -31,13 +35,12 @@
 				Geometry *clone() {
 					Geometry *geom = new Geometry();
 
-					geom->indicesType = indicesType;
 					geom->indices = indices;
 					geom->vertices = vertices;
 					geom->normals = normals;
 					geom->uvs = uvs;
 					geom->colors = colors;
-					geom->generateVbo();
+					geom->update();
 
 					return geom;
 				}
@@ -73,22 +76,28 @@
 						vbo->buildColorBuffer(colors.size() * 
 									sizeof(float), &colors.front());
 					}
-					
-					update();
 				}
 
 				void updateVertices() {
 					vbo->updateVerticeBuffer(vertices.size() * 
 								sizeof(float), &vertices.front());
+					verticesCount = vertices.size();
 				}
 				
 				void updateColors() {
 					vbo->updateColorBuffer(colors.size() * 
 								sizeof(float), &colors.front());
+					colorsCount = colors.size();
 				}
 				
 				void update() {
 					indicesCount = indices.size();
+					verticesCount = vertices.size();
+					normalsCount = normals.size();
+					uvsCount = uvs.size();
+					colorsCount = colors.size();
+					
+					generateVbo();
 				}
 				
 				void setDynamic(GeometryData type, bool state = true) {
@@ -104,9 +113,17 @@
 					}
 				}
 				
-				char indicesType;
-				
+				void setType(GLenum type) {
+					this->type = type;
+				}
+
 				unsigned int indicesCount;
+				unsigned int verticesCount;
+				unsigned int normalsCount;
+				unsigned int uvsCount;
+				unsigned int colorsCount;
+				
+				GLenum type;
 				
 				std::vector<unsigned int> indices;
 				std::vector<float> vertices;

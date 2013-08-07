@@ -2,6 +2,7 @@
 #define VBO_HPP
 
 	#include <GL/glew.h>
+	#include <iostream>
 	
 	namespace core {
 		class Vbo {

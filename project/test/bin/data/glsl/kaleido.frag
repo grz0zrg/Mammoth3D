@@ -4,7 +4,7 @@ out vec4 outputColor;
 in vec2 UV;
 
 uniform float alpha;
-uniform sampler2D myTextureSampler;
+uniform sampler2D t0;
 
 layout (std140) uniform fx {
     float uv_multiplier;
@@ -50,8 +50,8 @@ float rand(vec2 co){
 
 void main()
 {
-	vec4 tex = texture(myTextureSampler, UV*uv_multiplier);
-  
+	vec4 tex = texture(t0, UV*uv_multiplier);
+
 	vec3 sumcol = vec3(0.0);
 	vec3 sumw = vec3(0.0);	
 	for ( int i=0; i<num_iter;++i )
@@ -59,16 +59,16 @@ void main()
 		float t = float(i) * reci_num_iter_f;
 		vec3 w = spectrum_offset( t );
 		sumw += w;
-		sumcol += w * texture2D( myTextureSampler, barrelDistortion((UV*0.5f)+0.25f, max_distort*t ) ).rgb;
+		sumcol += w * texture2D( t0, barrelDistortion((UV*0.5)+0.25, max_distort*t ) ).rgb;
 	}
 	
 	tex.rgb = sumcol/sumw;
 
 	float dist = distance(UV, vec2(0.5, 0.5));
-	tex.rgb *= smoothstep(0.755f, 0.755f-0.5, dist);
+	tex.rgb *= smoothstep(0.755, 0.755-0.5, dist);
 	
 	float grain = rand(UV);
-	tex.rgb *= max(0.1075f+grain, 1.0f);
+	tex.rgb *= max(0.1095+grain, 1.0);
   
 	outputColor = vec4(tex.rgb, alpha);
 }

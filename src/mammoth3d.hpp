@@ -12,6 +12,7 @@
 	#include "core/utils.hpp"
 	#include "core/texture.hpp"
 	#include "core/uniform_block.hpp"
+	#include "core/geometry_utils.hpp"
 	#include "renderer/renderer.hpp"
 	#include "scenegraph/node.hpp"
 	#include "scenegraph/meshnode.hpp"
@@ -27,5 +28,6 @@
 	#include "joystick/joystick.hpp"
 	#include "synctracker/synctracker.hpp"
 	#include "synctracker/synctracker_controller.hpp"
+	#include "synctracker/synctracker_xrns.hpp"
 	
 #endif

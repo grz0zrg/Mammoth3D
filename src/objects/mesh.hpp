@@ -158,7 +158,9 @@
 				}
 				
 				void setGeometry(core::Geometry *geom) {
-					this->geom = geom;
+					if (geom) {
+						this->geom = geom;
+					}
 				}
 				
 				core::Geometry *cloneGeometry() {

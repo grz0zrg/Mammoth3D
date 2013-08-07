@@ -27,6 +27,7 @@
       <File Name="../src/core/uniform_block.hpp"/>
       <File Name="../src/core/utils.hpp"/>
       <File Name="../src/core/utils.cpp"/>
+      <File Name="../src/core/geometry_utils.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="loaders">
       <File Name="../src/loaders/meshloader.cpp"/>
@@ -58,7 +59,6 @@
       <File Name="../src/renderer/renderer.hpp"/>
       <File Name="../src/renderer/renderer.cpp"/>
     </VirtualDirectory>
-    <File Name="../src/mammoth3d.hpp"/>
     <VirtualDirectory Name="materials">
       <File Name="../src/materials/material.cpp"/>
       <File Name="../src/materials/material.hpp"/>
@@ -94,10 +94,13 @@
       <File Name="../src/synctracker/synctracker.hpp"/>
       <File Name="../src/synctracker/synctracker_controller.cpp"/>
       <File Name="../src/synctracker/synctracker_controller.hpp"/>
+      <File Name="../src/synctracker/synctracker_xrns.cpp"/>
+      <File Name="../src/synctracker/synctracker_xrns.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="joystick">
       <File Name="../src/joystick/joystick.hpp"/>
     </VirtualDirectory>
+    <File Name="../src/mammoth3d.hpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="src">
     <File Name="test/main.cpp"/>

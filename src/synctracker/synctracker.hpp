@@ -10,6 +10,7 @@
 	#include <iostream>
 	#include <algorithm>
 	#include <fstream>
+	#include <cstdlib>
 
 	namespace sync {
 		enum InterpolationType {
@@ -318,7 +319,7 @@
 						file.open(filename.c_str(), std::ios::in|std::ios::binary);
 
 						if (!file.is_open()) {
-							std::cout << "[SyncTracker] Failed to load " << filename << std::endl;
+							std::cout << "[SyncTracker] Unable to load " << filename << std::endl;
 							return;
 						} 
 						
@@ -361,7 +362,7 @@
 						
 						file.close();
 					} catch (std::ifstream::failure e) {
-						std::cout << "[SyncTracker] Failed to load " << filename << std::endl;
+						std::cout << "[SyncTracker] Unable to load " << filename << std::endl;
 					}
 				}
 				

@@ -16,8 +16,8 @@
 		class Camera {
 			public:
 				// type, left, right, top, bottom, near, far : if ORTHOGRAPHIC
-				Camera(Type type, float fov = 60, float aspect = 1, 
-						float near = 0.1, float far = 10000) {
+				Camera(Type type, float fov = 60.0f, float aspect = 1.0f, 
+						float near = 0.1f, float far = 10000.0f) {
 					this->type   = type;
 					this->left   = this->fov = fov;
 					this->right  = this->aspect = aspect;
@@ -47,8 +47,8 @@
 							float tx, float ty, float tz,
 							float ux, float uy, float uz) {
 					viewMatrix = glm::lookAt(glm::vec3(ex, ey, ez),
-												glm::vec3(tx, ty, tz),
-												glm::vec3(ux, uy, uz));
+											 glm::vec3(tx, ty, tz),
+											 glm::vec3(ux, uy, uz));
 				}
 				
 				void log(const char *str) {

@@ -5,15 +5,15 @@ layout(location = 0) out vec4 outputColor;
 in vec2 UV;
 
 uniform float alpha;
-uniform sampler2D myTextureSampler;
+uniform sampler2D t0;
 
 void main()
 {
 	float depth = gl_FragCoord.z / gl_FragCoord.w;
-	float fogFactor = smoothstep(0.0f, 256.0f, depth);
+	float fogFactor = smoothstep(0.0, 1024.0, depth);
 	
-	vec4 tex = texture(myTextureSampler, UV);
-	tex.a *= pow( gl_FragCoord.z, 20.0f ) * alpha;
+	vec4 tex = texture(t0, UV);
+	tex.a *= pow( gl_FragCoord.z, 20.0 ) * alpha;
 	
-	outputColor = mix(tex, vec4(vec3(0.192f, 0.478f, 0.670f), tex.a), fogFactor);
+	outputColor = mix(tex, vec4(vec3(0.192, 0.478, 0.670), tex.a), fogFactor);
 }

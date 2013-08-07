@@ -2,6 +2,7 @@
 #define SYNCTRACKER_CONTROLS_HPP
 
 	#include "synctracker.hpp"
+	#include "synctracker_xrns.hpp"
 	#include "../audio/audio.hpp"
 	#include "../joystick/joystick.hpp"
 	
