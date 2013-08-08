@@ -28,6 +28,7 @@
       <File Name="../src/core/utils.hpp"/>
       <File Name="../src/core/utils.cpp"/>
       <File Name="../src/core/geometry_utils.hpp"/>
+      <File Name="../src/core/geometry_utils.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="loaders">
       <File Name="../src/loaders/meshloader.cpp"/>
@@ -69,6 +70,7 @@
       <File Name="../src/objects/quad.cpp"/>
       <File Name="../src/objects/quad.hpp"/>
       <File Name="../src/objects/bitmaptext.hpp"/>
+      <File Name="../src/objects/bitmaptext.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="cameras">
       <File Name="../src/cameras/camera.hpp"/>

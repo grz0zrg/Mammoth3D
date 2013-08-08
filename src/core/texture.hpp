@@ -12,6 +12,8 @@
 				Texture(Image *image, bool linear_filtering = true, bool anisotropy = true, bool mipmaps = true) {
 					width = image->width;
 					height = image->height;
+					
+					target = GL_TEXTURE_2D;
 
 					glGenTextures(1, &id);
 					glBindTexture(GL_TEXTURE_2D, id);
@@ -55,6 +57,8 @@
 				
 			GLuint id;
 			int width, height;
+			
+			GLenum target;
 		};
 	}
 

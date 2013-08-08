@@ -8,124 +8,93 @@
 		class Vbo {
 			public:
 				Vbo() {
-					verticeBufferUsage = colorBufferUsage = GL_STATIC_DRAW;
-					
-					indiceBufferId = verticeBufferId = colorBufferId = uvBufferId = normalBufferId = 0;
+					usage = GL_STATIC_DRAW;
+					target = GL_ARRAY_BUFFER;
+					bufferId = attrib_index = 0;
+					data_type = GL_FLOAT;
+					normalized = GL_FALSE;
+					components = 3;
 				}
 				
 				~Vbo() {
-					glDeleteBuffers(1, &indiceBufferId);
-					glDeleteBuffers(1, &verticeBufferId);
-					glDeleteBuffers(1, &colorBufferId);
-					glDeleteBuffers(1, &uvBufferId);
-					glDeleteBuffers(1, &normalBufferId);
+					destroy();
 				}
 				
-				bool buildBuffer(GLuint *bufferId, GLsizeiptr size, 
-												const GLvoid *data, 
-												GLenum target = GL_ARRAY_BUFFER,
-												GLenum usage = GL_STATIC_DRAW) {
+				bool build(GLsizeiptr size, const GLvoid *data, 
+						   GLenum target = GL_ARRAY_BUFFER,
+						   GLenum usage = GL_STATIC_DRAW) {
 					if (size <= 0) {
 						return false;
 					}
 					
-					glGenBuffers(1, bufferId);
-					glBindBuffer(target, *bufferId);
+					if (bufferId) {
+						destroy();
+					}
+					
+					glGenBuffers(1, &bufferId);
+					glBindBuffer(target, bufferId);
 					glBufferData(target, size, data, usage);
 						
 					GLenum err = glGetError();
 					if (err != GL_NO_ERROR) {
-						glDeleteBuffers(1, bufferId);
+						destroy();
+						log("Creation failed.");
 						return false;
 					}
 					
 					return true;
 				}
 				
-				bool buildIndiceBuffer(GLsizeiptr size, const GLvoid *data) {
-					if (!buildBuffer(&indiceBufferId, size, data, 
-													GL_ELEMENT_ARRAY_BUFFER)) {
-						log("Indice buffer creation failed.");
-						return false;
+				void update(GLsizeiptr size, const GLvoid *data) {
+					if (bufferId == 0) {
+						return;
+					}
+
+					glBindBuffer(target, bufferId);
+					
+					//glBufferSubData(target, 0, size, data);
+					glBufferData(target, size, data, usage);
+				}
+				
+				void attrib(GLuint index) {
+					if (bufferId == 0) {
+						return;
 					}
 					
-					return true;
+					glBindBuffer(target, bufferId);
+					glEnableVertexAttribArray(index);
+					
+					attrib_index = index;
+				}
+				
+				void setUsage(GLenum usage) {
+					this->usage = usage;
+				}
+				
+				void setComponents(GLint c) {
+					components = c;
+				}
+				
+				void setDataType(GLenum dtype) {
+					data_type = dtype;
+				}
+				
+				void setNormalized(GLboolean n) {
+					normalized = n;
+				}
+				
+				void destroy() {
+					glDeleteBuffers(1, &bufferId);
 				}
 
-				bool buildVerticeBuffer(GLsizeiptr size, const GLvoid *data) {
-					if (!buildBuffer(&verticeBufferId, size, data, 
-										GL_ARRAY_BUFFER, verticeBufferUsage)) {
-						log("Vertice buffer creation failed.");
-						return false;
-					}
-					
-					return true;
-				}
-				
-				bool buildUvBuffer(GLsizeiptr size, const GLvoid *data) {
-					if (!buildBuffer(&uvBufferId, size, data, 
-										GL_ARRAY_BUFFER)) {
-						log("UV buffer creation failed.");
-						return false;
-					}
-					
-					return true;
-				}
-				
-				bool buildNormalBuffer(GLsizeiptr size, const GLvoid *data) {
-					if (!buildBuffer(&uvBufferId, size, data, 
-										GL_ARRAY_BUFFER)) {
-						log("Normal buffer creation failed.");
-						return false;
-					}
-					
-					return true;
-				}
-
-				bool buildColorBuffer(GLsizeiptr size, const GLvoid *data) {
-					if (!buildBuffer(&colorBufferId, size, data, GL_ARRAY_BUFFER,
-															colorBufferUsage)) {
-						log("Color buffer creation failed.");
-						return false;
-					}
-					
-					return true;
-				}
-				
-				void updateColorBuffer(GLsizeiptr size, const GLvoid *data) {
-					if (colorBufferId) {
-						glBindBuffer(GL_ARRAY_BUFFER, colorBufferId);
-						glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
-						//glBufferData(GL_ARRAY_BUFFER, size, data, colorBufferUsage);
-					} else {
-						buildColorBuffer(size, data);
-					}
-				}
-				
-				void updateVerticeBuffer(GLsizeiptr size, const GLvoid *data) {
-					if (verticeBufferId) {
-						glBindBuffer(GL_ARRAY_BUFFER, verticeBufferId);
-						glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
-						//glBufferData(GL_ARRAY_BUFFER, size, data, verticeBufferUsage);
-					} else {
-						buildVerticeBuffer(size, data);
-					}
-				}
-				
-				void deleteColorBuffer() {
-					glDeleteBuffers(1, &colorBufferId);
-				}
-				
-				void deleteVerticeBuffer() {
-					glDeleteBuffers(1, &verticeBufferId);
-				}
-				
 				void log(const char *str) {
 					std::cout << "[Vbo] " << str << std::endl;
 				}
-				
-				GLuint indiceBufferId, verticeBufferId, colorBufferId, uvBufferId, normalBufferId;
-				GLenum verticeBufferUsage, colorBufferUsage;
+
+				GLuint bufferId, attrib_index;
+				GLenum target, usage, data_type;
+				GLboolean normalized;
+				GLint components;
 		};
 	}
 

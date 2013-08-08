@@ -8,63 +8,51 @@
 
 	#include <GL/glew.h>
 	
+	#include "../core/vbo.hpp"
 	#include "../core/uniform_block.hpp"
 
 	namespace program {
 		class Program {
 				public:
-				class Ubo {
-					public:
-						core::UniformBlock *block;
-						GLuint bindingPoint;
-						GLuint blockIndex;
-						GLuint id;
-				};
-				
 				Program(GLuint prog) {
 					this->prog = prog;
+					vbos_count = 0;
 				}
 				
-				~Program() {
-					for (unsigned int i = 0; i < ubos.size(); i++) {
-						delete ubos[i];
+				~Program() {	
+					for (unsigned int i = 0; i < vbos.size(); i++) {
+						delete vbos[i];
 					}
 				}
 				
-				void addUniformBlock(core::UniformBlock *ub) {
-					Ubo *ubo = new Ubo();
-					
-					ubo->block = ub;
-					ubo->bindingPoint = 0;
-					ubo->blockIndex = glGetUniformBlockIndex(prog, ub->name.c_str());
-					glUniformBlockBinding(prog, ubo->blockIndex, ubo->bindingPoint);
-					
-					glGenBuffers(1, &ubo->id);
-					glBindBuffer(GL_UNIFORM_BUFFER, ubo->id);
-					if (!ub->data.empty()) {
-						glBufferData(GL_UNIFORM_BUFFER, ub->data.size() * sizeof(float), &ub->data[0], GL_DYNAMIC_DRAW);
+				void bindUniformBlock(core::UniformBlock *ub) {
+					GLuint blockIndex = glGetUniformBlockIndex(prog, ub->name.c_str());
+					glUniformBlockBinding(prog, blockIndex, ub->binding_point);
+				}
+
+				void bindVbos() {
+					for (unsigned int i = 0; i < vbos_count; i++) {
+						const core::Vbo *vbo = vbos[i];
+						glBindBuffer(vbo->target, vbo->bufferId);
+						glVertexAttribPointer(vbo->attrib_index, vbo->components, vbo->data_type, vbo->normalized, 0, 0);
 					}
-					
-					glBindBufferBase(GL_UNIFORM_BUFFER, ubo->bindingPoint, ubo->id);
-				
-					GLenum err = glGetError();
-					if (err != GL_NO_ERROR) {
-						std::cout << "Ubo creation failed while adding \"" << ub->name << "\" block, error code: " << err << std::endl;
-						std::cout << "Check if the uniform is used..." << std::endl;
-					}
-					
-					ubos.push_back(ubo);
 				}
 				
-				void updateUniforms() {
-					for (unsigned int i = 0; i < ubos.size(); i++) {
-						glBindBufferBase(GL_UNIFORM_BUFFER, ubos[i]->bindingPoint, ubos[i]->id);
-						glBufferSubData(GL_UNIFORM_BUFFER, 0, ubos[i]->block->data.size() * sizeof(float), &ubos[i]->block->data[0]);
-					}
+				void addVbo(core::Vbo *vbo) {
+					vbos.push_back(vbo);
+					vbos_count = vbos.size();
 				}
 				
 				void registerUniform(const std::string &name) {
 					uniforms[name] = glGetUniformLocation(prog, name.c_str());
+				}
+				
+				void setUniform1f(const std::string &name, float value) {
+					glUniform1f(uniforms[name], value);
+				}
+				
+				void setUniform1i(const std::string &name, GLint value) {
+					glUniform1i(uniforms[name], value);
 				}
 
 				GLint getUniformLocation(const std::string &name) {
@@ -74,8 +62,9 @@
 				GLuint prog;
 				
 				std::map<std::string, GLint> uniforms;
-					
-				std::vector<Ubo *> ubos;
+		
+				std::vector<core::Vbo *> vbos;
+				unsigned int vbos_count;
 		};
 	}
 

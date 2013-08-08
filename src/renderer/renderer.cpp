@@ -49,8 +49,10 @@ void renderer::Renderer::render(scenegraph::MeshNode *node) {
 		if (!geom) {
 			continue;
 		}
-				
+		
 		material::Material *mat = mesh->mat;
+		
+		program::Program *prog = mat->prog;
 				
 		if (previousMat != mat) {
 			mesh->mat->update();
@@ -104,7 +106,7 @@ void renderer::Renderer::render(scenegraph::MeshNode *node) {
 						break;
 								
 					case material::PROGRAM:
-						glUseProgram(mat->prog->prog);
+						glUseProgram(prog->prog);
 						break;
 								
 					case material::BLENDING:
@@ -129,40 +131,37 @@ void renderer::Renderer::render(scenegraph::MeshNode *node) {
 							currCamera->viewMatrix *
 							mesh->getTransformedMatrix();
 							
-			glUniformMatrix4fv(mat->prog->getUniformLocation("mvp"), 1, 
+			glUniformMatrix4fv(prog->getUniformLocation("mvp"), 1, 
 											GL_FALSE, glm::value_ptr(mvp));
 		}
 			
-		mat->prog->updateUniforms();
+		prog->bindVbos();
 
-		glUniform1f(mat->prog->getUniformLocation("alpha"), mesh->opacity);
+		prog->setUniform1f("alpha", mesh->opacity);
 
+		const core::Vbo *vVbo = geom->vVbo;
+		
 		//mesh->sortTriangles(mvp);
-		if (geom->vbo->verticeBufferUsage == GL_DYNAMIC_DRAW) {
+				
+		if (vVbo->usage == GL_DYNAMIC_DRAW) {
 			geom->updateVertices();
+		} else { // because already bound
+			glBindBuffer(GL_ARRAY_BUFFER, vVbo->bufferId);
 		}
-				
-		glBindBuffer(GL_ARRAY_BUFFER, geom->vbo->verticeBufferId);
-				
-		if (geom->vbo->indiceBufferId != 0) {
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geom->vbo->indiceBufferId);
-		}
-
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	
+		glVertexAttribPointer(vVbo->attrib_index, vVbo->components, vVbo->data_type, vVbo->normalized, 0, 0);
 
 		if (!mat->textures.empty()) {
-			
 			unsigned int textures_count = mat->textures.size();
 			for (unsigned int j = 0; j < textures_count; j++) {
 				glActiveTexture(GL_TEXTURE0+j);
 				glBindTexture(GL_TEXTURE_2D, mat->textures[j]->id);
 			}
 			
-			if (geom->vbo->uvBufferId) {
-				glBindBuffer(GL_ARRAY_BUFFER, geom->vbo->uvBufferId);
-				glEnableVertexAttribArray(1);
-				glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+			const core::Vbo *uVbo = geom->uVbo;
+			if (uVbo->bufferId) {
+				glBindBuffer(GL_ARRAY_BUFFER, uVbo->bufferId);
+				glVertexAttribPointer(uVbo->attrib_index, uVbo->components, uVbo->data_type, uVbo->normalized, 0, 0);
 			}
 		}
 
@@ -170,19 +169,19 @@ void renderer::Renderer::render(scenegraph::MeshNode *node) {
 			object::BitmapText *bt_mesh = (object::BitmapText *) mesh;
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_BUFFER, bt_mesh->tbo->id_texture);
-			glUniform1i(mat->prog->getUniformLocation("chars_pos"), 1);
 		}
 				
 		if (mesh->vertexColors) {
-			if (geom->vbo->colorBufferUsage == GL_DYNAMIC_DRAW) {
+			const core::Vbo *cVbo = geom->cVbo;
+			if (cVbo->usage == GL_DYNAMIC_DRAW) {
 				geom->updateColors();
+			} else { // already bound
+				glBindBuffer(GL_ARRAY_BUFFER, cVbo->bufferId);
 			}
-
-			glEnableVertexAttribArray(2);
-			glBindBuffer(GL_ARRAY_BUFFER, geom->vbo->colorBufferId);
-			glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, 0);
+			glVertexAttribPointer(cVbo->attrib_index, cVbo->components, cVbo->data_type, cVbo->normalized, 0, 0);
 		}
 
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geom->iVbo->bufferId);
 		glDrawElements(geom->type, geom->indicesCount, GL_UNSIGNED_INT, (void*)0);
 				
 		previousMat = mat;
