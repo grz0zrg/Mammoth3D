@@ -111,6 +111,15 @@
 					glGenerateMipmap(target);
 				}
 				
+				void setMultisampling(int samples) {
+					if (target != GL_TEXTURE_2D || image == 0) {
+						return;
+					}
+
+					glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, id);
+					glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGBA, width, height, false);
+				}
+				
 				~Texture() {
 					glDeleteTextures(1, &id);
 				}

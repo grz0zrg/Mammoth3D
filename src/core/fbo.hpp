@@ -6,9 +6,10 @@
 	namespace core {
 		class Fbo {
 			public:
-				Fbo(Texture *texture, bool depth_buffer = true) {
+				Fbo(Texture *texture, bool multisampling = false, bool depth_buffer = true) {
 					id = 0;
 					id_depthbuffer = 0;
+					this->multisampling = multisampling;
 					this->depth_buffer = depth_buffer;
 					
 					setTexture(texture);
@@ -28,8 +29,12 @@
 						glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, id_depthbuffer);
 					}
 					
-					glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture->id, 0);
- 
+					if (multisampling) {
+						glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texture->id, 0);
+					} else {
+						glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture->id, 0);
+					}
+					
 					GLenum DrawBuffers[2] = {GL_COLOR_ATTACHMENT0};
 					glDrawBuffers(1, &DrawBuffers[0]);
 					
@@ -49,7 +54,7 @@
 					std::cout << "[Fbo] " << str << std::endl;
 				}
 				
-				bool depth_buffer;
+				bool depth_buffer, multisampling;
 				GLuint id, id_depthbuffer;
 				Texture *texture;
 		};

@@ -38,7 +38,7 @@ object::BitmapText::BitmapText(font::BitmapFont *font) {
 	this->mat->setTexture(texture_buffer, 1);
 				
 	r = 1.0f; g = 1.0f; b = 1.0f;
-	alphaTreshold = 0.4f;
+	alphaTreshold = 0.5f;
 			
 	uniforms = new core::UniformBlock("infosBlock");
 	uniforms->setUniform("r", r);

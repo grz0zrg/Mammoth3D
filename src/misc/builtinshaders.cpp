@@ -47,6 +47,7 @@ const char builtinshaders::bitmapFontsFragmentShader[] = {
 			"    }\n"
 			" tx.a *= fragmentAlpha;\n"
 			" tx.rgb *= color.rgb;\n"
-			"	outputColor = tx;\n"
+			//" tx.rgb *= smoothstep(0.1, 1.0, tx.a);\n"
+			" outputColor = tx;\n"
 			"}\n"
 		};

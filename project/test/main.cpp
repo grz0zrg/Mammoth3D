@@ -64,9 +64,10 @@ int main(int argc, char **argv) {
 	kaleido_m->setProgram(kaleido_p);
 	
 	core::Texture *kaleido_t = 
-					ldr->getNewTexture(screen->getWidth()*screen->getAASamples(),
-									   screen->getHeight()*screen->getAASamples());
+					ldr->getNewTexture(screen->getWidth()/**screen->getAASamples()*/,
+									   screen->getHeight()/**screen->getAASamples()*/);
 	kaleido_t->setNearestFiltering();
+	kaleido_t->setMultisampling(screen->getAASamples());
 	kaleido_m->setTexture(kaleido_t);
 	
 	/*kaleido_m->mat->setBlending(true);
@@ -74,7 +75,7 @@ int main(int argc, char **argv) {
 	kaleido_m->mat->setDepthWrite(false);
 	kaleido_m->opacity = 0.75f;
 		*/
-	core::Fbo *fbo = new core::Fbo(kaleido_t);
+	core::Fbo *fbo = new core::Fbo(kaleido_t, true);
 	
 	// non optimized clouds
 	unsigned int cloud_count = 512;
@@ -95,7 +96,7 @@ int main(int argc, char **argv) {
 		cloud_m->mat->setDepthWrite(false);
 		cloud_m->opacity = glm::linearRand(0.0f, 0.85f);
 		
-		cloud_n->addMesh(cloud_m);
+		//cloud_n->addMesh(cloud_m);
 		
 		clouds_m[i] = cloud_m;
 	}

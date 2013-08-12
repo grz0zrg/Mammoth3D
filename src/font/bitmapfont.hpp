@@ -16,6 +16,8 @@
 					bitmap = font_texture;
 					
 					font_texture->setLinearFiltering();
+					font_texture->setMaxAnisotropy();
+					font_texture->generateMipmap();
 					
 					cellWidth  = bitmap->width  / 16;
 					cellHeight = bitmap->height / 16;

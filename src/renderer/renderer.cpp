@@ -17,6 +17,12 @@ void renderer::Renderer::render() {
 		} else {
 			glBindFramebuffer(GL_FRAMEBUFFER, renderTarget->id);
 			glViewport(0, 0, renderTarget->texture->width, renderTarget->texture->height);
+		
+			if (renderTarget->multisampling) {
+				glEnable(GL_MULTISAMPLE);
+			} else {
+				glDisable(GL_MULTISAMPLE);
+			}
 		}
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		//glClearDepth(1.0f);
