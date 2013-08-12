@@ -29,6 +29,7 @@
       <File Name="../src/core/utils.cpp"/>
       <File Name="../src/core/geometry_utils.hpp"/>
       <File Name="../src/core/geometry_utils.cpp"/>
+      <File Name="../src/core/uniform_block.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="loaders">
       <File Name="../src/loaders/meshloader.cpp"/>

@@ -36,43 +36,53 @@ int main(int argc, char **argv) {
 	program::Program *kaleido_p = ldr->getProgram("data/glsl/kaleido.vert", 
 												"data/glsl/kaleido.frag");
 								
-	core::Texture *cloud_t = ldr->createTexture("data/cloud10.png");
-	core::Texture *gradient_t = ldr->createTexture("data/gradient.png");
-	core::Texture *fbo_t = ldr->createTexture("data/texture.png");
+	core::Texture *cloud_t = ldr->getTexture("data/cloud10.png");
+	core::Texture *gradient_t = ldr->getTexture("data/gradient.png");
+	core::Texture *fbo_t = ldr->getTexture("data/texture.png");
 	
-	font::BitmapFont *font = new font::BitmapFont("data/font.png");
+	font::BitmapFont *font = ldr->getBitmapFont("data/font.png");
 	
 	object::BitmapText *text = new object::BitmapText(font);
 	text->setText("Hello World!");
+	text->setColor(226, 226, 226);
+	text->z = -5.0f;
 	
 	scenegraph::MeshNode *cloud_n = new scenegraph::MeshNode();
-	
+
 	object::Quad *background_m = new object::Quad(true);
-	background_m->mat->setProgram(background_p);
-	background_m->mat->setTexture(gradient_t);
-	
+	background_m->setProgram(background_p);
+	background_m->setTexture(gradient_t);
+
 	core::UniformBlock *ublock1 = new core::UniformBlock("fx");
 	ublock1->setUniform("uv_multiplier");
 	ublock1->setUniform("time");
 	ublock1->initialize();
 	
 	kaleido_p->bindUniformBlock(ublock1);
-	
+
 	object::Quad *kaleido_m = new object::Quad(true);
-	kaleido_m->mat->setProgram(kaleido_p);
+	kaleido_m->setProgram(kaleido_p);
+	
+	core::Texture *kaleido_t = 
+					ldr->getNewTexture(screen->getWidth()*screen->getAASamples(),
+									   screen->getHeight()*screen->getAASamples());
+	kaleido_t->setNearestFiltering();
+	kaleido_m->setTexture(kaleido_t);
+	
 	/*kaleido_m->mat->setBlending(true);
 	kaleido_m->mat->setDepthTest(false);
 	kaleido_m->mat->setDepthWrite(false);
 	kaleido_m->opacity = 0.75f;
 		*/
-	core::Fbo *fbo = new core::Fbo(kaleido_m->screen_aligned_texture);
+	core::Fbo *fbo = new core::Fbo(kaleido_t);
 	
+	// non optimized clouds
 	unsigned int cloud_count = 512;
 	object::Quad *clouds_m[cloud_count];
 	for (unsigned int i = 0; i < cloud_count; i++) {
 		object::Quad *cloud_m = new object::Quad();
-		cloud_m->mat->setTexture(cloud_t);
-		cloud_m->mat->setProgram(cloud_p);
+		cloud_m->setTexture(cloud_t);
+		cloud_m->setProgram(cloud_p);
 		cloud_m->x = glm::linearRand(-10.0f, 10.0f);
 		cloud_m->y = glm::linearRand(-0.95f, -2.75f);
 		cloud_m->z = -(float)i/32.0f;
@@ -85,11 +95,12 @@ int main(int argc, char **argv) {
 		cloud_m->mat->setDepthWrite(false);
 		cloud_m->opacity = glm::linearRand(0.0f, 0.85f);
 		
-		//cloud_n->addMesh(cloud_m);
+		cloud_n->addMesh(cloud_m);
 		
 		clouds_m[i] = cloud_m;
 	}
 	
+	// basic optimized clouds (simple batching)
 	core::Geometry *geom = new core::Geometry();
 	for (unsigned int i = 0; i < cloud_count; i++) {
 		object::Quad *cloud_m1 = new object::Quad();
@@ -107,8 +118,8 @@ int main(int argc, char **argv) {
 	object::Mesh *cloud_f = new object::Mesh();
 	cloud_f->setGeometry(geom);
 	cloud_f->setMaterial(ldr->getNewMaterial());
-	cloud_f->mat->setTexture(cloud_t);
-	cloud_f->mat->setProgram(cloud_p);
+	cloud_f->setTexture(cloud_t);
+	cloud_f->setProgram(cloud_p);
 	cloud_f->mat->setCullMode(GL_NONE);
 	//cloud_f->mat->setPolyMode(GL_LINE);
 
@@ -147,7 +158,7 @@ int main(int argc, char **argv) {
 	stracker->setTrack("uv_multiplier", &uv_multiplier);
 	
 	sync::SyncTrackerXRNS *xrnstracker = sync::SyncTrackerXRNS::getInstance();
-	xrnstracker->parseSong("Song.xml");
+	//xrnstracker->parseSong("Song.xml");
 	
 	sync::SyncTrackerController *ctracker = sync::SyncTrackerController::getInstance();
 	
@@ -163,7 +174,7 @@ int main(int argc, char **argv) {
 		ublock1->setUniform("time", deltaTime);
 		ublock1->update();
 		
-/*
+
 		for (unsigned int i = 0; i < cloud_count; i++) {
 			clouds_m[i]->z += 0.5f * deltaTime;
 			clouds_m[i]->opacity += 0.09f * deltaTime;
@@ -182,12 +193,12 @@ int main(int argc, char **argv) {
 				clouds_m[i]->opacity = 0.0f;
 			}
 		}
-	*/	
-		abc=songDTime;//+=0.09f*songDeltaTime;
-		//std::cout << abc << std::endl;
+	
+		abc=songDTime;
+
 		cam->lookAt(cos(abc), -2.5f+sin(abc)*5.0f, -3.0+cos(abc)*3, 0.0f, -0.25f+sin(abc), -10.0f, -1.15f+cos(abc)*0.75f, 1.0f, sin(abc)*0.25f);
 			
-		//stracker->update(songTime);
+		stracker->update(songTime);
 		
 		#ifdef DEBUG
 		ctracker->update();
@@ -207,7 +218,6 @@ int main(int argc, char **argv) {
 	delete kaleido_m;
 	delete background_m;
 	delete cloud_n;
-	delete font;
 	delete text;
 
 	stracker->free();

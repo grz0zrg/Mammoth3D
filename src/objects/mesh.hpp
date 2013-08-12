@@ -163,6 +163,22 @@
 					}
 				}
 				
+				void setTexture(core::Texture *texture, unsigned int index = 0) {
+					if (mat) {
+						mat->setTexture(texture, index);
+					}
+				}
+				
+				void setProgram(program::Program *program) {
+					if (mat) {
+						mat->setProgram(program);
+					}
+				}
+				
+				core::Texture *getTexture(unsigned int index = 0) {
+					return mat->getTexture(index);
+				}
+				
 				core::Geometry *cloneGeometry() {
 					if (geom) {
 						return geom->clone();

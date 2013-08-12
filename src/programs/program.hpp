@@ -27,7 +27,7 @@
 				
 				void bindUniformBlock(core::UniformBlock *ub) {
 					GLuint blockIndex = glGetUniformBlockIndex(prog, ub->name.c_str());
-					glUniformBlockBinding(prog, blockIndex, ub->binding_point);
+					glUniformBlockBinding(prog, blockIndex, ub->getBindingPoint());
 				}
 
 				void bindVbos() {

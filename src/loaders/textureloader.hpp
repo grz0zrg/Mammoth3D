@@ -45,6 +45,7 @@
 				}
 				
 				core::Texture *loadTexture(core::Image *image);
+				core::Texture *createEmptyTexture(int width, int height);
 				
 				std::vector<core::Texture *> textures;
 

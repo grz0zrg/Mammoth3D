@@ -11,6 +11,9 @@
 				template <class T>
 				Tbo(const std::vector<T>& data, GLenum format = GL_R32F, GLenum usage = GL_STATIC_DRAW) {
 					this->usage = usage;
+					this->format = format;
+					
+					glGetError();
 					
 					glGenBuffers(1, &id);
 			
@@ -21,22 +24,14 @@
 						glBufferData(GL_TEXTURE_BUFFER, data.size() * sizeof(T), &data[0], usage); 
 					}
 					
-					glGenTextures(1, &id_texture);
-					
-					glBindTexture(GL_TEXTURE_BUFFER, id_texture);
-					glTexBuffer(GL_TEXTURE_BUFFER, format, id);
-					
 					GLenum err = glGetError();
 					if (err != GL_NO_ERROR) {
 						std::cout << "Tbo creation failed, error code: " << err << std::endl;
 					}
-					
-					glBindBuffer(GL_TEXTURE_BUFFER, 0); 
 				}
 				
 				~Tbo() {
 					glDeleteBuffers(1, &id);
-					glDeleteTextures(1, &id_texture);
 				}
 				
 				template <class T>
@@ -46,8 +41,8 @@
 					glBufferData(GL_TEXTURE_BUFFER, data.size() * sizeof(T), &data[0], GL_DYNAMIC_DRAW); 
 				}
 				
-				GLuint id, id_texture;
-				GLenum usage;
+				GLuint id;
+				GLenum usage, format;
 		};
 	}
 	

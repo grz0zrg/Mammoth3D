@@ -74,7 +74,7 @@ program::Program *loader::ShaderLoader::buildProgram() {
 		log("glCreateProgram failed");
 		return 0;
 	}
-	
+
 	for(size_t i = 0; i < shaderList.size(); i++) {
 		glAttachShader(prog, shaderList[i]);
 		if (glGetError() == GL_INVALID_VALUE || 
@@ -82,7 +82,7 @@ program::Program *loader::ShaderLoader::buildProgram() {
 			log("glAttachShader failed");
 		}
 	}
-		
+
 	glLinkProgram(prog);
 
 	GLint status;
@@ -100,7 +100,7 @@ program::Program *loader::ShaderLoader::buildProgram() {
 		
 		return 0;
 	}
-	
+
 	programList.push_back(prog);
 
 	for(size_t i = 0; i < shaderList.size(); i++) {

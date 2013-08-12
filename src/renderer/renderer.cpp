@@ -57,7 +57,7 @@ void renderer::Renderer::render(scenegraph::MeshNode *node) {
 		if (previousMat != mat) {
 			mesh->mat->update();
 		}
-				
+
 		if (mat) {
 			while (!mat->states.empty()) {
 				material::StateChangeType state = mat->states.top();
@@ -125,24 +125,24 @@ void renderer::Renderer::render(scenegraph::MeshNode *node) {
 				}
 			}
 		}
-				
+
 		if (mesh->type != object::QUAD_ALIGNED) {
 			glm::mat4 mvp = currCamera->projMatrix * 
 							currCamera->viewMatrix *
 							mesh->getTransformedMatrix();
-							
+
 			glUniformMatrix4fv(prog->getUniformLocation("mvp"), 1, 
 											GL_FALSE, glm::value_ptr(mvp));
 		}
-			
+
 		prog->bindVbos();
 
 		prog->setUniform1f("alpha", mesh->opacity);
 
 		const core::Vbo *vVbo = geom->vVbo;
-		
+
 		//mesh->sortTriangles(mvp);
-				
+
 		if (vVbo->usage == GL_DYNAMIC_DRAW) {
 			geom->updateVertices();
 		} else { // because already bound
@@ -154,8 +154,10 @@ void renderer::Renderer::render(scenegraph::MeshNode *node) {
 		if (!mat->textures.empty()) {
 			unsigned int textures_count = mat->textures.size();
 			for (unsigned int j = 0; j < textures_count; j++) {
+				const core::Texture *texture = mat->textures[j];
+
 				glActiveTexture(GL_TEXTURE0+j);
-				glBindTexture(GL_TEXTURE_2D, mat->textures[j]->id);
+				glBindTexture(texture->target, texture->id);
 			}
 			
 			const core::Vbo *uVbo = geom->uVbo;
@@ -163,12 +165,6 @@ void renderer::Renderer::render(scenegraph::MeshNode *node) {
 				glBindBuffer(GL_ARRAY_BUFFER, uVbo->bufferId);
 				glVertexAttribPointer(uVbo->attrib_index, uVbo->components, uVbo->data_type, uVbo->normalized, 0, 0);
 			}
-		}
-
-		if (mesh->type == object::BITMAP_TEXT) {
-			object::BitmapText *bt_mesh = (object::BitmapText *) mesh;
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_BUFFER, bt_mesh->tbo->id_texture);
 		}
 				
 		if (mesh->vertexColors) {

@@ -15,7 +15,7 @@ const char builtinshaders::bitmapFontsVertexShader[] = {
 			"	gl_Position = mvp * vec4(vertexPosition, 1.0f);\n"
 			"}\n"
 		};
-		
+
 const char builtinshaders::bitmapFontsFragmentShader[] = {
 			"#version 330\n"
 			"layout(location = 0) out vec4 outputColor;\n"
@@ -30,18 +30,18 @@ const char builtinshaders::bitmapFontsFragmentShader[] = {
 			"	float cell_height;\n"
 			"};\n"
 
-			"uniform sampler2D myTextureSampler;\n"
-			"uniform samplerBuffer chars_pos;\n"
+			"uniform sampler2D t0;\n"
+			"uniform samplerBuffer t1;\n"
 			"void main()\n"
 			"{\n"
-			" float lim_y = (1.0f-cell_height/font_height)-0.01;\n"
+			" float lim_y = (1.0f-cell_height/font_height);\n"
 			//" float off_x = abs(0.5f-text_length)/2.0f;\n"
 			//" float cell_height_d2 = (cell_height/2.0f)/font_width;\n"
 			//" float off_y = 0.5f - cell_height_d2;\n" // y centering
 			" int id = int((uv.x*font_width)/cell_width);\n"
-			" vec4 pos = texelFetch(chars_pos, id);\n"
-			" float uvx = min(uv.x, text_length);\n"
-			" vec4 tx = texture(myTextureSampler, vec2(pos.x+(uvx-((id*cell_width)/font_width)), max(uv.y, lim_y)-pos.y));\n" //off_y+clamp(uv.y, off_y, 0.498f + cell_height_d2) // y centering
+			" vec4 pos = texelFetch(t1, id);\n"
+			" float uvx = uv.x;//min(uv.x, text_length);\n"
+			" vec4 tx = texture(t0, vec2(pos.x+(uvx-((id*cell_width)/font_width)), max(uv.y, lim_y)-pos.y));\n" //off_y+clamp(uv.y, off_y, 0.498f + cell_height_d2) // y centering
 			"    if(tx.a < color.a){\n"
 			"        discard;\n"
 			"    }\n"

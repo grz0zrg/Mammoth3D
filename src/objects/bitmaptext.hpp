@@ -29,9 +29,9 @@
 					this->g = (float)g/255.0f;
 					this->b = (float)b/255.0f;
 					
-					uniforms->setUniform("r", r);
-					uniforms->setUniform("g", g);
-					uniforms->setUniform("b", b);
+					uniforms->setUniform("r", this->r);
+					uniforms->setUniform("g", this->g);
+					uniforms->setUniform("b", this->b);
 					
 					uniforms->update();
 				}
@@ -54,6 +54,8 @@
 				program::Program *prog;
 				
 				core::UniformBlock *uniforms;
+				
+				core::Texture *texture_buffer;
 				
 				TextAlignment alignment;
 		};

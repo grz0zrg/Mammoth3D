@@ -30,7 +30,7 @@
 					if (bufferId) {
 						destroy();
 					}
-					
+
 					glGenBuffers(1, &bufferId);
 					glBindBuffer(target, bufferId);
 					glBufferData(target, size, data, usage);

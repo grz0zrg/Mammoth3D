@@ -32,6 +32,17 @@ core::Texture *loader::TextureLoader::loadTexture(core::Image *image) {
 	}
 	
 	core::Texture *texture = new core::Texture(image);
+	texture->generateMipmap(0, 4);
+	texture->setLinearFiltering();
+	texture->setMaxAnisotropy();
+	textures.push_back(texture);
+	
+	return texture;
+}
+
+core::Texture *loader::TextureLoader::createEmptyTexture(int width, int height) {
+	core::Texture *texture = new core::Texture();
+	texture->create(width, height);
 	textures.push_back(texture);
 	
 	return texture;

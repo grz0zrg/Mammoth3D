@@ -10,9 +10,10 @@
 	namespace core {
 		class UniformBlock {
 			public:
-				UniformBlock(const std::string& block_name, GLuint bpoint = 0) {
+				UniformBlock(const std::string& block_name) {
 					name = block_name;
-					binding_point = bpoint;
+					binding_point = binding_point_counter;
+					binding_point_counter++;
 					
 					id = 0;
 				}
@@ -60,6 +61,10 @@
 					glBufferSubData(GL_UNIFORM_BUFFER, 0, data_count * sizeof(float), &data[0]);
 				}
 				
+				GLuint getBindingPoint() {
+					return binding_point;
+				}
+				
 				std::vector<float> data;
 				unsigned int data_count;
 				
@@ -67,7 +72,11 @@
 				
 				std::string name;
 				
-				GLuint id, binding_point;
+				GLuint id;
+				GLuint binding_point;
+				
+			private:
+				static GLuint binding_point_counter;
 		};
 	}
 

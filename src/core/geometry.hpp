@@ -63,6 +63,8 @@
 				}
 				
 				void generateVbo() {
+					glGetError(); // clear
+					
 					bool ret = false;
 					if (!indices.empty()) {
 						if (iVbo) {
@@ -131,8 +133,8 @@
 							delete cVbo;
 						}
 						cVbo = new Vbo();
-						ret = cVbo->build(uvs.size() * sizeof(float), 
-									&uvs.front(),
+						ret = cVbo->build(colors.size() * sizeof(float), 
+									&colors.front(),
 									GL_ARRAY_BUFFER,
 									GL_STATIC_DRAW);
 						cVbo->attrib(3);

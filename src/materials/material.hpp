@@ -6,6 +6,7 @@
 	
 	#include "../programs/program.hpp"
 	#include "../core/texture.hpp"
+	#include "../core/utils.hpp"
 
 	namespace material {
 		typedef enum {
@@ -87,10 +88,21 @@
 					bindTextures();
 				}
 				
+				core::Texture *getTexture(unsigned int index = 0) {
+					if (index < textures.size()) {
+						return textures[index];
+					}
+				}
+				
 				void bindTextures() {
 					if (prog) {
+						glUseProgram(prog->prog);
 						for (unsigned int i = 0; i < textures.size(); i++) {
-							glUniform1i(glGetUniformLocation(prog->prog, "t"+i), i);
+							std::string prefix = "t";
+							prefix = prefix + core::utils::toString(i);
+							
+							prog->registerUniform(prefix);
+							prog->setUniform1i(prefix, i);
 						}
 					}
 				}
