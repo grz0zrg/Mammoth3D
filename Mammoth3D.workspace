@@ -8,9 +8,9 @@
   <Project Name="assimp2bin" Path="tools/assimp2bin/assimp2bin.project" Active="No"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Main" Selected="yes">
-      <Project Name="assimp2bin" ConfigName="Release"/>
+      <Project Name="test" ConfigName="LinDebug_x86"/>
       <Project Name="dae2bin" ConfigName="Release"/>
-      <Project Name="test" ConfigName="Debug_x86"/>
+      <Project Name="assimp2bin" ConfigName="LinDebug"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

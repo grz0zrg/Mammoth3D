@@ -2,7 +2,46 @@
 <CodeLite_Project Name="test" InternalType="Console">
   <Plugins>
     <Plugin Name="qmake">
-      <![CDATA[00080001N0005Debug0000000000000001N0009Debug_x640000000000000001N0009Debug_x860000000000000001N0017ReleaseStatic_x640000000000000001N0017ReleaseStatic_x860000000000000001N0011Release_x640000000000000001N0011Release_x860000000000000001N0015lightweight_x86000000000000]]>
+      <![CDATA[00120001N0005Debug0000000000000001N0009Debug_x640000000000000001N0009Debug_x860000000000000001N0012LinDebug_x860000000000000001N0014LinRelease_x860000000000000001N0017ReleaseStatic_x640000000000000001N0017ReleaseStatic_x860000000000000001N0011Release_x640000000000000001N0011Release_x860000000000000001N0012WinDebug_x860000000000000001N0014WinRelease_x860000000000000001N0015lightweight_x86000000000000]]>
+    </Plugin>
+    <Plugin Name="CMakePlugin">
+      <![CDATA[[{
+		"name":	"LinDebug_x86",
+		"enabled":	false,
+		"buildDirectory":	"build",
+		"sourceDirectory":	"$(ProjectPath)",
+		"generator":	"",
+		"buildType":	"",
+		"arguments":	[],
+		"parentProject":	""
+	}, {
+		"name":	"LinRelease_x86",
+		"enabled":	false,
+		"buildDirectory":	"build",
+		"sourceDirectory":	"$(ProjectPath)",
+		"generator":	"",
+		"buildType":	"",
+		"arguments":	[],
+		"parentProject":	""
+	}, {
+		"name":	"WinDebug_x86",
+		"enabled":	false,
+		"buildDirectory":	"build",
+		"sourceDirectory":	"$(ProjectPath)",
+		"generator":	"",
+		"buildType":	"",
+		"arguments":	[],
+		"parentProject":	""
+	}, {
+		"name":	"WinRelease_x86",
+		"enabled":	false,
+		"buildDirectory":	"build",
+		"sourceDirectory":	"$(ProjectPath)",
+		"generator":	"",
+		"buildType":	"",
+		"arguments":	[],
+		"parentProject":	""
+	}]]]>
     </Plugin>
   </Plugins>
   <Description/>
@@ -82,6 +121,7 @@
     <VirtualDirectory Name="scenegraph">
       <File Name="../src/scenegraph/meshnode.hpp"/>
       <File Name="../src/scenegraph/node.hpp"/>
+      <File Name="../src/scenegraph/cameranode.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="misc">
       <File Name="../src/misc/builtinshaders.cpp"/>
@@ -110,34 +150,34 @@
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
-      <Compiler Options="-ggdb" C_Options="-ggdb">
+      <Compiler Options="-ggdb" C_Options="-ggdb" Assembler="">
         <IncludePath Value="../include"/>
         <IncludePath Value="../lib"/>
       </Compiler>
-      <Linker Options="-static-libgcc;-static-libstdc++;-ggdb">
-        <LibraryPath Value="../lib/x86/"/>
-        <LibraryPath Value="../lib/x86/ogg"/>
-        <LibraryPath Value="../lib/x86/vorbis"/>
-        <LibraryPath Value="../lib/x86/portaudio"/>
-        <Library Value="portaudio.dll"/>
-        <Library Value="ogg.dll"/>
-        <Library Value="vorbisfile.dll"/>
-      </Linker>
+      <Linker Options="-static-libgcc;-static-libstdc++;-ggdb"/>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
-    <Configuration Name="Debug_x86" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;-W;-O0" C_Options="-g;-W;-O0" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+    <Configuration Name="LinDebug_x86" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g;-W;-O0" C_Options="-g;-W;-O0" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <IncludePath Value="../src"/>
-        <Preprocessor Value="GLFW_DLL"/>
         <Preprocessor Value="GLEW_STATIC"/>
         <Preprocessor Value="DEBUG"/>
       </Compiler>
       <Linker Options="" Required="yes">
-        <Library Value="opengl32"/>
-        <Library Value="glfw3dll"/>
+        <Library Value="glfw3"/>
+        <Library Value="GL"/>
+        <Library Value="portaudio"/>
+        <Library Value="ogg"/>
+        <Library Value="vorbisfile"/>
+        <Library Value="X11"/>
+        <Library Value="Xxf86vm"/>
+        <Library Value="Xrandr"/>
+        <Library Value="pthread"/>
+        <Library Value="Xi"/>
+        <Library Value="rt"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="./test/bin/$(ProjectName)" IntermediateDirectory="../obj/debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./test/bin" PauseExecWhenProcTerminates="yes"/>
+      <General OutputFile="./test/bin/$(ProjectName)" IntermediateDirectory="../obj/debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./test/bin" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[G_SLICE=always-malloc
 G_DEBUG=gc-friendly]]>
@@ -170,18 +210,128 @@ G_DEBUG=gc-friendly]]>
         <SearchPaths/>
       </Completion>
     </Configuration>
-    <Configuration Name="Release_x86" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O2;-W" C_Options="-O2;-W" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+    <Configuration Name="LinRelease_x86" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O2;-W" C_Options="-O2;-W" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+        <IncludePath Value="../src"/>
+        <Preprocessor Value="GLEW_STATIC"/>
+      </Compiler>
+      <Linker Options="" Required="yes">
+        <Library Value="glfw3"/>
+        <Library Value="GL"/>
+        <Library Value="portaudio"/>
+        <Library Value="ogg"/>
+        <Library Value="vorbisfile"/>
+        <Library Value="X11"/>
+        <Library Value="Xxf86vm"/>
+        <Library Value="Xrandr"/>
+        <Library Value="pthread"/>
+        <Library Value="Xi"/>
+        <Library Value="rt"/>
+      </Linker>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="./test/bin/$(ProjectName)" IntermediateDirectory="../obj/release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./test/bin" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="WinDebug_x86" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g;-W;-O0" C_Options="-g;-W;-O0" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+        <IncludePath Value="../src"/>
+        <Preprocessor Value="GLFW_DLL"/>
+        <Preprocessor Value="GLEW_STATIC"/>
+        <Preprocessor Value="DEBUG"/>
+      </Compiler>
+      <Linker Options="" Required="yes">
+        <LibraryPath Value="../lib/x86/"/>
+        <LibraryPath Value="../lib/x86/ogg"/>
+        <LibraryPath Value="../lib/x86/vorbis"/>
+        <LibraryPath Value="../lib/x86/portaudio"/>
+        <Library Value="glfw3dll"/>
+        <Library Value="opengl32"/>
+        <Library Value="portaudio.dll"/>
+        <Library Value="ogg.dll"/>
+        <Library Value="vorbisfile.dll"/>
+      </Linker>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="./test/bin/$(ProjectName)" IntermediateDirectory="../obj/debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./test/bin" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[G_SLICE=always-malloc
+G_DEBUG=gc-friendly]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="WinRelease_x86" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O2;-W" C_Options="-O2;-W" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
         <IncludePath Value="../src"/>
         <Preprocessor Value="GLFW_DLL"/>
         <Preprocessor Value="GLEW_STATIC"/>
       </Compiler>
       <Linker Options="" Required="yes">
-        <Library Value="opengl32"/>
+        <LibraryPath Value="../lib/x86/"/>
+        <LibraryPath Value="../lib/x86/ogg"/>
+        <LibraryPath Value="../lib/x86/vorbis"/>
+        <LibraryPath Value="../lib/x86/portaudio"/>
         <Library Value="glfw3dll"/>
+        <Library Value="opengl32"/>
+        <Library Value="portaudio.dll"/>
+        <Library Value="ogg.dll"/>
+        <Library Value="vorbisfile.dll"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="./test/bin/$(ProjectName)" IntermediateDirectory="../obj/release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./test/bin" PauseExecWhenProcTerminates="yes"/>
+      <General OutputFile="./test/bin/$(ProjectName)" IntermediateDirectory="../obj/release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="./test/bin" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
