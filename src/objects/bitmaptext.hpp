@@ -1,5 +1,5 @@
-#ifndef BITMAPTEXT_OBJECT_HPP
-#define BITMAPTEXT_OBJECT_HPP
+#ifndef MAMMOTH3D_BITMAPTEXT_OBJECT_HPP
+#define MAMMOTH3D_BITMAPTEXT_OBJECT_HPP
 	
 	#include "../font/bitmapfont.hpp"
 	#include "../loaders/shaderloader.hpp"
@@ -21,43 +21,43 @@
 				void setText(const std::string& text);
 				
 				void setFont(font::BitmapFont *font) {
-					this->font = font;
+					_font = font;
 				}
 				
 				void setColor(int r, int g, int b) {
-					this->r = (float)r/255.0f;
-					this->g = (float)g/255.0f;
-					this->b = (float)b/255.0f;
+					_r = (float)r/255.0f;
+					_g = (float)g/255.0f;
+					_b = (float)b/255.0f;
 					
-					uniforms->setUniform("r", this->r);
-					uniforms->setUniform("g", this->g);
-					uniforms->setUniform("b", this->b);
+					_uniforms->setUniform("r", _r);
+					_uniforms->setUniform("g", _g);
+					_uniforms->setUniform("b", _b);
 					
-					uniforms->update();
+					_uniforms->update();
 				}
 				
 				void setAlphaTreshold(float value) {
-					this->alphaTreshold = value;
-					uniforms->setUniform("a", alphaTreshold);
+					_alpha_treshold = value;
+					_uniforms->setUniform("a", _alpha_treshold);
 					
-					uniforms->update();
+					_uniforms->update();
 				}
 				
-				float r, g, b, alphaTreshold;
+				float _r, _g, _b, _alpha_treshold;
 				
-				font::BitmapFont *font;
+				font::BitmapFont *_font;
 				
-				std::string text;
+				std::string _text;
 				
-				core::Tbo *tbo;
+				core::Tbo *_tbo;
 				
-				program::Program *prog;
+				program::Program *_prog;
 				
-				core::UniformBlock *uniforms;
+				core::UniformBlock *_uniforms;
 				
-				core::Texture *texture_buffer;
+				core::Texture *_texture_buffer;
 				
-				TextAlignment alignment;
+				TextAlignment _alignment;
 		};
 	}
 	

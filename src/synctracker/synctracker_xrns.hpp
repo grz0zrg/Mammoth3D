@@ -1,5 +1,5 @@
-#ifndef SYNCTRACKER_XRNS_HPP
-#define SYNCTRACKER_XRNS_HPP
+#ifndef MAMMOTH3D_SYNCTRACKER_XRNS_HPP
+#define MAMMOTH3D_SYNCTRACKER_XRNS_HPP
 
 	#include "synctracker.hpp"
 	
@@ -11,44 +11,44 @@
 			class Line {
 				public:
 					Line(int index) {
-						this->index = index;
+						_index = index;
 					}
 					~Line() {}
 					
-					int index;
+					int _index;
 			};
 			
 			class Track {
 				public:
 					Track() {}
 					~Track() {
-						for (unsigned int i = 0; i < lines.size(); i++) {
-							delete lines[i];
+						for (unsigned int i = 0; i < _lines.size(); i++) {
+							delete _lines[i];
 						}
 					}
 					
-					std::string name;
-					std::vector<Line *> lines;
+					std::string _name;
+					std::vector<Line *> _lines;
 			};
 			
 			class Pattern {
 				public:
 					Pattern(int lines) {
-						this->lines = lines;
+						_lines = lines;
 					}
 
 					~Pattern() {
-						for (unsigned int i = 0; i < tracks.size(); i++) {
-							delete tracks[i];
+						for (unsigned int i = 0; i < _tracks.size(); i++) {
+							delete _tracks[i];
 						}
 					}
 					
-					int lines;
-					std::vector<Track *> tracks;
+					int _lines;
+					std::vector<Track *> _tracks;
 			};
 			
 			SyncTrackerXRNS() {
-				stracker = SyncTracker::getInstance();
+				_stracker = SyncTracker::getInstance();
 			}
 			
 			~SyncTrackerXRNS() {
@@ -59,21 +59,21 @@
 			void operator=(const SyncTrackerXRNS&);
 			static SyncTrackerXRNS *_singleton;
 			
-			SyncTracker *stracker;
+			SyncTracker *_stracker;
 			
-			std::vector<Pattern *> patterns;
-			std::vector<Track *> tracks;
+			std::vector<Pattern *> _patterns;
+			std::vector<Track *> _tracks;
 			
 			public:
 				void parseSong(const std::string& xrns);
 				
 				void freeSong() {
-					for (unsigned int i = 0; i < patterns.size(); i++) {
-						delete patterns[i];
+					for (unsigned int i = 0; i < _patterns.size(); i++) {
+						delete _patterns[i];
 					}
 					
-					for (unsigned int i = 0; i < tracks.size(); i++) {
-						delete tracks[i];
+					for (unsigned int i = 0; i < _tracks.size(); i++) {
+						delete _tracks[i];
 					}
 				}
 			

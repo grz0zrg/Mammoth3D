@@ -1,5 +1,5 @@
-#ifndef BITMAPFONT_HPP
-#define BITMAPFONT_HPP
+#ifndef MAMMOTH3D_BITMAPFONT_HPP
+#define MAMMOTH3D_BITMAPFONT_HPP
 
 	#include "../core/tbo.hpp"
 
@@ -8,43 +8,15 @@
 	namespace font {
 		class BitmapFont {
 			public:
-				BitmapFont(core::Texture *font_texture) {
-					if (!font_texture) {
-						return;
-					}
-
-					bitmap = font_texture;
-					
-					font_texture->setLinearFiltering();
-					font_texture->setMaxAnisotropy();
-					font_texture->generateMipmap();
-					
-					cellWidth  = bitmap->width  / 16;
-					cellHeight = bitmap->height / 16;
-					
-					chars.resize(512);
-
-					int currentChar = 0;
-					for(int cols = 0; cols < 16; cols++) {
-						for(int rows = 0; rows < 16; rows++) {
-							chars[currentChar]   = ((float)(cellWidth  * rows)+0.5f) / bitmap->width;
-							chars[currentChar+1] = ((float)(cellHeight * cols)+0.5f) / bitmap->height;
-							
-							currentChar += 2;
-						}
-					}
-				}
+				BitmapFont(core::Texture *font_texture);
 				
-				~BitmapFont() {
-					delete bitmap;
-					bitmap = 0;
-				}
+				~BitmapFont();
 
-				core::Texture *bitmap;
+				core::Texture *_bitmap;
 				
-				std::vector<float> chars;
+				std::vector<float> _chars;
 				
-				int cellWidth, cellHeight;
+				int _cellWidth, _cellHeight;
 		};
 	}
 	

@@ -4,7 +4,7 @@ window::Window *window::Window::_singleton = 0;
 
 void window::Window::openWindow(int width, int height, bool fullscreen, 
 										const char *title) {
-	if (fail) return;					
+	if (_fail) return;					
 	
 	glfwWindowHint(GLFW_RED_BITS, 8);
 	glfwWindowHint(GLFW_GREEN_BITS, 8);
@@ -12,7 +12,7 @@ void window::Window::openWindow(int width, int height, bool fullscreen,
 	glfwWindowHint(GLFW_ALPHA_BITS, 8);
 	glfwWindowHint(GLFW_DEPTH_BITS, 24);
 	glfwWindowHint(GLFW_STENCIL_BITS, 8);
-				
+	
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 	// opengl 3.3
 	//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -20,24 +20,30 @@ void window::Window::openWindow(int width, int height, bool fullscreen,
 		
 	//glfwWindowHint(GLFW_STEREO, GL_TRUE);
 			
-	primaryMonitor = glfwGetPrimaryMonitor();
+	_primary_monitor = glfwGetPrimaryMonitor();
 					
-	glfwVidMode = glfwGetVideoMode(primaryMonitor);
-					
-	if (fullscreen) {
-		glfw_window = glfwCreateWindow(width, height, title, primaryMonitor, NULL);
-	} else {
-		glfw_window = glfwCreateWindow(width, height, title, NULL, NULL);
+	_glfw_vid_mode = glfwGetVideoMode(_primary_monitor);
+	
+	if (width == 0 && height == 0) {
+		width  = _glfw_vid_mode->width;
+		height = _glfw_vid_mode->height;
+		setRefreshRate(_glfw_vid_mode->refreshRate);
 	}
 					
-	if (!glfw_window) {
-		log("glfwOpenWindow(...) failed");
-		fail = true;
+	if (fullscreen) {
+		_glfw_window = glfwCreateWindow(width, height, title, _primary_monitor, NULL);
+	} else {
+		_glfw_window = glfwCreateWindow(width, height, title, NULL, NULL);
+	}
+					
+	if (!_glfw_window) {
+		log("openWindow(...) failed");
+		_fail = true;
 		return;
 	}
 					
-	glfwMakeContextCurrent(glfw_window);
+	glfwMakeContextCurrent(_glfw_window);
 				
-	windowWidth = width;
-	windowHeight = height;
+	_window_width = width;
+	_window_height = height;
 }

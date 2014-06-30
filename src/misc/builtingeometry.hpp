@@ -1,5 +1,5 @@
-#ifndef MISC_BUILTINGEOMETRY_HPP
-#define MISC_BUILTINGEOMETRY_HPP
+#ifndef MAMMOTH3D_MISC_BUILTINGEOMETRY_HPP
+#define MAMMOTH3D_MISC_BUILTINGEOMETRY_HPP
 
 	namespace builtingeometry {
 		extern const unsigned int quadIndice[];

@@ -10,11 +10,11 @@
 		class Joystick {
 			public:
 				Joystick() {
-					joy = 0;
-					buttons_count = 0;
-					axes_count = 0;
-					buttons = 0;
-					axes = 0;
+					_joy = 0;
+					_buttons_count = 0;
+					_axes_count = 0;
+					_buttons = 0;
+					_axes = 0;
 				}
 				
 				~Joystick() {
@@ -31,19 +31,19 @@
 				}
 				
 				void setJoystick(int id) {
-					joy = id;
+					_joy = id;
 				}
 				
 				bool isButtonPressed(int button_index) {
-					return (bool)buttons[button_index];
+					return (bool)_buttons[button_index];
 				}
 				
 				bool isButtonReleased(int button_index) {
-					if (prevButtons.empty()) {
+					if (_prev_buttons.empty()) {
 						return false;
 					}
 				
-					if (prevButtons[button_index] > 0 && buttons[button_index] == 0) {
+					if (_prev_buttons[button_index] > 0 && _buttons[button_index] == 0) {
 						return true;
 					}
 
@@ -51,25 +51,25 @@
 				}
 				
 				float getAxe(int axe_index) {
-					return axes[axe_index];
+					return _axes[axe_index];
 				}
 				
 				void update() {
-					prevButtons.resize(buttons_count, 0);
-					for (int i = 0; i < buttons_count; i++) {
-						prevButtons[i] = buttons[i];
+					_prev_buttons.resize(_buttons_count, 0);
+					for (int i = 0; i < _buttons_count; i++) {
+						_prev_buttons[i] = _buttons[i];
 					}
 					
-					buttons = glfwGetJoystickButtons(joy, &buttons_count);
-					axes = glfwGetJoystickAxes(joy, &axes_count);
+					_buttons = glfwGetJoystickButtons(_joy, &_buttons_count);
+					_axes = glfwGetJoystickAxes(_joy, &_axes_count);
 				}
 				
-				int joy;
-				std::vector<unsigned char> prevButtons;
-				const unsigned char *buttons;
-				const float *axes;
-				int axes_count;
-				int buttons_count;
+				int _joy;
+				std::vector<unsigned char> _prev_buttons;
+				const unsigned char *_buttons;
+				const float *_axes;
+				int _axes_count;
+				int _buttons_count;
 		};
 	}
 

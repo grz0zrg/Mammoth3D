@@ -1,5 +1,5 @@
-#ifndef COLLADA_HPP
-#define COLLADA_HPP
+#ifndef MAMMOTH3D_COLLADA_HPP
+#define MAMMOTH3D_COLLADA_HPP
 
 	#include <iostream>  
 	#include <vector>

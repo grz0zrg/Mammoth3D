@@ -1,5 +1,5 @@
-#ifndef LOADER_HPP
-#define LOADER_HPP
+#ifndef MAMMOTH3D_LOADER_HPP
+#define MAMMOTH3D_LOADER_HPP
 
 	#include <string>
 	#include <map>
@@ -16,41 +16,41 @@
 		class Loader {
 			private:
 				Loader() { 
-					shaderLoader   = loader::ShaderLoader::getInstance();
-					meshLoader     = loader::MeshLoader::getInstance();
-					materialLoader = loader::MaterialLoader::getInstance();
-					imageLoader    = loader::ImageLoader::getInstance();
-					textureLoader  = loader::TextureLoader::getInstance();
+					_shader_loader   = loader::ShaderLoader::getInstance();
+					_mesh_loader     = loader::MeshLoader::getInstance();
+					_material_loader = loader::MaterialLoader::getInstance();
+					_image_loader    = loader::ImageLoader::getInstance();
+					_texture_loader  = loader::TextureLoader::getInstance();
 				}
 				
 				~Loader() {
-					shaderLoader->free();
-					meshLoader->free();
-					materialLoader->free();
-					imageLoader->free();
-					textureLoader->free();
+					_shader_loader->free();
+					_mesh_loader->free();
+					_material_loader->free();
+					_image_loader->free();
+					_texture_loader->free();
 					
 					std::map<std::string, font::BitmapFont *>::iterator fontsIt 
-																= bfonts.begin();
-					for (fontsIt; fontsIt != bfonts.end(); ++fontsIt) {
+																= _bfonts.begin();
+					for (fontsIt; fontsIt != _bfonts.end(); ++fontsIt) {
 						if (fontsIt->second) {
 							delete fontsIt->second;
 						}
 					}
-					bfonts.clear();
+					_bfonts.clear();
 				}
 				
 				Loader(const Loader&);
 				void operator=(const Loader&);
 				static Loader *_singleton;
 				
-				loader::ShaderLoader *shaderLoader;
-				loader::MeshLoader *meshLoader;
-				loader::MaterialLoader *materialLoader;
-				loader::ImageLoader *imageLoader;
-				loader::TextureLoader *textureLoader;
+				loader::ShaderLoader *_shader_loader;
+				loader::MeshLoader *_mesh_loader;
+				loader::MaterialLoader *_material_loader;
+				loader::ImageLoader *_image_loader;
+				loader::TextureLoader *_texture_loader;
 				
-				std::map<std::string, font::BitmapFont *> bfonts;
+				std::map<std::string, font::BitmapFont *> _bfonts;
 
 			public:
 				static Loader *getInstance()
@@ -73,39 +73,39 @@
 				
 				program::Program *getProgram(const std::string &vertexShader, 
 									const std::string &fragmentShader) {
-					shaderLoader->compileShaderFile(GL_VERTEX_SHADER, 
+					_shader_loader->compileShaderFile(GL_VERTEX_SHADER, 
 																vertexShader);
-					shaderLoader->compileShaderFile(GL_FRAGMENT_SHADER, 
+					_shader_loader->compileShaderFile(GL_FRAGMENT_SHADER, 
 																fragmentShader);
-					return shaderLoader->buildProgram();
+					return _shader_loader->buildProgram();
 				}
 				
-				object::Mesh *getMesh(const std::string &fileName) {
-					return meshLoader->loadMesh(fileName);
+				scenegraph::MeshNode *getMeshNode(const std::string &fileName) {
+					return _mesh_loader->loadMesh(fileName);
 				}
 				
 				material::Material *getNewMaterial() {
-					return materialLoader->createMaterial();
+					return _material_loader->createMaterial();
 				}
 				
 				core::Texture *getNewTexture(int width, int height) {
-					return textureLoader->createEmptyTexture(width, height);
+					return _texture_loader->createEmptyTexture(width, height);
 				}
 				
 				core::Texture *getTexture(const std::string &fileName) {
-					return textureLoader->loadTexture(imageLoader->loadImage(fileName));
+					return _texture_loader->loadTexture(_image_loader->loadImage(fileName));
 				}
 				
 				font::BitmapFont *getBitmapFont(const std::string &fileName) {
 					std::map<std::string, font::BitmapFont *>::iterator fontElement = 
-													bfonts.find(fileName);
+													_bfonts.find(fileName);
 					
-					if (fontElement != bfonts.end()) {
+					if (fontElement != _bfonts.end()) {
 						return fontElement->second;
 					}
 					
 					font::BitmapFont *_font = new font::BitmapFont(getTexture(fileName));
-					bfonts[fileName] = _font;
+					_bfonts[fileName] = _font;
 					
 					return _font;
 				}

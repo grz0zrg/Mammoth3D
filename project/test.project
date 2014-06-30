@@ -56,7 +56,6 @@
     </VirtualDirectory>
     <VirtualDirectory Name="core">
       <File Name="../src/core/math.hpp"/>
-      <File Name="../src/core/math.cpp"/>
       <File Name="../src/core/geometry.hpp"/>
       <File Name="../src/core/vbo.hpp"/>
       <File Name="../src/core/image.hpp"/>
@@ -69,6 +68,12 @@
       <File Name="../src/core/geometry_utils.hpp"/>
       <File Name="../src/core/geometry_utils.cpp"/>
       <File Name="../src/core/uniform_block.cpp"/>
+      <File Name="../src/core/math.cpp"/>
+      <File Name="../src/core/fbo.cpp"/>
+      <File Name="../src/core/geometry.cpp"/>
+      <File Name="../src/core/tbo.cpp"/>
+      <File Name="../src/core/texture.cpp"/>
+      <File Name="../src/core/vbo.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="loaders">
       <File Name="../src/loaders/meshloader.cpp"/>
@@ -131,6 +136,7 @@
     </VirtualDirectory>
     <VirtualDirectory Name="font">
       <File Name="../src/font/bitmapfont.hpp"/>
+      <File Name="../src/font/bitmapfont.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="synctracker">
       <File Name="../src/synctracker/synctracker.cpp"/>

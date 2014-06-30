@@ -1,5 +1,5 @@
-#ifndef GEOMETRY_UTILS_HPP
-#define GEOMETRY_UTILS_HPP
+#ifndef MAMMOTH3D_GEOMETRY_UTILS_HPP
+#define MAMMOTH3D_GEOMETRY_UTILS_HPP
 	
 	#include "geometry.hpp"
 	#include "../objects/mesh.hpp"

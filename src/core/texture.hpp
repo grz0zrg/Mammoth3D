@@ -1,5 +1,5 @@
-#ifndef TEXTURE_HPP
-#define TEXTURE_HPP
+#ifndef MAMMOTH3D_TEXTURE_HPP
+#define MAMMOTH3D_TEXTURE_HPP
 
 	#include <vector>
 	#include <iostream>
@@ -14,74 +14,20 @@
 					create(image, type);
 				}
 
-				void create(int width = 0, int height = 0, GLenum type = GL_TEXTURE_2D) {
-					this->width  = width;
-					this->height = height;
-
-					glDeleteTextures(1, &id);
-					
-					glGenTextures(1, &id);
-
-					target = type;
-					
-					glBindTexture(target, id);
-		
-					if (target == GL_TEXTURE_2D) {
-						//std::vector<unsigned char> fill;
-						//fill.resize(width*height*4, 0);
-						glTexImage2D(target, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-						glGenerateMipmap(target);
-					}
-				}
+				void create(int width = 0, int height = 0, 
+                                                GLenum type = GL_TEXTURE_2D);
+				void create(Image *image, GLenum type = GL_TEXTURE_2D);
 				
-				void create(Image *image, GLenum type = GL_TEXTURE_2D) {
-					if (!image) {
-						return;
-					}
-					
-					this->image = image;
-					
-					width = image->width;
-					height = image->height;
-					
-					glDeleteTextures(1, &id);
-					
-					glGenTextures(1, &id);
-
-					target = type;
-
-					glBindTexture(target, id);
-					
-					if (image->data.empty()) {
-						glTexImage2D(target, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-					} else {
-						glTexImage2D(target, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image->data[0]);
-					}
-
-					glGenerateMipmap(target);
-				}
-				
-				void setTextureSize(int width, int height) {
-					glBindTexture(target, id);
-					
-					if (target == GL_TEXTURE_2D) {
-						if (image) { // the image still need to be resized before
-							glTexImage2D(target, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image->data[0]);
-						} else {
-							glTexImage2D(target, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-						}
-						glGenerateMipmap(target);
-					}
-				}
+				void setTextureSize(int width, int height);
 
 				void bindBuffer(GLenum format, GLuint buffer) {
-					glBindTexture(target, id);
+					glBindTexture(_target, _id);
 					glTexBuffer(GL_TEXTURE_BUFFER, format, buffer);
 				}
 				
 				void setParameter(GLenum pname, GLint param) {
-					glBindTexture(target, id);
-					glTexParameteri(target, pname, param);
+					glBindTexture(_target, _id);
+					glTexParameteri(_target, pname, param);
 				}
 				
 				void setNearestFiltering() {
@@ -95,41 +41,50 @@
 				}
 				
 				void setMaxAnisotropy() {
-					glBindTexture(target, id);
+					glBindTexture(_target, _id);
 					
 					GLfloat maxAniso = 0.0f;
 					glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAniso);
-					glTexParameteri(target, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAniso);
+					glTexParameteri(_target, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAniso);
 				}
 				
 				void generateMipmap(int base_level = 0, int max_level = 4) {
-					glBindTexture(target, id);
+					glBindTexture(_target, _id);
 					
-					glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, base_level);
-					glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, max_level);
+					glTexParameteri(_target, GL_TEXTURE_BASE_LEVEL, base_level);
+					glTexParameteri(_target, GL_TEXTURE_MAX_LEVEL, max_level);
 					
-					glGenerateMipmap(target);
+					glGenerateMipmap(_target);
 				}
 				
 				void setMultisampling(int samples) {
-					if (target != GL_TEXTURE_2D || image == 0) {
+					if (_target != GL_TEXTURE_2D || _image == 0) {
 						return;
 					}
-
-					glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, id);
-					glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGBA, width, height, false);
+					
+					_samples = samples;
+                    _target = GL_TEXTURE_2D_MULTISAMPLE;
+                    
+					glDeleteTextures(1, &_id);
+					
+					glGenTextures(1, &_id);
+					
+					glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, _id);
+					glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, 
+                                            GL_RGBA, _width, _height, GL_TRUE);
 				}
 				
 				~Texture() {
-					glDeleteTextures(1, &id);
+					glDeleteTextures(1, &_id);
 				}
 				
-			GLuint id;
-			int width, height;
+			GLuint _id;
+			int _width, _height;
+			int _samples;
 			
-			Image *image;
+			Image *_image;
 			
-			GLenum target;
+			GLenum _target;
 		};
 	}
 

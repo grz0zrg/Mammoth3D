@@ -1,5 +1,5 @@
-#ifndef TEXTURELOADER_HPP
-#define TEXTURELOADER_HPP
+#ifndef MAMMOTH3D_TEXTURELOADER_HPP
+#define MAMMOTH3D_TEXTURELOADER_HPP
 
 	#include <fstream>
 	#include <iostream>
@@ -19,9 +19,9 @@
 				}
 			
 				~TextureLoader() { 
-					for (unsigned int i = 0; i < textures.size(); i++) {
-						if (textures[i]) {
-							delete textures[i];
+					for (unsigned int i = 0; i < _textures.size(); i++) {
+						if (_textures[i]) {
+							delete _textures[i];
 						}
 					}
 				}
@@ -47,22 +47,16 @@
 				core::Texture *loadTexture(core::Image *image);
 				core::Texture *createEmptyTexture(int width, int height);
 				
-				std::vector<core::Texture *> textures;
+				std::vector<core::Texture *> _textures;
 
 			private:
 				template <typename T>
-				void logPretty(const std::string &str, T param) {
-					std::cout << "[TextureLoader] " << str << "\"" << 
-								param << "\"" << std::endl;
-				}
-				
-				template <typename T>
 				void log(const std::string &str, T param) {
-					std::cout << "[TextureLoader] " << str << param << std::endl;
+					std::cout << "[TextureLoader ] " << str << param << std::endl;
 				}
 					
 				void log(const char *str) {
-					std::cout << "[TextureLoader] " << str << std::endl;
+					std::cout << "[TextureLoader ] " << str << std::endl;
 				}
 				
 			TextureLoader(const TextureLoader&);

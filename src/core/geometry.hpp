@@ -1,5 +1,5 @@
-#ifndef GEOMETRY_HPP
-#define GEOMETRY_HPP
+#ifndef MAMMOTH3D_GEOMETRY_HPP
+#define MAMMOTH3D_GEOMETRY_HPP
 
 	#include <vector>
 	#include <iostream>
@@ -15,196 +15,42 @@
 		
 		class Geometry {
 			public:
-				Geometry() {
-					indicesCount = 0;
-					verticesCount = 0;
-					normalsCount = 0;
-					uvsCount = 0;
-					colorsCount = 0;
-					
-					iVbo = vVbo = nVbo = uVbo = cVbo = 0;
-
-					type = GL_TRIANGLES;
-				}
+				Geometry();
+				~Geometry();
 				
-				~Geometry() {
-					if (iVbo) {
-						delete iVbo;
-					}
-					
-					if (vVbo) {
-						delete vVbo;
-					}
-					
-					if (nVbo) {
-						delete nVbo;
-					}
-
-					if (uVbo) {
-						delete uVbo;
-					}
-					
-					if (cVbo) {
-						delete cVbo;
-					}
-				}
+				Geometry *clone();
 				
-				Geometry *clone() {
-					Geometry *geom = new Geometry();
-
-					geom->indices = indices;
-					geom->vertices = vertices;
-					geom->normals = normals;
-					geom->uvs = uvs;
-					geom->colors = colors;
-					geom->update();
-
-					return geom;
-				}
+				void generateVbo();
+                
+				void updateVertices();
+				void updateColors();
+				void update();
 				
-				void generateVbo() {
-					glGetError(); // clear
-					
-					bool ret = false;
-					if (!indices.empty()) {
-						if (iVbo) {
-							delete iVbo;
-						}
-						iVbo = new Vbo();
-						ret = iVbo->build(indices.size() * sizeof(unsigned int), 
-									&indices.front(),
-									GL_ELEMENT_ARRAY_BUFFER,
-									GL_STATIC_DRAW);
-						if (!ret) {
-							log("Indices VBO creation failed.");
-						}
-					}
-					
-					if (!vertices.empty()) {
-						if (vVbo) {
-							delete vVbo;
-						}
-						vVbo = new Vbo();
-						ret = vVbo->build(vertices.size() * sizeof(float), 
-									&vertices.front(),
-									GL_ARRAY_BUFFER,
-									GL_STATIC_DRAW);
-						vVbo->attrib(0);
-						vVbo->setComponents(3);
-						if (!ret) {
-							log("Vertices VBO creation failed.");
-						}
-					}
-					
-					if (!uvs.empty()) {
-						if (uVbo) {
-							delete uVbo;
-						}
-						uVbo = new Vbo();
-						ret = uVbo->build(uvs.size() * sizeof(float), 
-									&uvs.front(),
-									GL_ARRAY_BUFFER,
-									GL_STATIC_DRAW);
-						uVbo->attrib(1);
-						uVbo->setComponents(2);
-						if (!ret) {
-							log("UVs VBO creation failed.");
-						}
-					}
-					
-					if (!normals.empty()) {
-						if (nVbo) {
-							delete nVbo;
-						}
-						nVbo = new Vbo();
-						ret = nVbo->build(normals.size() * sizeof(float), 
-									&normals.front(),
-									GL_ARRAY_BUFFER,
-									GL_STATIC_DRAW);
-						nVbo->attrib(2);
-						nVbo->setComponents(3);
-						if (!ret) {
-							log("Normals VBO creation failed.");
-						}
-					}
-					
-					if (!colors.empty()) {
-						if (cVbo) {
-							delete cVbo;
-						}
-						cVbo = new Vbo();
-						ret = cVbo->build(colors.size() * sizeof(float), 
-									&colors.front(),
-									GL_ARRAY_BUFFER,
-									GL_STATIC_DRAW);
-						cVbo->attrib(3);
-						cVbo->setComponents(4);
-						if (!ret) {
-							log("Colors VBO creation failed.");
-						}
-					}
-				}
-
-				void updateVertices() {
-					vVbo->update(vertices.size() * sizeof(float), &vertices.front());
-					verticesCount = vertices.size();
-				}
-				
-				void updateColors() {
-					cVbo->update(colors.size() * sizeof(float), &colors.front());
-					colorsCount = colors.size();
-				}
-				
-				void update() {
-					indicesCount = indices.size();
-					verticesCount = vertices.size();
-					normalsCount = normals.size();
-					uvsCount = uvs.size();
-					colorsCount = colors.size();
-					
-					generateVbo();
-				}
-				
-				void setDynamic(GeometryData type, bool state = true) {
-					GLenum usage = GL_DYNAMIC_DRAW;
-					if (!state) {
-						usage = GL_STATIC_DRAW;
-					}
-					
-					if (type == GEOMETRY_COLOR) {
-						if (cVbo) {
-							cVbo->setUsage(usage);
-						}
-					} else if (type == GEOMETRY_VERTICE) {
-						if (vVbo) {
-							vVbo->setUsage(usage);
-						}
-					}
-				}
+				void setDynamic(GeometryData type, bool state = true);
 				
 				void setType(GLenum type) {
-					this->type = type;
+					_type = type;
 				}
 				
 				void log(const char *str) {
 					std::cout << "[Geometry] " << str << std::endl;
 				}
 
-				unsigned int indicesCount;
-				unsigned int verticesCount;
-				unsigned int normalsCount;
-				unsigned int uvsCount;
-				unsigned int colorsCount;
+				unsigned int _indices_count;
+				unsigned int _vertices_count;
+				unsigned int _normals_count;
+				unsigned int _uvs_count;
+				unsigned int _colors_count;
 				
-				GLenum type;
+				GLenum _type;
 				
-				std::vector<unsigned int> indices;
-				std::vector<float> vertices;
-				std::vector<float> normals;
-				std::vector<float> uvs;
-				std::vector<float> colors;
+				std::vector<unsigned int> _indices;
+				std::vector<float> _vertices;
+				std::vector<float> _normals;
+				std::vector<float> _uvs;
+				std::vector<float> _colors;
 
-				Vbo *iVbo, *vVbo, *nVbo, *uVbo, *cVbo;
+				Vbo *_i_vbo, *_v_vbo, *_n_vbo, *_u_vbo, *_c_vbo;
 		};
 	}
 

@@ -1,5 +1,5 @@
-#ifndef MATH_HPP
-#define MATH_HPP
+#ifndef MAMMOTH3D_MATH_HPP
+#define MAMMOTH3D_MATH_HPP
 	
 	#include <cmath>
 	

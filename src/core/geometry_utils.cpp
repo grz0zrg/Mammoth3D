@@ -5,7 +5,7 @@ void core::geometryutils::merge(core::Geometry *geom, object::Mesh *mesh) {
 		return;
 	}
 				
-	core::Geometry *mesh_geom = mesh->geom;
+	core::Geometry *mesh_geom = mesh->_geom;
 				
 	if (!mesh_geom) {
 		return;
@@ -13,38 +13,38 @@ void core::geometryutils::merge(core::Geometry *geom, object::Mesh *mesh) {
 				
 	glm::mat4 mesh_m = mesh->getTransformedMatrix();
 				
-	geom->indices.reserve(geom->indices.size()+mesh_geom->indices.size());
-	geom->vertices.reserve(geom->vertices.size()+mesh_geom->vertices.size());
-	geom->normals.reserve(geom->normals.size()+mesh_geom->normals.size());
-	geom->uvs.reserve(geom->uvs.size()+mesh_geom->uvs.size());
-	geom->colors.reserve(geom->colors.size()+mesh_geom->colors.size());
+	geom->_indices.reserve(geom->_indices.size()+mesh_geom->_indices.size());
+	geom->_vertices.reserve(geom->_vertices.size()+mesh_geom->_vertices.size());
+	geom->_normals.reserve(geom->_normals.size()+mesh_geom->_normals.size());
+	geom->_uvs.reserve(geom->_uvs.size()+mesh_geom->_uvs.size());
+	geom->_colors.reserve(geom->_colors.size()+mesh_geom->_colors.size());
 	
-	unsigned int in_indices_count = geom->vertices.size() / 3;
-	for (unsigned int i = 0; i < mesh_geom->indices.size(); i++) {
-		geom->indices.push_back(mesh_geom->indices[i]+in_indices_count);
+	unsigned int in_indices_count = geom->_vertices.size() / 3;
+	for (unsigned int i = 0; i < mesh_geom->_indices.size(); i++) {
+		geom->_indices.push_back(mesh_geom->_indices[i]+in_indices_count);
 	}
 
-	for (unsigned int i = 0; i < mesh_geom->vertices.size(); i += 3) {
-		glm::vec4 vertex = glm::vec4(mesh_geom->vertices[i], 
-									 mesh_geom->vertices[i+1],
-									 mesh_geom->vertices[i+2], 1.0f);
+	for (unsigned int i = 0; i < mesh_geom->_vertices.size(); i += 3) {
+		glm::vec4 vertex = glm::vec4(mesh_geom->_vertices[i], 
+									 mesh_geom->_vertices[i+1],
+									 mesh_geom->_vertices[i+2], 1.0f);
 					
 		vertex = mesh_m * vertex;
 
-		geom->vertices.push_back(vertex.x);
-		geom->vertices.push_back(vertex.y);
-		geom->vertices.push_back(vertex.z);
+		geom->_vertices.push_back(vertex.x);
+		geom->_vertices.push_back(vertex.y);
+		geom->_vertices.push_back(vertex.z);
 	}
 				
-	for (unsigned int i = 0; i < mesh_geom->normals.size(); i++) {
-		geom->normals.push_back(mesh_geom->normals[i]);
+	for (unsigned int i = 0; i < mesh_geom->_normals.size(); i++) {
+		geom->_normals.push_back(mesh_geom->_normals[i]);
 	}
 				
-	for (unsigned int i = 0; i < mesh_geom->uvs.size(); i++) {
-		geom->uvs.push_back(mesh_geom->uvs[i]);
+	for (unsigned int i = 0; i < mesh_geom->_uvs.size(); i++) {
+		geom->_uvs.push_back(mesh_geom->_uvs[i]);
 	}
 				
-	for (unsigned int i = 0; i < mesh_geom->colors.size(); i++) {
-		geom->colors.push_back(mesh_geom->colors[i]);
+	for (unsigned int i = 0; i < mesh_geom->_colors.size(); i++) {
+		geom->_colors.push_back(mesh_geom->_colors[i]);
 	}
 }

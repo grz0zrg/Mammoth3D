@@ -1,6 +1,6 @@
 #include "math.hpp"
 
-double core::math::PI = 3.141592654;
+double core::math::PI = 3.141592653;
 
 float core::math::deg2rad(float deg) {
 	return deg * PI / 180;

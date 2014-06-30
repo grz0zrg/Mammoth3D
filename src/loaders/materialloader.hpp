@@ -1,5 +1,5 @@
-#ifndef MATERIALLOADER_HPP
-#define MATERIALLOADER_HPP
+#ifndef MAMMOTH3D_MATERIALLOADER_HPP
+#define MAMMOTH3D_MATERIALLOADER_HPP
 
 	#include <vector>
 	
@@ -12,10 +12,10 @@
 				}
 			
 				~MaterialLoader() { 
-					for (unsigned int i = 0; i < materials.size(); i++) {
-						delete materials[i];
+					for (unsigned int i = 0; i < _materials.size(); i++) {
+						delete _materials[i];
 					}
-					materials.clear();
+					_materials.clear();
 				}
 				
 				static MaterialLoader *getInstance()
@@ -38,11 +38,11 @@
 
 				material::Material *createMaterial() {
 					material::Material *material = new material::Material();
-					materials.push_back(material);
+					_materials.push_back(material);
 					return material;
 				}
 				
-				std::vector<material::Material *> materials;
+				std::vector<material::Material *> _materials;
 			
 			private:
 				MaterialLoader(const MaterialLoader&);

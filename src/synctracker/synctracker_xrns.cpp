@@ -109,17 +109,17 @@ void sync::SyncTrackerXRNS::parseSong(const std::string& xrns) {
 				int line_index = atoi(line_element->Attribute("index"));
 							
 				Line *line = new Line(line_index);
-				track->lines.push_back(line);
+				track->_lines.push_back(line);
 								
 				line_element = line_element->NextSiblingElement();
 			}
 						
-			pattern->tracks.push_back(track);
+			pattern->_tracks.push_back(track);
 							
 			patterntrack_element = patterntrack_element->NextSiblingElement();
 		}
 						
-		patterns.push_back(pattern);
+		_patterns.push_back(pattern);
 						
 		pattern_element = pattern_element->NextSiblingElement();
 	}
@@ -136,8 +136,8 @@ void sync::SyncTrackerXRNS::parseSong(const std::string& xrns) {
 		}
 						
 		Track *track = new Track();
-		track->name = std::string(st_name->GetText());
-		tracks.push_back(track);
+		track->_name = std::string(st_name->GetText());
+		_tracks.push_back(track);
 						
 		sequencertrack_element = sequencertrack_element->NextSiblingElement();
 	}
@@ -149,24 +149,24 @@ void sync::SyncTrackerXRNS::parseSong(const std::string& xrns) {
 		tinyxml2::XMLElement* pattern_id_element = sequence_entry->FirstChildElement("Pattern");
 						
 		int pattern_id = atoi(pattern_id_element->GetText());
-		Pattern *pattern = patterns[pattern_id];
+		Pattern *pattern = _patterns[pattern_id];
 						
-		for (unsigned int i = 0; i < pattern->tracks.size(); i++) {
-			Track *track = pattern->tracks[i];
+		for (unsigned int i = 0; i < pattern->_tracks.size(); i++) {
+			Track *track = pattern->_tracks[i];
 							
-			for (unsigned int j = 0; j < track->lines.size(); j++) {
-				int index = track->lines[j]->index;
+			for (unsigned int j = 0; j < track->_lines.size(); j++) {
+				int index = track->_lines[j]->_index;
 								
 				Line *line = new Line(index+currLine);
-				tracks[i]->lines.push_back(line);
+				_tracks[i]->_lines.push_back(line);
 			}
 		}
 						
 		sequence_entry = sequence_entry->NextSiblingElement();
 						
-		currLine += pattern->lines;
+		currLine += pattern->_lines;
 	}
 					
-	stracker->bpm = atoi(globalSongDataElement->FirstChildElement("BeatsPerMin")->GetText());
-	stracker->lpb = atoi(globalSongDataElement->FirstChildElement("LinesPerBeat")->GetText());
+	_stracker->_bpm = atoi(globalSongDataElement->FirstChildElement("BeatsPerMin")->GetText());
+	_stracker->_lpb = atoi(globalSongDataElement->FirstChildElement("LinesPerBeat")->GetText());
 }

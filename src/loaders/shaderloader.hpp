@@ -1,5 +1,5 @@
-#ifndef SHADERLOADER_HPP
-#define SHADERLOADER_HPP
+#ifndef MAMMOTH3D_SHADERLOADER_HPP
+#define MAMMOTH3D_SHADERLOADER_HPP
 
 	#include <GL/glew.h>
 	#include <string>
@@ -17,26 +17,20 @@
 		class ShaderLoader {
 			private:
 				ShaderLoader() { 
-					bitmapFontsProgram = 0;
+					_bitmap_fonts_program = 0;
 				};
 			
 				~ShaderLoader() {
-					std::for_each(programList.begin(), programList.end(), 
+					std::for_each(_program_list.begin(), _program_list.end(), 
 															glDeleteProgram);
-					std::for_each(shaderList.begin(), shaderList.end(), 
+					std::for_each(_shader_list.begin(), _shader_list.end(), 
 															glDeleteShader);
 					
-					for (unsigned int i = 0; i < programs.size(); i++) {
-						delete programs[i];
+					for (unsigned int i = 0; i < _programs.size(); i++) {
+						delete _programs[i];
 					}
 				};
 			
-				template <typename T>
-				void logPretty(const std::string &str, T param) {
-					std::cout << "[ShaderLoader] " << str << "\"" << 
-								param << "\"" << std::endl;
-				}
-				
 				template <typename T>
 				void log(const std::string &str, T param) {
 					std::cout << "[ShaderLoader] " << str << param << std::endl;
@@ -50,11 +44,11 @@
 				void operator=(const ShaderLoader&);
 				static ShaderLoader *_singleton;
 				
-				std::vector<GLuint> shaderList;
-				std::vector<GLuint> programList;
-				std::vector<program::Program *> programs;
+				std::vector<GLuint> _shader_list;
+				std::vector<GLuint> _program_list;
+				std::vector<program::Program *> _programs;
 				
-				program::Program *bitmapFontsProgram;
+				program::Program *_bitmap_fonts_program;
 			
 			public:
 				void compileShader(GLenum eShaderType, 

@@ -1,5 +1,5 @@
-#ifndef MATERIAL_HPP
-#define MATERIAL_HPP
+#ifndef MAMMOTH3D_MATERIAL_HPP
+#define MAMMOTH3D_MATERIAL_HPP
 
 	#include <stack>
 	#include <GL/glew.h>
@@ -21,17 +21,17 @@
 		class Material {
 			public:
 				Material() { 
-					polyMode = GL_FILL;
-					cullMode = GL_BACK;
-					depthWrite = true;
-					depthTest = false;
-					blending = false;
-					prog = 0;	
-					lineWidth = 1.0f;
+					_poly_mode = GL_FILL;
+					_cull_mode = GL_BACK;
+					_depth_write = true;
+					_depth_test = false;
+					_blending = false;
+					_prog = 0;	
+					_line_width = 1.0f;
 					
-					blendFuncSrc = GL_SRC_ALPHA;
-					blendFuncDst = GL_ONE_MINUS_SRC_ALPHA;
-					blendEquation = GL_FUNC_ADD;
+					_blend_func_src = GL_SRC_ALPHA;
+					_blend_func_dst = GL_ONE_MINUS_SRC_ALPHA;
+					_blend_equation = GL_FUNC_ADD;
 				}
 				
 				~Material() { 
@@ -40,95 +40,96 @@
 				
 				void setProgram(program::Program *prog) {
 					if (prog != 0) {
-						this->prog = prog;
-						this->prog->registerUniform("alpha");
-						this->prog->registerUniform("mvp");
+						_prog = prog;
+						_prog->registerUniform("alpha");
+						_prog->registerUniform("mvp");
 						
 						bindTextures();
 					}
 				}
 				
 				void setPolyMode(GLenum polyMode) {
-					this->polyMode = polyMode;
+					_poly_mode = polyMode;
 				}
 				
 				void setLineWidth(GLfloat width) {
-					lineWidth = width;
+					_line_width = width;
 				}
 				
 				void setCullMode(GLenum cullMode) {
-					this->cullMode = cullMode;
+					_cull_mode = cullMode;
 				}
 				
 				void setDepthWrite(bool depthWrite) {
-					this->depthWrite = depthWrite;
+					_depth_write = depthWrite;
 				}
 				
 				void setDepthTest(bool depthTest) {
-					this->depthTest = depthTest;
+					_depth_test = depthTest;
 				}
 				
 				void setBlending(bool blending) {
-					this->blending = blending;
+					_blending = blending;
 				}
 				
 				void setBlendFunc(GLenum src, GLenum dst) {
-					blendFuncSrc = src;
-					blendFuncDst = dst;
+					_blend_func_src = src;
+					_blend_func_dst = dst;
 				}
 				
 				void setBlendEquation(GLenum equation) {
-					blendEquation = equation;
+					_blend_equation = equation;
 				}
 				
 				void setTexture(core::Texture *texture, unsigned int id = 0) {
-					textures.resize(id+1);
-					textures[id] = texture;
+					_textures.resize(id+1);
+					_textures[id] = texture;
 					
 					bindTextures();
 				}
 				
 				core::Texture *getTexture(unsigned int index = 0) {
-					if (index < textures.size()) {
-						return textures[index];
+					if (index < _textures.size()) {
+						return _textures[index];
 					}
 				}
 				
 				void bindTextures() {
-					if (prog) {
-						glUseProgram(prog->prog);
-						for (unsigned int i = 0; i < textures.size(); i++) {
+					if (_prog) {
+						glUseProgram(_prog->_id);
+
+						for (unsigned int i = 0; i < _textures.size(); i++) {
 							std::string prefix = "t";
 							prefix = prefix + core::utils::toString(i);
 							
-							prog->registerUniform(prefix);
-							prog->setUniform1i(prefix, i);
+							_prog->registerUniform(prefix);
+							_prog->setUniform1i(prefix, i);
 						}
 					}
 				}
 				
 				void update() {
-					while (!states.empty())
-						states.pop();
+					while (!_states.empty())
+						_states.pop();
 
-					states.push(PROGRAM);
-					states.push(POLY_MODE);
-					states.push(CULL_MODE);
-					states.push(DEPTH_WRITE);
-					states.push(DEPTH_TEST);
-					states.push(BLENDING);
+					_states.push(PROGRAM);
+					_states.push(POLY_MODE);
+					_states.push(CULL_MODE);
+					_states.push(DEPTH_WRITE);
+					_states.push(DEPTH_TEST);
+					_states.push(BLENDING);
 				}
 			
-				program::Program *prog;
-				GLenum polyMode, cullMode;
-				GLfloat lineWidth;
-				bool depthWrite, depthTest, blending;
+				program::Program *_prog;
+				GLenum _poly_mode, _cull_mode;
+				GLfloat _line_width;
+				bool _depth_write, _depth_test, _blending;
 				
-				GLenum blendFuncSrc, blendFuncDst, blendEquation;
+				GLenum _blend_func_src, _blend_func_dst, _blend_equation;
 				
-				std::vector<core::Texture *> textures;
+				std::vector<core::Texture *> _textures;
 				
-				std::stack<StateChangeType> states;
+				std::stack<StateChangeType> _states;
 		};
 	}
 	

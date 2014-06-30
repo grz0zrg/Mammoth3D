@@ -1,5 +1,5 @@
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#ifndef MAMMOTH3D_UTILS_HPP
+#define MAMMOTH3D_UTILS_HPP
 	
 	#include <string>
 	#include <sstream>

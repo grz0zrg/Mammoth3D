@@ -1,13 +1,13 @@
-#include "ImageLoader.hpp"
+#include "imageloader.hpp"
 
 loader::ImageLoader *loader::ImageLoader::_singleton = 0;
 
 core::Image *loader::ImageLoader::loadImage(const std::string &fileName, int mirrored_vertically) {
-	logPretty("loading: ", fileName);
+	log("loading: ", fileName);
 	
-	if (images.find(fileName) != images.end()) {
-		if (images[fileName] != 0) {
-			return images[fileName];
+	if (_images.find(fileName) != _images.end()) {
+		if (_images[fileName] != 0) {
+			return _images[fileName];
 		}
 	}
 	
@@ -53,7 +53,7 @@ core::Image *loader::ImageLoader::loadImage(const std::string &fileName, int mir
 	}
 	
 	core::Image *image = new core::Image(width, height, data);
-	images[fileName] = image;
+	_images[fileName] = image;
 	
 	return image;
 }

@@ -1,5 +1,5 @@
-#ifndef NODE_HPP
-#define NODE_HPP
+#ifndef MAMMOTH3D_NODE_HPP
+#define MAMMOTH3D_NODE_HPP
 
 	#include <vector>
 	#include <string>
@@ -15,24 +15,24 @@
 			NODE_CAMERA,
 			NODE_LIGHT,
 			NODE_TRANSFORM,
-			NODE_DRAWABLE
+			NODE_MESH
 		};
 
 		class Node {
 			public:
 				Node(const std::string &name = "") {
-					this->name = name;
-					visible    = true;
-					parent     = 0;
+					_name = name;
+					_visible    = true;
+					_parent     = 0;
 					
-					accMatrix  = glm::mat4(1.0f);
-					localMatrix = glm::mat4(1.0f);
+					_acc_matrix  = glm::mat4(1.0f);
+					_local_matrix = glm::mat4(1.0f);
 					
-					x = y = z    = 0.0f;
-					rx = ry = rz = 0.0f;
-					sx = sy = sz = 0.0f;
+					_x = _y = _z    = 0.0f;
+					_rx = _ry = _rz = 0.0f;
+					_sx = _sy = _sz = 0.0f;
 					
-					type = NODE_TRANSFORM;
+					_type = NODE_TRANSFORM;
 				}
 				
 				~Node() {
@@ -41,23 +41,23 @@
 				
 				void add(Node *node)
 				{
-					children.push_back(node);
+					_children.push_back(node);
 					node->setParent(this);
 				}
 				
 				void remove(Node *node) {
-					for (unsigned int i = 0; i < children.size(); i++) {
-						if (children[i] == node) {
-							children.erase(children.begin()+i);
+					for (unsigned int i = 0; i < _children.size(); i++) {
+						if (_children[i] == node) {
+							_children.erase(_children.begin()+i);
 						}
 					}
 				}
 				
 				Node *clone() {
 					Node *node     = new Node();
-					node->parent   = parent;
-					node->children = children;
-					node->visible  = visible;
+					node->_parent   = _parent;
+					node->_children = _children;
+					node->_visible  = _visible;
 
 					return node;
 				}
@@ -65,75 +65,75 @@
 				glm::mat4 getTransformedMatrix() {
 					return getLocalMatrix();
 					
-					accMatrix = getLocalMatrix();
+					_acc_matrix = getLocalMatrix();
 					
 					Node *curr = this;
 					while (curr->getParent() != 0) {
-						curr = curr->parent;
-						accMatrix *= curr->getLocalMatrix();
+						curr = curr->_parent;
+						_acc_matrix *= curr->getLocalMatrix();
 					}
 					
-					return accMatrix;
+					return _acc_matrix;
 				}
 				
 				glm::mat4 getLocalMatrix() {
 					glm::mat4 matrix;
 						
-					matrix = glm::translate(localMatrix, glm::vec3(x, y, z));
-					matrix *= glm::rotate(localMatrix, rx, glm::vec3(1, 0, 0));
-					matrix *= glm::rotate(localMatrix, ry, glm::vec3(0, 1, 0));
-					matrix *= glm::rotate(localMatrix, rz, glm::vec3(0, 0, 1));
-					matrix *= glm::scale(localMatrix, glm::vec3(sx, sy, sz));
+					matrix = glm::translate(_local_matrix, glm::vec3(_x, _y, _z));
+					matrix *= glm::rotate(_local_matrix, _rx, glm::vec3(1, 0, 0));
+					matrix *= glm::rotate(_local_matrix, _ry, glm::vec3(0, 1, 0));
+					matrix *= glm::rotate(_local_matrix, _rz, glm::vec3(0, 0, 1));
+					matrix *= glm::scale(_local_matrix, glm::vec3(_sx, _sy, _sz));
 					
 					return matrix;
 				}
 				
 				bool isVisible() {
-					return visible;
+					return _visible;
 				}
 				
 				void setVisible(bool visible) {
-					this->visible = visible;
+					_visible = visible;
 				}
 				
 				void findAndRemove(Node *node) {
-					for (unsigned int i = 0; i < children.size(); i++) {
-						if (children[i] == node) {
-							children.erase(children.begin() + i);
+					for (unsigned int i = 0; i < _children.size(); i++) {
+						if (_children[i] == node) {
+							_children.erase(_children.begin() + i);
 						}
 						
-						children[i]->findAndRemove(node);
+						_children[i]->findAndRemove(node);
 					}
 				}
 				
 				void clear() {
-					children.clear();
+					_children.clear();
 				}
 				
 				void setParent(Node *node) {
-					parent = node;
+					_parent = node;
 				}
 				
 				Node *getParent() {
-					return parent;
+					return _parent;
 				}
 				
-				glm::mat4 accMatrix;
-				glm::mat4 localMatrix;
+				glm::mat4 _acc_matrix;
+				glm::mat4 _local_matrix;
 
-				float x, y, z;
-				float sx, sy, sz;
-				float rx, ry, rz;
+				float _x, _y, _z;
+				float _sx, _sy, _sz;
+				float _rx, _ry, _rz;
 				
-				bool visible;
+				bool _visible;
 			
-				Node *parent;
+				Node *_parent;
 				
-				std::vector<Node *> children;
+				std::vector<Node *> _children;
 				
-				NodeType type;
+				NodeType _type;
 				
-				std::string name;
+				std::string _name;
 		};
 	}
 

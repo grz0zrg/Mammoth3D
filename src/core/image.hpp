@@ -1,5 +1,5 @@
-#ifndef IMAGE_HPP
-#define IMAGE_HPP
+#ifndef MAMMOTH3D_IMAGE_HPP
+#define MAMMOTH3D_IMAGE_HPP
 
 	#include <vector>
 	
@@ -7,22 +7,22 @@
 		class Image {
 			public:
 				Image(int width, int height, std::vector<unsigned char> data) {
-					this->width = width;
-					this->height = height;
-					this->data = data;
+					_width  = width;
+					_height = height;
+					_data   = data;
 				}
 				
 				Image(int width, int height) {
-					this->width = width;
-					this->height = height;
+					_width  = width;
+					_height = height;
 				}
 				
 				~Image() {
 					
 				}
 				
-			int width, height;
-			std::vector<unsigned char> data;
+			int _width, _height;
+			std::vector<unsigned char> _data;
 		};
 	}
 

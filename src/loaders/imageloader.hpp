@@ -1,5 +1,5 @@
-#ifndef IMAGELOADER_HPP
-#define IMAGELOADER_HPP
+#ifndef MAMMOTH3D_IMAGELOADER_HPP
+#define MAMMOTH3D_IMAGELOADER_HPP
 
 	#include <fstream>
 	#include <iostream>
@@ -18,8 +18,8 @@
 			
 				~ImageLoader() { 
 					std::map<std::string, core::Image *>::iterator imagesIt 
-																= images.begin();
-					for (imagesIt; imagesIt != images.end(); ++imagesIt) {
+																= _images.begin();
+					for (imagesIt; imagesIt != _images.end(); ++imagesIt) {
 						if (imagesIt->second) {
 							delete imagesIt->second;
 						}
@@ -44,24 +44,18 @@
 					}
 				}
 
-				std::map<std::string, core::Image *> images;
+				std::map<std::string, core::Image *> _images;
 				
 				core::Image *loadImage(const std::string &fileName, int mirrored_vertically = 0);
 			
 			private:
 				template <typename T>
-				void logPretty(const std::string &str, T param) {
-					std::cout << "[ImageLoader] " << str << "\"" << 
-								param << "\"" << std::endl;
-				}
-				
-				template <typename T>
 				void log(const std::string &str, T param) {
-					std::cout << "[ImageLoader] " << str << param << std::endl;
+					std::cout << "[ImageLoader ] " << str << param << std::endl;
 				}
 					
 				void log(const char *str) {
-					std::cout << "[ImageLoader] " << str << std::endl;
+					std::cout << "[ImageLoader ] " << str << std::endl;
 				}
 				
 			ImageLoader(const ImageLoader&);

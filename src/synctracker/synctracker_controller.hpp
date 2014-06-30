@@ -1,5 +1,5 @@
-#ifndef SYNCTRACKER_CONTROLS_HPP
-#define SYNCTRACKER_CONTROLS_HPP
+#ifndef MAMMOTH3D_SYNCTRACKER_CONTROLS_HPP
+#define MAMMOTH3D_SYNCTRACKER_CONTROLS_HPP
 
 	#include "synctracker.hpp"
 	#include "synctracker_xrns.hpp"
@@ -7,7 +7,7 @@
 	#include "../joystick/joystick.hpp"
 	
 	// used to control the synctracker within the app with a gamepad/joystick
-	// default mapping is for a PS2 gamepad
+	// default mapping is for a PS2 gamepad but can be changed easily by editing e_inputType
 	namespace sync {
 		class SyncTrackerController {
 			SyncTrackerController() {
@@ -52,11 +52,14 @@
 			bool block_loop;
 			int mode;
 			
+			enum e_inputType{	B_1 = 0, B_2 = 2, B_3 = 3, B_4 = 1,
+								B_L1 = 4, B_R1 = 6, B_L2 = 5, B_R2 = 7, B_START = 9, B_SELECT = 8};
+			
 			public:
 				void update();
 				
 				void logState() {
-					std::cout << "T: " << stracker->tracks[track]->name << 
+					std::cout << "T: " << stracker->_tracks[track]->_name << 
 								 " Id: " << track <<
 								 " Row: "  << irow << std::endl;
 				}

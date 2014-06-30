@@ -12,7 +12,7 @@ void loader::ShaderLoader::compileShader(GLenum eShaderType,
 	}
 	
 	const char *shaderData = strShader.c_str();
-	glShaderSource(shader, 1, &shaderData, NULL);
+	glShaderSource(shader, 1, &shaderData, 0);
 
 	glCompileShader(shader);
 
@@ -47,8 +47,8 @@ void loader::ShaderLoader::compileShader(GLenum eShaderType,
 			}
 		}
 	}
-
-	shaderList.push_back(shader);
+	
+	_shader_list.push_back(shader);
 }
 
 void loader::ShaderLoader::compileShaderFile(GLenum eShaderType, 
@@ -63,7 +63,7 @@ void loader::ShaderLoader::compileShaderFile(GLenum eShaderType,
 		compileShader(eShaderType, buffer.str().c_str());
 		file.close();
 	} else {
-		logPretty("Cannot open: ", filename);
+		log("Cannot open: ", filename);
 	}
 }
 
@@ -75,8 +75,8 @@ program::Program *loader::ShaderLoader::buildProgram() {
 		return 0;
 	}
 
-	for(size_t i = 0; i < shaderList.size(); i++) {
-		glAttachShader(prog, shaderList[i]);
+	for(size_t i = 0; i < _shader_list.size(); i++) {
+		glAttachShader(prog, _shader_list[i]);
 		if (glGetError() == GL_INVALID_VALUE || 
 			glGetError() == GL_INVALID_OPERATION) {
 			log("glAttachShader failed");
@@ -101,31 +101,31 @@ program::Program *loader::ShaderLoader::buildProgram() {
 		return 0;
 	}
 
-	programList.push_back(prog);
+	_program_list.push_back(prog);
 
-	for(size_t i = 0; i < shaderList.size(); i++) {
-		GLuint shader = shaderList[i];
+	for(size_t i = 0; i < _shader_list.size(); i++) {
+		GLuint shader = _shader_list[i];
 		glDetachShader(prog, shader);
 		glDeleteShader(shader);
 	}
 
-	shaderList.clear();
+	_shader_list.clear();
 	
 	program::Program *p = new program::Program(prog);
-	programs.push_back(p);
+	_programs.push_back(p);
 	
 	return p;
 }
 
 program::Program *loader::ShaderLoader::getBitmapFontsProgram() {
-	if (bitmapFontsProgram == 0) {
+	if (_bitmap_fonts_program == 0) {
 		compileShader(GL_VERTEX_SHADER, builtinshaders::bitmapFontsVertexShader);
 		compileShader(GL_FRAGMENT_SHADER, builtinshaders::bitmapFontsFragmentShader);
 		
-		bitmapFontsProgram = buildProgram();
+		_bitmap_fonts_program = buildProgram();
 		
-		bitmapFontsProgram->registerUniform("chars_pos");
+		_bitmap_fonts_program->registerUniform("chars_pos");
 	}
 	
-	return bitmapFontsProgram;
+	return _bitmap_fonts_program;
 }

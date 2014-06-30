@@ -1,8 +1,9 @@
-#ifndef AUDIO_HPP
-#define AUDIO_HPP
+#ifndef MAMMOTH3D_AUDIO_HPP
+#define MAMMOTH3D_AUDIO_HPP
 
 	#include <iostream>
 	#include <cstdlib>
+    #include <cmath>
 
 	#include "vorbis/vorbisfile.h"
 	#include "portaudio/portaudio.h"
@@ -10,41 +11,22 @@
 	namespace audio {
 		class Audio {
 			private:
-				Audio() {
-					paErr = Pa_Initialize();
-					
-					paErr != paNoError ? terminatePa = false : terminatePa = true;
-					logPaError();
-					
-					music = 0;
-					music_stream = 0;
-					
-					sample_rate = 44100;
-					
-					log("", Pa_GetVersionText());
-				};
-				
-				~Audio() {
-					freeMusic();
-					if(terminatePa) {
-						paErr = Pa_Terminate();
-						logPaError();
-					}
-				};
+				Audio(const char* file_name = 0);
+				~Audio();
 				
 				void logPaError() {
-					if( paErr != paNoError ) {
-						log("PortAudio error: ", Pa_GetErrorText(paErr));
+					if( _pa_error_code != paNoError ) {
+						log("PortAudio error: ", Pa_GetErrorText(_pa_error_code));
 					}
 				}
 				
 				template <typename T>
 				void log(const std::string &str, T param) {
-					std::cout << "[Audio] " << str << param << std::endl;
+					std::cout << "[Audio       ] " << str << param << std::endl;
 				}
 
 				void log(const std::string &str) {
-					std::cout << "[Audio] " << str << std::endl;
+					std::cout << "[Audio       ] " << str << std::endl;
 				}
 
 				struct musicData {
@@ -61,121 +43,41 @@
 					bool backward;
 				};
 		
-				static int paCallback( const void *inputBuffer,
-						void *outputBuffer,
-						unsigned long framesPerBuffer,
-						const PaStreamCallbackTimeInfo* timeInfo,
-						PaStreamCallbackFlags statusFlags,
-						void *userData);
+				static int paCallback( const void *input_buffer,
+						void *output_buffer,
+						unsigned long frames_per_buffer,
+						const PaStreamCallbackTimeInfo* time_info,
+						PaStreamCallbackFlags status_flags,
+						void *user_data);
 				
 				Audio(const Audio&);
 				void operator=(const Audio&);
+                
+                static Audio *_singleton;
 				
-				PaError paErr;
-				PaStream *music_stream;
-				musicData *music;
+				PaError _pa_error_code;
+				PaStream *_music_stream;
+				musicData *_music;
 				
-				double sample_rate;
-
-				int _value;
-				static Audio *_singleton;
+				double _sample_rate;
 				
-				bool terminatePa;
+				bool _terminatePa;
 
 			public:
-				void loadMusic(const char* fileName) {
-					if(music_stream) {
-						paErr = Pa_CloseStream(music_stream);
-						logPaError();
-						music_stream = 0;
-					}
-
-					log("loading: ", fileName);
-					
-					OggVorbis_File vf;
-					music = 0;
-					music = new musicData;
-					if(!music) {
-						music = 0;
-						log("alloc error");
-						return;
-					}
-					music->left = music->right = 0;
-					music->position = 0;
-					music->loop = false;
-					music->paused = false;
-					music->finished = false;
-					music->started = false;
-					music->volume = 1.0;
-					music->callbackStartTime = 0.0f;
-					
-					int err = ov_fopen(fileName, &vf);
-					if(err < 0) {
-						log("ov_fopen error code: ", err);
-						delete music;
-					
-						return;
-					}
-					
-					unsigned long length = (long)ov_pcm_total(&vf, -1);
-					music->left = new float[length];
-					music->right = new float[length];
-					music->frames = length;
-					if( !music->left || !music->right ) {
-						log("alloc error");
-						ov_clear( &vf );
-						freeMusic();
-						
-						return;
-					}
-					
-					unsigned long total_in = 0;
-					unsigned long offset = 0;
-					float **samples;
-					long frame = 0;
-					int current_section = 0;
-
-					long ret = ov_read_float(&vf, &samples, 1024, &current_section);
-					while(ret != 0) {
-						if(ret == OV_HOLE || ret == OV_EBADLINK || ret == OV_EINVAL) {
-							log("ov_read_float return code: ", ret);
-						} else {
-							for( frame = 0; frame < ret; ++frame ) {
-								music->left[frame + offset] = samples[0][frame];
-								music->right[frame + offset] =samples[1][frame];
-								total_in += 2;
-								if(frame + offset > length) {
-									log("error reading music data: (offset + frame) = ", (offset + frame));
-									ov_clear( &vf );
-									freeMusic();
-									
-									return;
-								}
-							}
-
-							offset += ret;
-						}
-						
-						ret = ov_read_float(&vf, &samples, 1024, &current_section);
-					}
-
-					ov_clear(&vf);
-					
-					paErr = Pa_OpenDefaultStream( &music_stream, 0, 2, paFloat32, sample_rate, 
-												paFramesPerBufferUnspecified,
-												&Audio::paCallback, music);
-					logPaError();
+				void loadMusic(const char* file_name);
+                void playMusic(bool loop = false);
+                void pauseMusic();
+                void freeMusic();
+				
+				void setMusicPosition(unsigned long position) {
+					_music->position = position * _sample_rate;
 				}
 				
-				void setSongPosition(unsigned long position) {
-					music->position = position * sample_rate;
+				unsigned long getMusicPosition() {
+					return _music->position;
 				}
 				
-				unsigned long getSongPosition() {
-					return music->position;
-				}
-				
-				double getSongTime() {
+				double getMusicTime() {
 					/*if (music->callbackStartTime <= 0.0) {
 						return 0.0;
 					}
@@ -185,62 +87,29 @@
 						return 0.0;
 					}*/
 					
-					return ((double)music->position)/sample_rate;//stream_time;
+					return ((double)_music->position)/_sample_rate;//stream_time;
 				}
 				
-				void playMusic(bool loop = false) {
-					if(music ) {
-						music->loop = loop;
-						paErr = Pa_StartStream(music_stream);
-						logPaError();
-						log("playing...");
-						music->paused = false;
-					}
-				}
-				
-				void pauseMusic() {
-					if(music) {
-						paErr = Pa_StopStream(music_stream);
-						logPaError();
-						log("paused...");
-						music->paused = true;
+				void setMusicVolume(float volume) {
+					if(_music) {
+						_music->volume = volume;
 					}
 				}
 				
 				bool isMusicFinished() {
-					if (music->loop) {
+					if (_music->loop) {
 						return false;
 					}
 
-					return music->finished;
+					return _music->finished;
 				}
 				
-				double getSongLength() {
-					if(music) {
-						return (double)music->frames/sample_rate;
+				double getMusicLength() {
+					if(_music) {
+						return (double)_music->frames/_sample_rate;
 					}
 					
 					return 0;
-				}
-				
-				void freeMusic() {
-					if(music_stream) {
-						paErr = Pa_CloseStream(music_stream);
-						logPaError();
-						music_stream = 0;
-					}
-
-					if(music) {
-						if (music->left) {
-							delete[] music->left;
-						}
-							
-						if (music->right) {
-							delete[] music->right;
-						}
-						delete music;
-						music = 0;
-					}
 				}
 				
 				static Audio *getInstance()

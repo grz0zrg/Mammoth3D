@@ -12,7 +12,7 @@ const char builtinshaders::bitmapFontsVertexShader[] = {
 			"{\n"
 			"	uv = vertexUv;\n"
 			"	fragmentAlpha = alpha;\n"
-			"	gl_Position = mvp * vec4(vertexPosition, 1.0f);\n"
+			"	gl_Position = /*mvp * */vec4(vertexPosition, 1.0f);\n"
 			"}\n"
 		};
 
@@ -23,7 +23,7 @@ const char builtinshaders::bitmapFontsFragmentShader[] = {
 			"in vec2 uv;\n"
 			"layout (std140) uniform infosBlock {\n"
 			"   vec4 color;\n"
-			"	float text_length;\n"
+			"	//float text_length;\n"
 			"	float font_width;\n"
 			"	float font_height;\n"
 			"	float cell_width;\n"
@@ -42,12 +42,12 @@ const char builtinshaders::bitmapFontsFragmentShader[] = {
 			" vec4 pos = texelFetch(t1, id);\n"
 			" float uvx = uv.x;//min(uv.x, text_length);\n"
 			" vec4 tx = texture(t0, vec2(pos.x+(uvx-((id*cell_width)/font_width)), max(uv.y, lim_y)-pos.y));\n" //off_y+clamp(uv.y, off_y, 0.498f + cell_height_d2) // y centering
-			"    if(tx.a < color.a){\n"
-			"        discard;\n"
-			"    }\n"
+			//" tx.a = smoothstep(0.4375, 0.5625, tx.a);\n" // can smooth the edges if the font have a distance field as alpha channel
+			" if(tx.a < color.a){\n"
+			"     discard;\n"
+			" }\n"
 			" tx.a *= fragmentAlpha;\n"
 			" tx.rgb *= color.rgb;\n"
-			//" tx.rgb *= smoothstep(0.1, 1.0, tx.a);\n"
-			" outputColor = tx;\n"
+			" outputColor = vec4(color.r,color.g,color.b,1.0);//tx;\n"
 			"}\n"
 		};

@@ -81,9 +81,8 @@ void loader::Collada::exportMeshsTo(const char *dir) {
 				log("Failed to export Mesh: ", filename);
 			}
 
-			// write mesh datas
-			char indicesType = 0;
-			file.write((char*)&indicesType, sizeof(indicesType));
+			unsigned int numMeshes = 1;
+			file.write((char*)&numMeshes, sizeof(numMeshes));
 
 			unsigned int indicesCount = mesh->indices.size();
 			unsigned int verticesCount = mesh->vertices.size();

@@ -7,11 +7,9 @@ To use the entire framework just include "mammoth3d.hpp".
 
 Made it to do [demos](http://en.wikipedia.org/wiki/Demoscene)
 
-Disclaimer: The framework is kinda messy, this is my first try at a 3D engine ever, the point has always been to get it up "quickly" to do demos. :)
-
 ### Usage ###
 
-There is a sample project which is just a test area in the "project" folder, this can be used as a starting point.
+There is a sample project in the "project" folder, this can be used as a starting point.
 
 The sample project should compile easily on Windows/Linux using the [codelite](http://www.codelite.org/) .workspace, there is configurations for Windows and Linux.
 
@@ -23,7 +21,7 @@ The engine use a binary format to load scenes/meshes, converters are available i
 
 assimp2bin load any meshes files that the [Assimp](http://assimp.sourceforge.net/) library support
 
-dae2bin is deprecated, export Collada (.dae) only and only meshes vertices (UVs/normals exports are buggy)
+dae2bin is deprecated, export Collada (.dae) only and only meshes vertices (UVs/normals export is buggy)
 
 ### Others platforms ###
 

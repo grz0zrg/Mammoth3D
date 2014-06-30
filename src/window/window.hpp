@@ -1,5 +1,5 @@
-#ifndef WINDOW_HPP
-#define WINDOW_HPP
+#ifndef MAMMOTH3D_WINDOW_HPP
+#define MAMMOTH3D_WINDOW_HPP
 
 	#include <GLFW/glfw3.h>
 	
@@ -10,23 +10,25 @@
 		class Window {
 			private:
 				Window() {
-					fail = false;
+					_fail = false;
+					
+					glfwSetErrorCallback(errorCallback);
 
-					if (!glfwInit()) {
+					if (glfwInit() == GL_FALSE) {
 						log("glfwInit() failed");
-						fail = true;
+						_fail = true;
 					}
 					
-					primaryMonitor = 0;
-					glfw_window = 0;
-					glfwVidMode = 0;
+					_primary_monitor = 0;
+					_glfw_window = 0;
+					_glfw_vid_mode = 0;
 					
-					frames = 0;
-					fpsTimer = getTime();
-					lastTime = getTime();
-					deltaTime = 0.0;
+					_frames = 0;
+					_fps_timer = getTime();
+					_last_time = getTime();
+					_delta_time = 0.0;
 					
-					aa = 0;
+					_aa = 0;
 				}
 				
 				~Window() {
@@ -34,7 +36,7 @@
 				}
 				
 				template <typename T>
-				void logPretty(const std::string &str, T param) {
+				static void logPretty(const std::string &str, T param) {
 					std::cout << "[Window] " << str << "\"" << 
 								param << "\"" << std::endl;
 				}
@@ -48,18 +50,22 @@
 					std::cout << "[Window] " << str << std::endl;
 				}
 				
-				bool fail;
+				static void errorCallback(int error_code, const char *description) {
+					logPretty(description, error_code);
+				}
 				
-				const static std::string engineVersion;
+				bool _fail;
 				
-				int windowWidth, windowHeight, aa;
+				const static std::string _engine_version;
 				
-				int frames, fps;
-				double fpsTimer, deltaTime, lastTime;
+				int _window_width, _window_height, _aa;
 				
-				GLFWmonitor *primaryMonitor;
-				const GLFWvidmode *glfwVidMode;
-				GLFWwindow *glfw_window;
+				int _frames, _fps;
+				double _fps_timer, _delta_time, _last_time;
+				
+				GLFWmonitor *_primary_monitor;
+				const GLFWvidmode *_glfw_vid_mode;
+				GLFWwindow *_glfw_window;
 			
 				Window(const Window&);
 				void operator=(const Window&);
@@ -78,29 +84,29 @@
 				}
 			
 				void swapBuffers() {
-					glfwSwapBuffers(glfw_window);
+					glfwSwapBuffers(_glfw_window);
 					
-					frames++;
-					if (getTime()-fpsTimer >= 1.0) {
-						fps = frames;
-						frames = 0;
-						fpsTimer = getTime();
+					_frames++;
+					if (getTime()-_fps_timer >= 1.0) {
+						_fps = _frames;
+						_frames = 0;
+						_fps_timer = getTime();
 					}
 					
-					deltaTime = getTime() - lastTime;
-					lastTime = getTime();
+					_delta_time = getTime() - _last_time;
+					_last_time = getTime();
 				}
 				
 				double getDeltaTime() {
-					return deltaTime;
+					return _delta_time;
 				}
 				
 				void hideMouseCursor() {
-					glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+					glfwSetInputMode(_glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 				}
 				
 				void showMouseCursor() {
-					glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+					glfwSetInputMode(_glfw_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 				}
 
 				double getTime() {
@@ -108,36 +114,36 @@
 				}
 				
 				int getFps() {
-					return fps;
+					return _fps;
 				}
 				
 				void setFSAA(int level) {
-					if (glfw_window) {
+					if (_glfw_window) {
 						log("FSAA cannot be applied, window already opened");
 						return;
 					}
 					glfwWindowHint(GLFW_SAMPLES, level);
 					
-					aa = level;
+					_aa = level;
 				}
 				
 				bool isIconified() {
-					if (glfwGetWindowAttrib(glfw_window, GLFW_ICONIFIED) == GL_TRUE) {
+					if (glfwGetWindowAttrib(_glfw_window, GLFW_ICONIFIED) == GL_TRUE) {
 						return true;
 					}
 					return false;
 				}
 				
 				int getRefreshRate() {
-					if (glfwVidMode) {
-						return glfwVidMode->refreshRate;
+					if (_glfw_vid_mode) {
+						return _glfw_vid_mode->refreshRate;
 					}
 					
 					return 0;
 				}
 				
 				void setRefreshRate(int hz) {
-					if (glfw_window) {
+					if (_glfw_window) {
 						log("Refresh rate cannot be applied, window already opened");
 						return;
 					}
@@ -145,30 +151,30 @@
 				}
 
 				void onResize(GLFWwindowsizefun cbfun) {
-					glfwSetWindowSizeCallback(glfw_window, cbfun);
+					glfwSetWindowSizeCallback(_glfw_window, cbfun);
 				}
 				
 				int getAASamples() {
-					return aa;
+					return _aa;
 				}
 				
 				bool running() {
-					if (fail) { 
+					if (_fail) { 
 						return false; 
 					}
 					
 					glfwPollEvents();
 					
-					return (glfwGetKey(glfw_window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
-							!glfwWindowShouldClose(glfw_window));
+					return (glfwGetKey(_glfw_window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
+							!glfwWindowShouldClose(_glfw_window));
 				}
 				
 				int getWidth() {
-					return windowWidth;
+					return _window_width;
 				}
 				
 				int getHeight() {
-					return windowHeight;
+					return _window_height;
 				}
 				
 				static Window *getInstance()

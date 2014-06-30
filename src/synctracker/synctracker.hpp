@@ -1,5 +1,5 @@
-#ifndef SYNCTRACKER_HPP
-#define SYNCTRACKER_HPP
+#ifndef MAMMOTH3D_SYNCTRACKER_HPP
+#define MAMMOTH3D_SYNCTRACKER_HPP
 
 	// heavily inspired by GNU Rocket http://rocket.sourceforge.net/
 	// all interpolations methods come directly from it
@@ -22,8 +22,8 @@
 
 		class SyncTracker {
 			SyncTracker() {
-				bpm = 100.0f;
-				lpb = 4.0f;
+				_bpm = 100.0f;
+				_lpb = 4.0f;
 			}
 			
 			~SyncTracker() {
@@ -46,19 +46,19 @@
 								~Row() { };
 								
 								void setValue(float value, InterpolationType type) {
-									this->value = value;
-									this->type = type;	
+									_value = value;
+									_type = type;	
 								}
 								
-								int row; 
+								int _row; 
 
-								float value;
-								InterpolationType type;
+								float _value;
+								InterpolationType _type;
 						};
 						
 						Track(const std::string& name, float *linked_value) {
-							this->name = name;
-							this->linked_value = linked_value;
+							_name = name;
+							_linked_value = linked_value;
 						}
 						
 						~Track() {
@@ -66,101 +66,101 @@
 						}
 						
 						static bool sortRows(Row *t1, Row *t2) { 
-							return (t1->row < t2->row); 
+							return (t1->_row < t2->_row); 
 						}
 						
 						void sort() {
-							std::sort(rows.begin(), rows.end(), sortRows);
+							std::sort(_rows.begin(), _rows.end(), sortRows);
 						}
 						
 						void addRow(int row_index, float value, InterpolationType type) {
 							Row *row = new Row(value, type);
-							rows.push_back(row);
-							row->row = row_index;
+							_rows.push_back(row);
+							row->_row = row_index;
 						}
 						
 						void setRow(int index, float value, InterpolationType type) {
-							rows[index]->setValue(value, type);
+							_rows[index]->setValue(value, type);
 						}
 						
 						void deleteRow(int index) {
-							delete rows[index];
+							delete _rows[index];
 							
-							rows.erase(rows.begin()+index);
+							_rows.erase(_rows.begin()+index);
 							sort();
 						}
 						
 						float linear(int row_index, double row) {
-							Row *row1 = rows[row_index];
-							Row *row2 = rows[row_index+1];
+							Row *row1 = _rows[row_index];
+							Row *row2 = _rows[row_index+1];
 							
-							double t = (row - row1->row) / (row2->row - row1->row);
-							return (float)(row1->value + (row2->value - row1->value) * t);
+							double t = (row - row1->_row) / (row2->_row - row1->_row);
+							return (float)(row1->_value + (row2->_value - row1->_value) * t);
 						}
 						
 						float smooth(int row_index, double row) {
-							Row *row1 = rows[row_index];
-							Row *row2 = rows[row_index+1];
+							Row *row1 = _rows[row_index];
+							Row *row2 = _rows[row_index+1];
 							
-							double t = (row - row1->row) / (row2->row - row1->row);
+							double t = (row - row1->_row) / (row2->_row - row1->_row);
 							t = t * t * (3 - 2 * t);
-							return (float)(row1->value + (row2->value - row1->value) * t);
+							return (float)(row1->_value + (row2->_value - row1->_value) * t);
 						}
 						
 						float ramp(int row_index, double row) {
-							Row *row1 = rows[row_index];
-							Row *row2 = rows[row_index+1];
+							Row *row1 = _rows[row_index];
+							Row *row2 = _rows[row_index+1];
 							
-							double t = (row - row1->row) / (row2->row - row1->row);
+							double t = (row - row1->_row) / (row2->_row - row1->_row);
 							t = pow(t, 2.0);
-							return (float)(row1->value + (row2->value - row1->value) * t);
+							return (float)(row1->_value + (row2->_value - row1->_value) * t);
 						}
 						
 						void clear() {
-							for (unsigned int i = 0; i < rows.size(); i++) {
-								delete rows[i];
+							for (unsigned int i = 0; i < _rows.size(); i++) {
+								delete _rows[i];
 							}
 							
-							rows.clear();
+							_rows.clear();
 						}
 						
-						std::string name;
-						float *linked_value;
-						std::vector<Row *> rows;
+						std::string _name;
+						float *_linked_value;
+						std::vector<Row *> _rows;
 				};
 
-				std::vector<Track *> tracks;
+				std::vector<Track *> _tracks;
 				
-				float bpm, lpb;
+				float _bpm, _lpb;
 				
 				void setBPM(float bpm) {
-					this->bpm = bpm;
+					_bpm = bpm;
 				}
 				
 				void setLPB(float lpb) {
-					this->lpb = lpb;
+					_lpb = lpb;
 				}
 				
 				void setTrack(const std::string& name, float *linked_value) {
 					int track_id = findTrack(name);
 					if (track_id >= 0) {
-						tracks[track_id]->linked_value = linked_value;
+						_tracks[track_id]->_linked_value = linked_value;
 						return;
 					}
 
 					Track *track = new Track(name, linked_value);
-					tracks.push_back(track);
+					_tracks.push_back(track);
 				}
 				
 				void freeTracks() {
-					for (unsigned int i = 0; i < tracks.size(); i++) {
-						delete tracks[i];
+					for (unsigned int i = 0; i < _tracks.size(); i++) {
+						delete _tracks[i];
 					}
 				}
 				
 				int findTrack(const std::string& name) {
-					for (unsigned int i = 0; i < tracks.size(); i++) {
-						if (tracks[i]->name == name) {
+					for (unsigned int i = 0; i < _tracks.size(); i++) {
+						if (_tracks[i]->_name == name) {
 							return i;
 						}
 					}
@@ -169,13 +169,13 @@
 				}
 				
 				int findRow(Track *track, int row) {
-					int lo = 0, hi = track->rows.size();
+					int lo = 0, hi = track->_rows.size();
 					while (lo < hi) {
 						int mi = (lo + hi) / 2;
 
-						if (track->rows[mi]->row < row) {
+						if (track->_rows[mi]->_row < row) {
 							lo = mi + 1;
-						} else if (track->rows[mi]->row > row) {
+						} else if (track->_rows[mi]->_row > row) {
 							hi = mi;
 						} else {
 							return mi;
@@ -191,7 +191,7 @@
 						return 0;
 					}
 					
-					Track *track = tracks[track_index];
+					Track *track = _tracks[track_index];
 
 					int id_row = findRow(track, row_index);
 					if (id_row < 0) {
@@ -211,7 +211,7 @@
 						return;
 					}
 					
-					Track *track = tracks[track_index];
+					Track *track = _tracks[track_index];
 					
 					int id_row = findRow(track, row_index);
 					if (id_row < 0) {
@@ -227,10 +227,10 @@
 					double row_d = getRow(music_time);
 					unsigned int row_index = (int)floor(row_d);
 					
-					for (unsigned int i = 0; i < tracks.size(); i++) {
-						Track *track = tracks[i];
+					for (unsigned int i = 0; i < _tracks.size(); i++) {
+						Track *track = _tracks[i];
 						
-						if (track->linked_value == 0) {
+						if (track->_linked_value == 0) {
 							continue;
 						}
 						
@@ -240,35 +240,35 @@
 						}
 						
 						if (id_row < 0) {
-							*track->linked_value = default_value;
+							*track->_linked_value = default_value;
 							continue;
 						}
 						
-						if (id_row > (int)track->rows.size() - 2) {
-							*track->linked_value = track->rows[track->rows.size()-1]->value;
+						if (id_row > (int)track->_rows.size() - 2) {
+							*track->_linked_value = track->_rows[track->_rows.size()-1]->_value;
 							continue;
 						}
 						
-						Track::Row *row = track->rows[id_row];
-						switch(row->type) {
+						Track::Row *row = track->_rows[id_row];
+						switch(row->_type) {
 							case STEP:
-								*track->linked_value = row->value;
+								*track->_linked_value = row->_value;
 								break;
 								
 							case LINEAR:
-								*track->linked_value = track->linear(id_row, row_d);
+								*track->_linked_value = track->linear(id_row, row_d);
 								break;
 			
 							case SMOOTH:
-								*track->linked_value = track->smooth(id_row, row_d);
+								*track->_linked_value = track->smooth(id_row, row_d);
 								break;
 								
 							case RAMP:
-								*track->linked_value = track->ramp(id_row, row_d);
+								*track->_linked_value = track->ramp(id_row, row_d);
 								break;
 							
 							default:
-								*track->linked_value = default_value;
+								*track->_linked_value = default_value;
 								break;
 						}
 					}
@@ -281,28 +281,28 @@
 						return;
 					}
 
-					file.write((char*)&bpm, sizeof(bpm));
-					file.write((char*)&lpb, sizeof(lpb));
+					file.write((char*)&_bpm, sizeof(_bpm));
+					file.write((char*)&_lpb, sizeof(_lpb));
 					
-					unsigned int numTracks = tracks.size();
+					unsigned int numTracks = _tracks.size();
 					file.write((char*)&numTracks, sizeof(numTracks));
 					
-					for (unsigned int i = 0; i < tracks.size(); i++) {
-						Track *track = tracks[i];
+					for (unsigned int i = 0; i < _tracks.size(); i++) {
+						Track *track = _tracks[i];
 						
-						unsigned int nameLength = track->name.length()+1;
+						unsigned int nameLength = track->_name.length()+1;
 						file.write((char*)&nameLength, sizeof(nameLength));
-						file.write(track->name.c_str(), sizeof(char)*nameLength);
+						file.write(track->_name.c_str(), sizeof(char)*nameLength);
 						
-						unsigned int numRows = track->rows.size();
+						unsigned int numRows = track->_rows.size();
 						file.write((char*)&numRows, sizeof(numRows));
 						
-						for (unsigned int j = 0; j < track->rows.size(); j++) {
-							Track::Row *row = track->rows[j];
+						for (unsigned int j = 0; j < track->_rows.size(); j++) {
+							Track::Row *row = track->_rows[j];
 							
-							file.write((char*)&row->row, sizeof(row->row));
-							file.write((char*)&row->value, sizeof(row->value));
-							file.write((char*)&row->type, sizeof(row->type));
+							file.write((char*)&row->_row, sizeof(row->_row));
+							file.write((char*)&row->_value, sizeof(row->_value));
+							file.write((char*)&row->_type, sizeof(row->_type));
 						}
 					}
 			
@@ -327,8 +327,8 @@
 						
 						freeTracks();
 						
-						file.read((char*)&bpm, sizeof(bpm));
-						file.read((char*)&lpb, sizeof(lpb));
+						file.read((char*)&_bpm, sizeof(_bpm));
+						file.read((char*)&_lpb, sizeof(_lpb));
 						
 						unsigned int numTracks = 0;
 						file.read((char*)&numTracks, sizeof(numTracks));
@@ -347,16 +347,16 @@
 							file.read((char*)&numRows, sizeof(numRows));
 							
 							Track *track = new Track(track_name, 0);
-							tracks.push_back(track);
+							_tracks.push_back(track);
 							
 							for (unsigned int j = 0; j < numRows; j++) {
 								Track::Row *row = new Track::Row(0.0f, STEP);
 								
-								file.read((char*)&row->row, sizeof(row->row));
-								file.read((char*)&row->value, sizeof(row->value));
-								file.read((char*)&row->type, sizeof(row->type));
+								file.read((char*)&row->_row, sizeof(row->_row));
+								file.read((char*)&row->_value, sizeof(row->_value));
+								file.read((char*)&row->_type, sizeof(row->_type));
 								
-								track->rows.push_back(row);
+								track->_rows.push_back(row);
 							}
 						}
 						
@@ -367,11 +367,11 @@
 				}
 				
 				double getRow(double music_time) {
-					return (music_time * (bpm/60) * lpb);
+					return (music_time * (_bpm/60) * _lpb);
 				}
 				
 				unsigned long getSongPosition(double row) {
-					return (unsigned long)(row / (bpm/60) / lpb);
+					return (unsigned long)(row / (_bpm/60) / _lpb);
 				}
 			
 				static SyncTracker *getInstance()

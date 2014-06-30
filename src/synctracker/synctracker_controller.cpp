@@ -1,45 +1,45 @@
 #include "synctracker_controller.hpp"
 
 sync::SyncTrackerController *sync::SyncTrackerController::_singleton = 0;
-
+											
 void sync::SyncTrackerController::update() {
 	joystick->update();
 			
-	if (stracker->tracks.empty()) {
+	if (stracker->_tracks.empty()) {
 		track = -1;
 		return;
 	}
 					
-	if (joystick->isButtonReleased(13)) {
-		if (track+1 < (int)stracker->tracks.size()) {
+	if (joystick->isButtonReleased(B_L1)) {
+		if (track+1 < (int)stracker->_tracks.size()) {
 			track++;
 			logState();
 		}
 	}
 					
-	if (joystick->isButtonReleased(15)) {
+	if (joystick->isButtonReleased(B_R1)) {
 		if (track-1 >= 0) {
 			track--;
 			logState();
 		}
 	}
 					
-	if (joystick->isButtonReleased(5)) { // R (7 = T)
+	if (joystick->isButtonReleased(B_L2)) { // L (7 = T)
 		mode++;
 		mode %= 2;
 		
 		std::cout << "Mode: " << mode << std::endl;
 	}
 					
-	if (joystick->isButtonReleased(8)) { // back
+	if (joystick->isButtonReleased(B_SELECT)) { // back
 		stracker->save();
 	}
 					
-	if (joystick->isButtonReleased(9)) { // start
-		audio->setSongPosition(0);
+	if (joystick->isButtonReleased(B_START)) { // start
+		audio->setMusicPosition(0);
 	}
 					
-	if (joystick->isButtonReleased(0)) {
+	if (joystick->isButtonReleased(B_1)) {
 		if (interpolation_type == STEP) {
 			interpolation_type = LINEAR;
 			std::cout << "Interpolation type: LINEAR" << std::endl;
@@ -55,14 +55,14 @@ void sync::SyncTrackerController::update() {
 		}
 	}
 					
-	if (joystick->isButtonReleased(3)) {
-		if (stracker->deleteRow(stracker->tracks[track]->name, irow)) {
+	if (joystick->isButtonReleased(B_3)) {
+		if (stracker->deleteRow(stracker->_tracks[track]->_name, irow)) {
 			std::cout << "Row deleted: " << irow << std::endl;
 		}
 	}
-					
-	if (joystick->isButtonReleased(2)) {
-		stracker->setRow(stracker->tracks[track]->name, irow, value, interpolation_type);
+			
+	if (joystick->isButtonReleased(B_2)) {
+		stracker->setRow(stracker->_tracks[track]->_name, irow, value, interpolation_type);
 		logState();
 		std::cout << "Row value set to: " << value << std::endl;
 	}
@@ -89,7 +89,7 @@ void sync::SyncTrackerController::update() {
 		std::cout << "Value: " << value << std::endl;
 	}
 					
-	if (joystick->isButtonReleased(1)) {
+	if (joystick->isButtonReleased(B_4)) {
 		block_loop = !block_loop;
 				
 		if (block_loop) {
@@ -99,10 +99,10 @@ void sync::SyncTrackerController::update() {
 	}
 					
 	if (block_loop) {
-		int prow = (int)floor(stracker->getRow(audio->getSongTime()));
+		int prow = (int)floor(stracker->getRow(audio->getMusicTime()));
 		if (prow > block_loop_start+block_loop_length /*|| 
 			prow < block_loop_start*/) {
-			audio->setSongPosition(stracker->getSongPosition(block_loop_start));
+			audio->setMusicPosition(stracker->getSongPosition(block_loop_start));
 		}
 	}
 }

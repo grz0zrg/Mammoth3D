@@ -1,5 +1,5 @@
-#ifndef MESHLOADER_HPP
-#define MESHLOADER_HPP
+#ifndef MAMMOTH3D_MESHLOADER_HPP
+#define MAMMOTH3D_MESHLOADER_HPP
 
 	#include <fstream>
 	#include <iostream>
@@ -11,7 +11,7 @@
 	#include "../loaders/materialloader.hpp"	
 	#include "../loaders/imageloader.hpp"
 	#include "../loaders/textureloader.hpp"
-	#include "../objects/mesh.hpp"
+	#include "../scenegraph/meshnode.hpp"
 	
 	namespace loader {
 		class MeshLoader {
@@ -19,27 +19,7 @@
 				MeshLoader() { 
 				}
 			
-				~MeshLoader() { 
-					std::map<std::string, std::vector<object::Mesh *> >::iterator meshsIt 
-																= meshs.begin();
-					for (meshsIt; meshsIt != meshs.end(); ++meshsIt) {
-						if (!meshsIt->second.empty()) {
-							for (unsigned int i = 0; i < meshsIt->second.size(); i++) {
-								delete meshsIt->second[i];
-							}
-							meshsIt->second.clear();
-						}
-					}
-					
-					std::map<std::string, core::Geometry *>::iterator meshsGeomIt 
-															= meshsGeom.begin();
-					for (meshsGeomIt; meshsGeomIt != meshsGeom.end(); ++meshsGeomIt) {
-						if (meshsGeomIt->second) {
-							delete meshsGeomIt->second;
-						}
-						meshsGeomIt->second = 0;
-					}
-				}
+				~MeshLoader();
 				
 				static MeshLoader *getInstance()
 				{
@@ -59,25 +39,21 @@
 					}
 				}
 
-				object::Mesh *loadMesh(const std::string &fileName);
+				scenegraph::MeshNode *loadMesh(const std::string &fileName);
 				
-				std::map<std::string, core::Geometry *> meshsGeom;
-				std::map<std::string, std::vector<object::Mesh *> > meshs;
+				std::map<std::string, std::vector<core::Geometry *> > _meshs_geom;
+				std::map<std::string, std::vector<object::Mesh *> > _meshs;
+				std::map<std::string, std::vector<scenegraph::MeshNode *> > _mesh_nodes;
+				std::map<std::string, scenegraph::MeshNode *> _nodes;
 			
 			private:
 				template <typename T>
-				void logPretty(const std::string &str, T param) {
-					std::cout << "[MeshLoader] " << str << "\"" << 
-								param << "\"" << std::endl;
-				}
-				
-				template <typename T>
 				void log(const std::string &str, T param) {
-					std::cout << "[MeshLoader] " << str << param << std::endl;
+					std::cout << "[MeshLoader  ] " << str << param << std::endl;
 				}
 					
 				void log(const char *str) {
-					std::cout << "[MeshLoader] " << str << std::endl;
+					std::cout << "[MeshLoader  ] " << str << std::endl;
 				}
 				
 			MeshLoader(const MeshLoader&);
