@@ -10,36 +10,36 @@ void sync::SyncTrackerController::update() {
 		return;
 	}
 					
-	if (joystick->isButtonReleased(B_L1)) {
+	if (joystick->buttonReleased(B_L1)) {
 		if (track+1 < (int)stracker->_tracks.size()) {
 			track++;
 			logState();
 		}
 	}
 					
-	if (joystick->isButtonReleased(B_R1)) {
+	if (joystick->buttonReleased(B_R1)) {
 		if (track-1 >= 0) {
 			track--;
 			logState();
 		}
 	}
 					
-	if (joystick->isButtonReleased(B_L2)) { // L (7 = T)
+	if (joystick->buttonReleased(B_L2)) { // L (7 = T)
 		mode++;
 		mode %= 2;
 		
 		std::cout << "Mode: " << mode << std::endl;
 	}
 					
-	if (joystick->isButtonReleased(B_SELECT)) { // back
+	if (joystick->buttonReleased(B_SELECT)) { // back
 		stracker->save();
 	}
 					
-	if (joystick->isButtonReleased(B_START)) { // start
+	if (joystick->buttonReleased(B_START)) { // start
 		audio->setMusicPosition(0);
 	}
 					
-	if (joystick->isButtonReleased(B_1)) {
+	if (joystick->buttonReleased(B_1)) {
 		if (interpolation_type == STEP) {
 			interpolation_type = LINEAR;
 			std::cout << "Interpolation type: LINEAR" << std::endl;
@@ -55,13 +55,13 @@ void sync::SyncTrackerController::update() {
 		}
 	}
 					
-	if (joystick->isButtonReleased(B_3)) {
+	if (joystick->buttonReleased(B_3)) {
 		if (stracker->deleteRow(stracker->_tracks[track]->_name, irow)) {
 			std::cout << "Row deleted: " << irow << std::endl;
 		}
 	}
 			
-	if (joystick->isButtonReleased(B_2)) {
+	if (joystick->buttonReleased(B_2)) {
 		stracker->setRow(stracker->_tracks[track]->_name, irow, value, interpolation_type);
 		logState();
 		std::cout << "Row value set to: " << value << std::endl;
@@ -89,7 +89,7 @@ void sync::SyncTrackerController::update() {
 		std::cout << "Value: " << value << std::endl;
 	}
 					
-	if (joystick->isButtonReleased(B_4)) {
+	if (joystick->buttonReleased(B_4)) {
 		block_loop = !block_loop;
 				
 		if (block_loop) {

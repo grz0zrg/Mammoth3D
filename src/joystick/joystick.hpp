@@ -34,11 +34,11 @@
 					_joy = id;
 				}
 				
-				bool isButtonPressed(int button_index) {
+				bool buttonPressed(int button_index) {
 					return (bool)_buttons[button_index];
 				}
 				
-				bool isButtonReleased(int button_index) {
+				bool buttonReleased(int button_index) {
 					if (_prev_buttons.empty()) {
 						return false;
 					}
