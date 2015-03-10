@@ -143,7 +143,9 @@ void audio::Audio::loadMusic(const char* file_name) {
     logPaError();
 }
 
-void audio::Audio::playMusic(bool loop) {
+void audio::Audio::playMusic(bool loop, float volume) {
+	setMusicVolume(volume);
+	
     if(_music ) {
         _pa_error_code = Pa_StartStream(_music_stream);
                 

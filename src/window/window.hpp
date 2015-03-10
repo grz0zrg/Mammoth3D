@@ -72,8 +72,8 @@
 				static Window *_singleton;
 	
 			public:
-				void openWindow(int width, int height, bool fullscreen = false, 
-													const char *title = "");
+				void open(int width, int height, bool fullscreen = false, 
+                                                const char *title = "");
 				
 				void setVSync() {
 					glfwSwapInterval(1);
@@ -97,7 +97,7 @@
 					_last_time = getTime();
 				}
 				
-				double getDeltaTime() {
+				double getDeltaTime() const {
 					return _delta_time;
 				}
 				
@@ -109,32 +109,34 @@
 					glfwSetInputMode(_glfw_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 				}
 
-				double getTime() {
+				double getTime() const {
 					return glfwGetTime();
 				}
 				
-				int getFps() {
+				int getFps() const {
 					return _fps;
 				}
 				
-				void setFSAA(int level) {
+				void setMSAA(int level) {
 					if (_glfw_window) {
-						log("FSAA cannot be applied, window already opened");
+						log("MSAA cannot be set, window already opened (call setMSAA before calling window open)");
+                        
 						return;
 					}
+                    
 					glfwWindowHint(GLFW_SAMPLES, level);
 					
 					_aa = level;
 				}
 				
-				bool isIconified() {
+				bool isIconified() const {
 					if (glfwGetWindowAttrib(_glfw_window, GLFW_ICONIFIED) == GL_TRUE) {
 						return true;
 					}
 					return false;
 				}
 				
-				int getRefreshRate() {
+				int getRefreshRate() const {
 					if (_glfw_vid_mode) {
 						return _glfw_vid_mode->refreshRate;
 					}
@@ -144,7 +146,8 @@
 				
 				void setRefreshRate(int hz) {
 					if (_glfw_window) {
-						log("Refresh rate cannot be applied, window already opened");
+						log("Refresh rate cannot be set, window already opened (call setRefreshRate before calling window open)");
+                        
 						return;
 					}
 					glfwWindowHint(GLFW_REFRESH_RATE, hz);
@@ -154,11 +157,11 @@
 					glfwSetWindowSizeCallback(_glfw_window, cbfun);
 				}
 				
-				int getAASamples() {
+				int getAASamples() const {
 					return _aa;
 				}
 				
-				bool running() {
+				bool running() const {
 					if (_fail) { 
 						return false; 
 					}
@@ -169,11 +172,11 @@
 							!glfwWindowShouldClose(_glfw_window));
 				}
 				
-				int getWidth() {
+				int getWidth() const {
 					return _window_width;
 				}
 				
-				int getHeight() {
+				int getHeight() const {
 					return _window_height;
 				}
 				

@@ -65,7 +65,7 @@
 
 			public:
 				void loadMusic(const char* file_name);
-                void playMusic(bool loop = false);
+                void playMusic(bool loop = false, float volume = 1.0f);
                 void pauseMusic();
                 void freeMusic();
 				
