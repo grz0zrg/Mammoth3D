@@ -1,12 +1,12 @@
-#ifndef MAMMOTH3D_QUAD_OBJECT_HPP
-#define MAMMOTH3D_QUAD_OBJECT_HPP
+#ifndef MAMMOTH3D_SCREEN_ALIGNED_QUAD_OBJECT_HPP
+#define MAMMOTH3D_SCREEN_ALIGNED_QUAD_OBJECT_HPP
 	
 	#include "mesh.hpp"
-
+	
 	namespace object {
-		class Quad : public Mesh {
+		class ScreenAlignedQuad : public Mesh {
 			public:
-				Quad(bool screen_aligned = false) {
+				ScreenAlignedQuad() {
 					_geom = new core::Geometry();
 					
 					for (unsigned int i = 0; i < 6; i++) {
@@ -29,10 +29,10 @@
 
 					//this->mat->setBlending(true);
 					
-					_type = QUAD;
+					_type = QUAD_ALIGNED;
 				}
 				
-				~Quad() {
+				~ScreenAlignedQuad() {
 					delete _mat;
 					delete _geom;
 				}
