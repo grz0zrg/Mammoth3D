@@ -6,42 +6,42 @@
     </Plugin>
     <Plugin Name="CMakePlugin">
       <![CDATA[[{
-		"name":	"LinDebug_x86",
-		"enabled":	false,
-		"buildDirectory":	"build",
-		"sourceDirectory":	"$(ProjectPath)",
-		"generator":	"",
-		"buildType":	"",
-		"arguments":	[],
-		"parentProject":	""
-	}, {
-		"name":	"LinRelease_x86",
-		"enabled":	false,
-		"buildDirectory":	"build",
-		"sourceDirectory":	"$(ProjectPath)",
-		"generator":	"",
-		"buildType":	"",
-		"arguments":	[],
-		"parentProject":	""
-	}, {
-		"name":	"WinDebug_x86",
-		"enabled":	false,
-		"buildDirectory":	"build",
-		"sourceDirectory":	"$(ProjectPath)",
-		"generator":	"",
-		"buildType":	"",
-		"arguments":	[],
-		"parentProject":	""
-	}, {
-		"name":	"WinRelease_x86",
-		"enabled":	false,
-		"buildDirectory":	"build",
-		"sourceDirectory":	"$(ProjectPath)",
-		"generator":	"",
-		"buildType":	"",
-		"arguments":	[],
-		"parentProject":	""
-	}]]]>
+  "name": "LinDebug_x86",
+  "enabled": false,
+  "buildDirectory": "build",
+  "sourceDirectory": "$(ProjectPath)",
+  "generator": "",
+  "buildType": "",
+  "arguments": [],
+  "parentProject": ""
+ }, {
+  "name": "LinRelease_x86",
+  "enabled": false,
+  "buildDirectory": "build",
+  "sourceDirectory": "$(ProjectPath)",
+  "generator": "",
+  "buildType": "",
+  "arguments": [],
+  "parentProject": ""
+ }, {
+  "name": "WinDebug_x86",
+  "enabled": false,
+  "buildDirectory": "build",
+  "sourceDirectory": "$(ProjectPath)",
+  "generator": "",
+  "buildType": "",
+  "arguments": [],
+  "parentProject": ""
+ }, {
+  "name": "WinRelease_x86",
+  "enabled": false,
+  "buildDirectory": "build",
+  "sourceDirectory": "$(ProjectPath)",
+  "generator": "",
+  "buildType": "",
+  "arguments": [],
+  "parentProject": ""
+ }]]]>
     </Plugin>
   </Plugins>
   <Description/>
@@ -116,6 +116,8 @@
       <File Name="../src/objects/quad.hpp"/>
       <File Name="../src/objects/bitmaptext.hpp"/>
       <File Name="../src/objects/bitmaptext.cpp"/>
+      <File Name="../src/objects/screen_aligned_quad.hpp"/>
+      <File Name="../src/objects/screen_aligned_quad.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="cameras">
       <File Name="../src/cameras/camera.hpp"/>
@@ -164,7 +166,7 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="LinDebug_x86" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;-W;-O0" C_Options="-g;-W;-O0" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+      <Compiler Options="-g;-W;-O0" C_Options="-g;-W;-O0" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="../src"/>
         <Preprocessor Value="GLEW_STATIC"/>
         <Preprocessor Value="DEBUG"/>
@@ -188,7 +190,7 @@
         <![CDATA[G_SLICE=always-malloc
 G_DEBUG=gc-friendly]]>
       </Environment>
-      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
         <DebuggerSearchPaths/>
         <PostConnectCommands/>
         <StartupCommands/>
@@ -217,7 +219,7 @@ G_DEBUG=gc-friendly]]>
       </Completion>
     </Configuration>
     <Configuration Name="LinRelease_x86" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O2;-W" C_Options="-O2;-W" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+      <Compiler Options="-O2;-W" C_Options="-O2;-W" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="../src"/>
         <Preprocessor Value="GLEW_STATIC"/>
       </Compiler>
@@ -239,7 +241,7 @@ G_DEBUG=gc-friendly]]>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
-      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
         <DebuggerSearchPaths/>
         <PostConnectCommands/>
         <StartupCommands/>
@@ -268,7 +270,7 @@ G_DEBUG=gc-friendly]]>
       </Completion>
     </Configuration>
     <Configuration Name="WinDebug_x86" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;-W;-O0" C_Options="-g;-W;-O0" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+      <Compiler Options="-g;-W;-O0" C_Options="-g;-W;-O0" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="../src"/>
         <Preprocessor Value="GLFW_DLL"/>
         <Preprocessor Value="GLEW_STATIC"/>
@@ -291,7 +293,7 @@ G_DEBUG=gc-friendly]]>
         <![CDATA[G_SLICE=always-malloc
 G_DEBUG=gc-friendly]]>
       </Environment>
-      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
         <DebuggerSearchPaths/>
         <PostConnectCommands/>
         <StartupCommands/>
@@ -320,7 +322,7 @@ G_DEBUG=gc-friendly]]>
       </Completion>
     </Configuration>
     <Configuration Name="WinRelease_x86" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O2;-W" C_Options="-O2;-W" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" UseDifferentPCHFlags="no" PCHFlags="">
+      <Compiler Options="-O2;-W" C_Options="-O2;-W" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="../src"/>
         <Preprocessor Value="GLFW_DLL"/>
         <Preprocessor Value="GLEW_STATIC"/>
@@ -341,7 +343,7 @@ G_DEBUG=gc-friendly]]>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
-      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="">
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
         <DebuggerSearchPaths/>
         <PostConnectCommands/>
         <StartupCommands/>
