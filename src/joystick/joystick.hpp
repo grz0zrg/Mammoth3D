@@ -51,7 +51,11 @@
 				}
 				
 				float getAxe(int axe_index) {
-					return _axes[axe_index];
+					if (_axes) {
+						return _axes[axe_index];
+					}
+					
+					return 0.0f;
 				}
 				
 				void update() {
