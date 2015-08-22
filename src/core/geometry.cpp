@@ -8,7 +8,8 @@ core::Geometry::Geometry() {
     _colors_count   = 0;
 					
     _i_vbo = _v_vbo = _n_vbo = _u_vbo = _c_vbo = 0;
-
+    _ic_vbo = _iv_vbo = _iu_vbo = _in_vbo = false;
+    
     _type = GL_TRIANGLES;
 }
 
@@ -74,6 +75,11 @@ void core::Geometry::generateVbo() {
                             GL_STATIC_DRAW);
         _v_vbo->attrib(0);
         _v_vbo->setComponents(3);
+        
+        if (_iv_vbo) {
+            _v_vbo->setAttribDivisor(1);
+        }
+        
         if (!ret) {
             log("Vertices VBO creation failed.");
         }
@@ -90,6 +96,11 @@ void core::Geometry::generateVbo() {
                             GL_STATIC_DRAW);
         _u_vbo->attrib(1);
         _u_vbo->setComponents(2);
+        
+        if (_iu_vbo) {
+            _u_vbo->setAttribDivisor(1);
+        }
+        
         if (!ret) {
             log("UVs VBO creation failed.");
         }
@@ -106,6 +117,11 @@ void core::Geometry::generateVbo() {
                             GL_STATIC_DRAW);
         _n_vbo->attrib(2);
         _n_vbo->setComponents(3);
+        
+        if (_in_vbo) {
+            _n_vbo->setAttribDivisor(1);
+        }
+        
         if (!ret) {
             log("Normals VBO creation failed.");
         }
@@ -122,6 +138,13 @@ void core::Geometry::generateVbo() {
                             GL_STATIC_DRAW);
         _c_vbo->attrib(3);
         _c_vbo->setComponents(4);
+        
+        _c_vbo->setNormalized(GL_TRUE);
+        
+        if (_ic_vbo) {
+            _c_vbo->setAttribDivisor(1);
+        }
+        
         if (!ret) {
             log("Colors VBO creation failed.");
         }
@@ -133,15 +156,69 @@ void core::Geometry::setDynamic(GeometryData type, bool state) {
     if (!state) {
         usage = GL_STATIC_DRAW;
     }
-					
-    if (type == GEOMETRY_COLOR) {
-        if (_c_vbo) {
-            _c_vbo->setUsage(usage);
-        }
-    } else if (type == GEOMETRY_VERTICE) {
-        if (_v_vbo) {
-            _v_vbo->setUsage(usage);
-        }
+    
+    switch (type) {
+        case GEOMETRY_COLOR:
+            if (_c_vbo) {
+                _c_vbo->setUsage(usage);
+            }
+            break;
+            
+        case GEOMETRY_VERTICE:
+            if (_v_vbo) {
+                _v_vbo->setUsage(usage);
+            }
+            break;
+            
+        case GEOMETRY_NORMAL:
+            if (_n_vbo) {
+                _n_vbo->setUsage(usage);
+            }
+            break;
+            
+        case GEOMETRY_UV:
+            if (_u_vbo) {
+                _u_vbo->setUsage(usage);
+            }
+            break;
+            
+        default:
+            break;
+    }
+}
+
+void core::Geometry::setInstanced(GeometryData type) {
+    switch (type) {
+        case GEOMETRY_COLOR:
+            if (_c_vbo) {
+                _c_vbo->setAttribDivisor(1);
+                _ic_vbo = true;
+            }
+            break;
+            
+        case GEOMETRY_VERTICE:
+            if (_v_vbo) {
+                _v_vbo->setAttribDivisor(1);
+                _iv_vbo = true;
+            }
+            break;
+            
+        case GEOMETRY_NORMAL:
+            if (_n_vbo) {
+                _n_vbo->setAttribDivisor(1);
+                _in_vbo = true;
+            }
+            break;
+            
+        case GEOMETRY_UV:
+            if (_u_vbo) {
+                _u_vbo->setAttribDivisor(1);
+                _iu_vbo = true;
+            }
+            break;
+            
+        default:
+            break;
     }
 }
 

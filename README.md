@@ -19,7 +19,7 @@ The "lib" folder contain all the libraries the engine use, some are mingw32 x86 
 
 This framework is specifically made for demos; texture, shader, geometry etc can (and should) be created through a general purpose loader, with the "loader" there is no need to explicitely create any objects and releasing the memory, all stuff needed for a demo can be created this way, anything used from the framework does not need to be released explicitely or created.
 
-#### Step by step example ####
+### Step by step guide ###
 
 Opening a window (set false to true for fullscreen, last argument is MSAA level)
 
@@ -28,7 +28,7 @@ auto app = window::Window::getInstance();
 app->open("example", 800, 600, false, 2);
 ```
 	
-By default the mouse cursor will be hidden and vsync will be requested
+*By default the mouse cursor will be hidden and vsync will be requested*
 
 Loading GLSL files and compiling a program:
 	
@@ -56,7 +56,7 @@ auto text = ldr->getNewBitmapText("font.png", "Hello World!", 255, 0, 255, 0.25f
 text->setScreenAlign(true); // set this to false to manipulate the text quad, to allow for rotations, scaling etc otherwise by default it is true and the text will be screen aligned, always visible
 ```
 	
-The text, color, treshold, screen alignment can be updated in real-time.
+*The text, color, treshold, screen alignment can be updated in real-time.*
 
 Creating a camera and setting up its position/target:
 
@@ -126,9 +126,9 @@ synctracker->update(song_time);
 synctracker_controller->update();
 ```
 	
-There is no graphical interface to edit the synctracker data but there is still text output in the console reflecting any actions you do.
+*There is no graphical interface to edit the synctracker data but there is still text output in the console reflecting any actions you do.*
 
-#### More stuff ####
+### More stuff ###
 
 It is easy to pass stuff to a shader program using uniform blocks:
 
@@ -136,7 +136,7 @@ It is easy to pass stuff to a shader program using uniform blocks:
 auto ublock = loader::Loader::getInstance()->getNewUniformBlock("BlockName", {{"r", 1.0f}, {"g", 1.0f}, {"b", 1.0f}, {"a", 1.0f}, {"stuff", 1.0f}}, program);
 ```
 	
-There is only "float" uniform type available at the moment.
+*There is only "float" uniform type available at the moment.*
 	
 Then in the GLSL shader (name does not matter here):
 	
@@ -171,7 +171,9 @@ auto particle = ldr->getNewQuad({{particle_texture, 0}});
 auto particles = particle->enableInstancing(1000); // 1000 objects will be drawn in a single call, particles is a vector of Mesh, you can change individual attributes from it for each mesh (note: only transform attributes are passed per instance right now)
 ```
 		
-Then in the vertex shader you can use `gl_InstanceID` to get the object id, you will need to declare attribute location for the instance transform matrix as `layout(location = 4) in mat4 imvp;`
+*An attribute location for instances transform matrix should be specified in the vertex shader as `layout(location = 4) in mat4 imvp;`*
+
+*Then in the vertex shader you can use `gl_InstanceID` to get the object id, combine it with a TBO and texelFetch function in the shader for any more per instance stuff like colors, uvs...*
 
 There is also a fast way to display huge amount of static objects by merging geometries, it will be difficult to apply effects on each of them but may be faster than instancing:
 

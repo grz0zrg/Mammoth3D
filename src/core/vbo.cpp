@@ -15,6 +15,8 @@ bool core::Vbo::build(GLsizeiptr size, const GLvoid *data, GLenum target,
     glGenBuffers(1, &_buffer_id);
     glBindBuffer(target, _buffer_id);
     glBufferData(target, size, data, usage);
+    
+    _target = target;
 						
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
@@ -44,6 +46,10 @@ void core::Vbo::attrib(GLuint index) {
 					
     glBindBuffer(_target, _buffer_id);
     glEnableVertexAttribArray(index);
-					
+    
+    if (_attrb_divisor) {
+        glVertexAttribDivisor(index, _d);
+    }
+    
     _attrib_index = index;
 }

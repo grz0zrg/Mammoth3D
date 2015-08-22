@@ -59,6 +59,7 @@
                     _i_mat_vbo = 0;
 					
 					_matrix_auto_update = true;
+
 					_vertex_colors = false;
 					
 					_model_matrix = glm::mat4(1.0f);

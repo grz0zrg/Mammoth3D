@@ -53,20 +53,20 @@ float rand(vec2 co){
 void main()
 {
 
-	//ivec2 iUV = ivec2(textureSize(t0) * UV);
+	ivec2 iUV = ivec2(textureSize(t0) * UV);
 	//vec4 tex = texture(t0, UV);
-	
+
 	//vec4 tex =vec4(0.0,0.0,0.0,0.0);
 	//tex += texture2D(t0, vec2(UV.y-1-sqrt(abs(0.5*UV.x-1-0.5))*abs(UV.x-1), 1.25-UV.x-1));
 	//tex += texelFetch(t0, ivec2(textureSize(t0) * vec2(UV.y-1-sqrt(abs(0.5*UV.x-1-0.5))*abs(UV.x-1), 1.25-UV.x-1))*uv_multiplier*time,0);
-	//vec4 tex = texelFetch(t0, ivec2(textureSize(t0) * UV),0);
-	//tex += texelFetch(t0, ivec2(textureSize(t0) * UV),1);
+	//vec4 tex = texelFetch(t0, ivec2(textureSize(t0) * UV), 0, 0);
+	//tex += texelFetch(t0, ivec2(textureSize(t0) * UV), 0, 1);
 	//tex /= 2;
 
-	
+
 	vec4 tex = vec4(0);
 	vec3 sumcol = vec3(0.0);
-	vec3 sumw = vec3(0.0);	
+	vec3 sumw = vec3(0.0);
 	for ( int i=0; i<num_iter;++i )
 	{
 		float t = float(i) * reci_num_iter_f;
@@ -75,23 +75,42 @@ void main()
 		//sumcol += w * texture2D( t0, barrelDistortion((UV*0.5)+0.25, max_distort*t ) ).rgb;
 
 		ivec2 UVi = ivec2(textureSize(t0) * barrelDistortion((UV*0.5)+0.25, max_distort*t ));
-		
+
 		vec3 accum = vec3(0.0);
-		for(int sample = 0; sample < 4; ++sample) {
-			accum += texelFetch(t0, UVi, sample).rgb;
-		}
-		accum /= 4;
+		/*//for(int sample = 0; sample < 2; ++sample) {
+			accum += texelFetch(t0, UVi, 0, 0).rgb;
+			//UVi.x += 64;
+			accum += texelFetch(t0, UVi, 0, 1).rgb;
+		//}
+		accum /= 2;
+*/
+		accum += texelFetch(t0, UVi, 0, 0).rgb;
 
 		sumcol += w * accum;
 	}
 
 	tex.rgb = sumcol/sumw;
-	
+
+
+/* 	vec4 tex = vec4(0.0);
+	for(int sample = 0; sample < 2; ++sample) {
+		tex += texelFetch(t0, iUV, 0, sample);
+	}
+	tex /= 2;
+*/
 	float dist = distance(UV, vec2(0.5, 0.5)) * aperture;
 	tex.rgb *= smoothstep(0.755, 0.755-0.5, dist);
-	
+
 	float grain = rand(UV);
 	tex.rgb *= max(0.1095+grain, 1.0);
- 
+
+
+/*
+	accum += texelFetch(t0, iUV, 0, 0).rgb;
+	iUV = ivec2(textureSize(t0) * UV);
+	iUV.x += 64;
+	iUV.y += 64;
+	accum += texelFetch(t0, iUV, 0, 1).rgb;
+	accum /=2;*/
 	outputColor = vec4(tex.rgb, alpha);
 }

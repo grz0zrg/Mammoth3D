@@ -3,6 +3,7 @@
 layout(location = 0) out vec4 outputColor;
 
 in vec2 UV;
+in vec4 COLOR;
 
 layout (std140) uniform Params {
 	float aperture;
@@ -23,5 +24,5 @@ void main()
 
 	tex.a *= /*pow( gl_FragCoord.z, 20.0 ) * */alpha;
 
-	outputColor = mix(tex, vec4(/*vec3(0.192, 0.478, 0.670)*/tx.rgb, tex.a), 1.0);
+	outputColor = mix(tex, vec4(/*vec3(0.192, 0.478, 0.670)*//*tx.rgb * */tex.rgb * COLOR.rgb, tex.a), 1.0);
 }

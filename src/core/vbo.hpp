@@ -14,6 +14,8 @@
 					_data_type = GL_FLOAT;
 					_normalized = GL_FALSE;
 					_components = 3;
+                    
+                    _attrb_divisor = false;
 				}
 				
 				~Vbo() {
@@ -43,15 +45,31 @@
 				void setNormalized(GLboolean n) {
 					_normalized = n;
 				}
-				
+                
+                void setAttribDivisor(GLuint d) {
+                    if (_buffer_id == 0) {
+                        return;
+                    }
+
+                    glBindBuffer(_target, _buffer_id);
+                    
+                    glVertexAttribDivisor(_attrib_index, d);
+                    
+                    _d = d;
+                    
+                    _attrb_divisor = true;
+                }
+                
 				void destroy() {
 					glDeleteBuffers(1, &_buffer_id);
 				}
 
-				GLuint _buffer_id, _attrib_index;
+				GLuint _buffer_id, _attrib_index, _d;
 				GLenum _target, _usage, _data_type;
 				GLboolean _normalized;
 				GLint _components;
+                
+                bool _attrb_divisor;
                 
             private:
 				void log(const char *str) {

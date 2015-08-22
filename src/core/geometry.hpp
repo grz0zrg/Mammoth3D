@@ -10,8 +10,10 @@
 		typedef enum {
 			GEOMETRY_INDICE,
 			GEOMETRY_VERTICE,
-			GEOMETRY_COLOR
-		}GeometryData;
+			GEOMETRY_COLOR,
+            GEOMETRY_NORMAL,
+            GEOMETRY_UV
+		} GeometryData;
 		
 		class Geometry {
 			public:
@@ -25,6 +27,8 @@
 				void updateVertices();
 				void updateColors();
 				void update();
+                
+                void setInstanced(GeometryData type);
 				
 				void setDynamic(GeometryData type, bool state = true);
 				
@@ -51,6 +55,8 @@
 				std::vector<float> _colors;
 
 				Vbo *_i_vbo, *_v_vbo, *_n_vbo, *_u_vbo, *_c_vbo;
+                
+                bool _ic_vbo, _iv_vbo, _iu_vbo, _in_vbo;
 		};
 	}
 

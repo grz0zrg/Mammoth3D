@@ -54,8 +54,12 @@ int main(int argc, char **argv) {
 	auto texture_buffer = ldr->getNewTextureBuffer(std::vector<float> {1.0f, 0.0f, 0.0f, 0.0f});
 
     auto star_f = ldr->getNewQuad({{star_t, 0}, {texture_buffer, 1}});
+    star_f->_vertex_colors = true;
     auto star_meshs_instance = star_f->enableInstancing(256);
     
+    auto star_f_colors = star_f->getGeometry();
+    star_f_colors->setInstanced(core::GEOMETRY_COLOR);
+
     for (unsigned int i = 0; i < star_meshs_instance.size(); i++) {
         auto m = star_meshs_instance[i];
         
@@ -64,7 +68,13 @@ int main(int argc, char **argv) {
         m->_z = -(float)i/32.0f; //-(float)i/32.0f;
         //m->_rz = (glm::linearRand(-1.0f, 1.0f) * M_PI) * 90;
         m->_sx = m->_sy = glm::linearRand(0.0f, 1.0f) * glm::linearRand(0.0f, 1.0f) * 1.5f + 0.5f;
+        
+        for (unsigned int j = 0; j < 4; j++) {
+            star_f_colors->_colors.push_back(glm::linearRand(0.0f, 1.0f));
+        }
     }
+    
+    star_f_colors->update();
     
     //star_f->setGeometry(geom);
     //star_f->setMaterial(ldr->getNewMaterial());

@@ -226,7 +226,15 @@ void renderer::Renderer::render(scenegraph::MeshNode *node) {
 			} else { // already bound
 				glBindBuffer(GL_ARRAY_BUFFER, cVbo->_buffer_id);
 			}
-			glVertexAttribPointer(cVbo->_attrib_index, cVbo->_components, cVbo->_data_type, cVbo->_normalized, 0, 0);
+            
+            unsigned int ssize = 0;
+
+            if (cVbo->_attrb_divisor) {
+                ssize = 4 * sizeof(float);
+            }
+            
+			glVertexAttribPointer(cVbo->_attrib_index, cVbo->_components, cVbo->_data_type, cVbo->_normalized, ssize, 0);
+            glVertexAttribDivisor(cVbo->_attrib_index, 1);
 		}
         
         if (mesh->_i_count == 0) {
