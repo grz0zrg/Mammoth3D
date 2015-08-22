@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Workspace Name="Mammoth3D" Database="./Mammoth3D.tags">
+<CodeLite_Workspace Name="Mammoth3D" Database="./Mammoth3D.tags" SWTLW="No">
   <Project Name="test" Path="project/test.project" Active="Yes"/>
   <Environment>
     <![CDATA[]]>

@@ -45,7 +45,7 @@
 				}
 				
 				core::Texture *loadTexture(core::Image *image);
-				core::Texture *createEmptyTexture(int width, int height);
+				core::Texture *createEmptyTexture(int width, int height, GLenum type);
 				
 				std::vector<core::Texture *> _textures;
 

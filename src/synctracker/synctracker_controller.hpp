@@ -68,7 +68,10 @@
 				{
 					if (!_singleton) {
 						_singleton =  new SyncTrackerController;
+						
+						std::atexit(free);
 					}
+					
 					return _singleton;
 				}
 

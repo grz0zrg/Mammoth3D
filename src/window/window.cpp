@@ -2,9 +2,14 @@
 
 window::Window *window::Window::_singleton = 0;
 
-void window::Window::open(int width, int height, bool fullscreen, 
-										const char *title) {
-	if (_fail) return;					
+void window::Window::open(const char *title, int width, int height, bool fullscreen, int msaa_level) {
+	if (_fail) return;		
+
+    if (msaa_level > 0) {
+        glfwWindowHint(GLFW_SAMPLES, msaa_level);
+					
+        _aa = msaa_level;
+    }
 	
 	glfwWindowHint(GLFW_RED_BITS, 8);
 	glfwWindowHint(GLFW_GREEN_BITS, 8);
@@ -48,4 +53,7 @@ void window::Window::open(int width, int height, bool fullscreen,
 				
 	_window_width  = width;
 	_window_height = height;
+    
+    hideMouseCursor();
+    setVSync();
 }

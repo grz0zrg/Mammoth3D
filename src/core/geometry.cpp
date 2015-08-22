@@ -35,7 +35,7 @@ core::Geometry::~Geometry() {
 }
 
 core::Geometry *core::Geometry::clone() {
-    Geometry *geom = new Geometry();
+    auto geom = new Geometry();
 
     geom->_indices  = _indices;
     geom->_vertices = _vertices;

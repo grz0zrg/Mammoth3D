@@ -65,7 +65,7 @@ scenegraph::MeshNode *loader::MeshLoader::loadMesh(const std::string &fileName) 
 		return 0;
 	}
 	
-	scenegraph::MeshNode *root_node;
+	scenegraph::MeshNode *root_node = 0;
 
 	std::ifstream file;
 	file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -209,7 +209,7 @@ scenegraph::MeshNode *loader::MeshLoader::loadMesh(const std::string &fileName) 
 					
 				_mesh_nodes[fileName].push_back(node);
 			}
-				
+			
 			_nodes[fileName] = root_node;
 				
 			file.close();

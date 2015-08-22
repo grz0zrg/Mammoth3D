@@ -5,6 +5,7 @@
 	
 	#include <string>
 	#include <iostream>
+    #include <chrono>
 	
 	#include "../core/fbo.hpp"
 	
@@ -84,7 +85,13 @@
 					_viewport_width = _viewport_height = 0;
 					
 					_aspect_ratio = 0;
-					
+                    
+                    _frame = 0;
+                    
+                    _fps = 0;
+                    
+                    _time = std::chrono::high_resolution_clock::now();
+                
 					setRenderTarget();
 				}
 				
@@ -113,7 +120,11 @@
 				material::Material *_previous_mat;
 				camera::Camera *_curr_camera;
 				
-				int _viewport_width, _viewport_height;
+				GLsizei _viewport_width, _viewport_height;
+                
+                std::chrono::high_resolution_clock::time_point _time;
+                
+                unsigned int _frame, _fps;
 				
 				float _aspect_ratio;
 
@@ -132,6 +143,10 @@
 					
 					_curr_camera = camera;
 				}
+                
+                unsigned int getFps() {
+                    return _fps;
+                }
 				
 				//void setRenderTarget(void *target) {
 				//	setRenderTarget(static_cast<core::Fbo *>(target));
@@ -146,7 +161,7 @@
 						}
 					}
 					
-					Renderable *renderable = new Renderable();
+					auto renderable = new Renderable();
 					renderable->renderTarget = render_target;
 					
 					renderable->setCamera(_curr_camera);
@@ -155,6 +170,14 @@
 					
 					_current_render_target_id = _render_queue.size()-1;
 				}
+                
+                void setGammaCorrection(bool enable) const {
+                    if (enable) {
+                        glEnable(GL_FRAMEBUFFER_SRGB);
+                    } else {
+                        glDisable(GL_FRAMEBUFFER_SRGB);
+                    }
+                }
 				
 				void add(scenegraph::Node *node) {
 					_render_queue[_current_render_target_id]->addNode(node);
@@ -165,23 +188,23 @@
 				}
 				
 				void remove(object::Mesh *mesh) {
-					Renderable *currentRenderTarget = _render_queue[_current_render_target_id];
-					scenegraph::MeshNode *meshNode = currentRenderTarget->meshNode;
+					auto currentRenderTarget = _render_queue[_current_render_target_id];
+					auto meshNode = currentRenderTarget->meshNode;
 
 					meshNode->removeMesh(mesh);
 				}
 				
 				void remove(scenegraph::Node *node) {
-					Renderable *currentRenderTarget = _render_queue[_current_render_target_id];
-					scenegraph::Node *root = currentRenderTarget->getRoot();
+					auto currentRenderTarget = _render_queue[_current_render_target_id];
+					auto root = currentRenderTarget->getRoot();
 					
 					root->findAndRemove(node);
 				}
 				
 				void removeAll(scenegraph::Node *node) {
 					for (unsigned int i = 0; i < _render_queue.size(); i++) {
-						Renderable *renderTarget = _render_queue[i];
-						scenegraph::Node *root = renderTarget->getRoot();
+						auto renderTarget = _render_queue[i];
+						auto root = renderTarget->getRoot();
 						
 						root->findAndRemove(node);
 					}
@@ -189,7 +212,7 @@
 				
 				void removeAll() {
 					for (unsigned int i = 0; i < _render_queue.size(); i++) {
-						Renderable *renderTarget = _render_queue[i];
+						auto renderTarget = _render_queue[i];
 						renderTarget->getRoot()->clear();
 					}
 				}
@@ -202,6 +225,8 @@
 				{
 					if (!_singleton) {
 						_singleton =  new Renderer;
+						
+						std::atexit(free);
 					}
 
 					return _singleton;
@@ -219,6 +244,8 @@
 				GLuint _previous_program;
 				GLenum _previous_poly_mode, _previous_cull_mode;
 				bool _previous_depth_write, _previous_depth_test;
+                
+                glm::mat4 mvp;
 		};
 	}
 	

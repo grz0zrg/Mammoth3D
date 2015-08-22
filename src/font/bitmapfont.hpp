@@ -8,7 +8,7 @@
 	namespace font {
 		class BitmapFont {
 			public:
-				BitmapFont(core::Texture *font_texture);
+				BitmapFont(core::Texture *font_texture, int col_count = 16, int row_count = 16);
 				
 				~BitmapFont();
 

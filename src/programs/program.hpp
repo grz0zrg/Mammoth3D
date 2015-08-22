@@ -37,9 +37,10 @@
 
 				void bindVbos() {
 					for (unsigned int i = 0; i < _vbos_count; i++) {
-						const core::Vbo *vbo = _vbos[i];
+						const auto vbo = _vbos[i];
 						glBindBuffer(vbo->_target, vbo->_buffer_id);
-						glVertexAttribPointer(vbo->_attrib_index, vbo->_components, vbo->_data_type, vbo->_normalized, 0, 0);
+						glVertexAttribPointer(vbo->_attrib_index, vbo->_components, 
+                                        vbo->_data_type, vbo->_normalized, 0, 0);
 					}
 				}
 				
@@ -65,7 +66,7 @@
 				}
 				
 				void log(const char *str) {
-					std::cout << "[Program] " << str << std::endl;
+					std::cout << "[Program     ] " << str << std::endl;
 				}
 				
 				GLuint _id;

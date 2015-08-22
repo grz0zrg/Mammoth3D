@@ -166,7 +166,7 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="LinDebug_x86" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;-W;-O0" C_Options="-g;-W;-O0" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-g;-W;-O0;-std=c++11" C_Options="-g;-W;-O0" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="../src"/>
         <Preprocessor Value="GLEW_STATIC"/>
         <Preprocessor Value="DEBUG"/>
@@ -211,7 +211,7 @@ G_DEBUG=gc-friendly]]>
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion EnableCpp11="no">
+      <Completion EnableCpp11="no" EnableCpp14="no">
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>
@@ -219,7 +219,7 @@ G_DEBUG=gc-friendly]]>
       </Completion>
     </Configuration>
     <Configuration Name="LinRelease_x86" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O2;-W" C_Options="-O2;-W" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-O2;-W;-std=c++11" C_Options="-O2;-W" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="../src"/>
         <Preprocessor Value="GLEW_STATIC"/>
       </Compiler>
@@ -262,7 +262,7 @@ G_DEBUG=gc-friendly]]>
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion EnableCpp11="no">
+      <Completion EnableCpp11="no" EnableCpp14="no">
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>
@@ -270,7 +270,7 @@ G_DEBUG=gc-friendly]]>
       </Completion>
     </Configuration>
     <Configuration Name="WinDebug_x86" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;-W;-O0" C_Options="-g;-W;-O0" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-g;-W;-O0;-std=c++11" C_Options="-g;-W;-O0" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="../src"/>
         <Preprocessor Value="GLFW_DLL"/>
         <Preprocessor Value="GLEW_STATIC"/>
@@ -314,7 +314,7 @@ G_DEBUG=gc-friendly]]>
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion EnableCpp11="no">
+      <Completion EnableCpp11="no" EnableCpp14="no">
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>
@@ -322,7 +322,7 @@ G_DEBUG=gc-friendly]]>
       </Completion>
     </Configuration>
     <Configuration Name="WinRelease_x86" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O2;-W" C_Options="-O2;-W" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-O2;-W;-std=c++11" C_Options="-O2;-W" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="../src"/>
         <Preprocessor Value="GLFW_DLL"/>
         <Preprocessor Value="GLEW_STATIC"/>
@@ -364,7 +364,7 @@ G_DEBUG=gc-friendly]]>
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion EnableCpp11="no">
+      <Completion EnableCpp11="no" EnableCpp14="no">
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>

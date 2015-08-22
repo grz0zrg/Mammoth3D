@@ -17,8 +17,7 @@
 				}
 			
 				~ImageLoader() { 
-					std::map<std::string, core::Image *>::iterator imagesIt 
-																= _images.begin();
+					auto imagesIt = _images.begin();
 					for (imagesIt; imagesIt != _images.end(); ++imagesIt) {
 						if (imagesIt->second) {
 							delete imagesIt->second;

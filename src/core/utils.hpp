@@ -3,7 +3,7 @@
 	
 	#include <string>
 	#include <sstream>
-	
+
 	namespace core {
 		namespace utils {
 			template<typename T>

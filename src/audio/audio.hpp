@@ -116,6 +116,8 @@
 				{
 					if (!_singleton) {
 						_singleton =  new Audio;
+						
+						std::atexit(free);
 					}
 
 					return _singleton;

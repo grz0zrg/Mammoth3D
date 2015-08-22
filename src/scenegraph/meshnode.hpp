@@ -19,11 +19,11 @@
 				void setProgram(program::Program *prog) {
 					for (unsigned int i = 0; i < _meshs.size(); i++) {
 						_meshs[i]->setProgram(prog);
-						_meshs[i]->_z = -100.0f;
+						//_meshs[i]->_z = -100.0f;
 					}
 					
 					for (unsigned int i = 0; i < _children.size(); i++) {
-						Node *node = _children[i];
+						auto node = _children[i];
 						
 						if (node->_type == NODE_MESH) {
 							MeshNode *mesh_node = (MeshNode *)node;
@@ -43,7 +43,7 @@
 					}
 					
 					for (unsigned int i = 0; i < _children.size(); i++) {
-						Node *node = _children[i];
+						auto node = _children[i];
 						
 						if (node->_type == NODE_MESH) {
 							MeshNode *mesh_node = (MeshNode *)node;

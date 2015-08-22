@@ -27,8 +27,15 @@ void core::UniformBlock::initialize(bool dynamic) {
     }
 }
 
-void core::UniformBlock::setUniform(const std::string& uniform_name, 
-                                                        float value) {
+void core::UniformBlock::set(const std::map<std::string, float> &uniforms) {
+    for (auto it = uniforms.begin(); it != uniforms.end(); ++it) {
+        set(it->first, it->second);
+    }
+    
+    update();
+}
+
+void core::UniformBlock::set(const std::string& uniform_name, float value) {
     if (_uniform_index.find(uniform_name) == _uniform_index.end()) {
         _uniform_index[uniform_name] = _data.size();
         _data.push_back(value);

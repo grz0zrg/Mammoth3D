@@ -19,7 +19,7 @@ object::BitmapText::BitmapText(font::BitmapFont *font) {
 	
 	_geom->update();
 	
-	loader::ShaderLoader *sldr = loader::ShaderLoader::getInstance();
+	auto sldr = loader::ShaderLoader::getInstance();
 					
 	_prog = new program::Program(sldr->getBitmapFontsProgram()->_id);
 				
@@ -41,15 +41,15 @@ object::BitmapText::BitmapText(font::BitmapFont *font) {
 	_alpha_treshold = 0.5f;
 			
 	_uniforms = new core::UniformBlock("infosBlock");
-	_uniforms->setUniform("r", _r);
-	_uniforms->setUniform("g", _g);
-	_uniforms->setUniform("b", _b);
-	_uniforms->setUniform("a", _alpha_treshold);
-	//uniforms->setUniform("text_length", 0);
-	_uniforms->setUniform("font_width", font->_bitmap->_width);
-	_uniforms->setUniform("font_height", font->_bitmap->_height);
-	_uniforms->setUniform("cell_width", font->_cellWidth);
-	_uniforms->setUniform("cell_height", font->_cellHeight);
+	_uniforms->set("r", _r);
+	_uniforms->set("g", _g);
+	_uniforms->set("b", _b);
+	_uniforms->set("a", _alpha_treshold);
+	//uniforms->set("text_length", 0);
+	_uniforms->set("font_width", font->_bitmap->_width);
+	_uniforms->set("font_height", font->_bitmap->_height);
+	_uniforms->set("cell_width", font->_cellWidth);
+	_uniforms->set("cell_height", font->_cellHeight);
 	_uniforms->initialize();
 
 	_prog->bindUniformBlock(_uniforms);
@@ -79,7 +79,7 @@ void object::BitmapText::setText(const std::string& text) {
 		}
 		_tbo->updateData(chars_map);
 		
-		//uniforms->setUniform("text_length", (float)(text.length()*font->cellWidth)/font->bitmap->width);
+		//uniforms->set("text_length", (float)(text.length()*font->cellWidth)/font->bitmap->width);
 		//uniforms->update();
 	}
 					

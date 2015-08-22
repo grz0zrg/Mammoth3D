@@ -24,21 +24,29 @@
 					_font = font;
 				}
 				
+                void setScreenAlign(bool align) {
+                    if (align) {
+                        _type = QUAD_ALIGNED;
+                    } else {
+                        _type = QUAD;
+                    }
+                }
+                
 				void setColor(int r, int g, int b) {
 					_r = (float)r/255.0f;
 					_g = (float)g/255.0f;
 					_b = (float)b/255.0f;
 					
-					_uniforms->setUniform("r", _r);
-					_uniforms->setUniform("g", _g);
-					_uniforms->setUniform("b", _b);
+					_uniforms->set("r", _r);
+					_uniforms->set("g", _g);
+					_uniforms->set("b", _b);
 					
 					_uniforms->update();
 				}
 				
 				void setAlphaTreshold(float value) {
 					_alpha_treshold = value;
-					_uniforms->setUniform("a", _alpha_treshold);
+					_uniforms->set("a", _alpha_treshold);
 					
 					_uniforms->update();
 				}

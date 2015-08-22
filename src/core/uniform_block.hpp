@@ -22,8 +22,10 @@
 					glDeleteBuffers(1, &_id);
 				}
 				
-				void setUniform(const std::string& uniform_name,
+				void set(const std::string& uniform_name,
 								float value = 1.0f);
+                                
+                void set(const std::map<std::string, float> &uniforms = std::map<std::string, float>());
                                 
 				void initialize(bool dynamic = true);
                 

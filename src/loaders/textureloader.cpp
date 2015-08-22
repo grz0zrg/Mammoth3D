@@ -40,9 +40,9 @@ core::Texture *loader::TextureLoader::loadTexture(core::Image *image) {
 	return texture;
 }
 
-core::Texture *loader::TextureLoader::createEmptyTexture(int width, int height) {
+core::Texture *loader::TextureLoader::createEmptyTexture(int width, int height, GLenum type) {
 	core::Texture *texture = new core::Texture();
-	texture->create(width, height);
+	texture->create(width, height, type);
 	_textures.push_back(texture);
 	
 	return texture;

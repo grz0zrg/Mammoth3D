@@ -72,8 +72,7 @@
 				static Window *_singleton;
 	
 			public:
-				void open(int width, int height, bool fullscreen = false, 
-                                                const char *title = "");
+				void open(const char *title, int width, int height, bool fullscreen = false, int msaa_level = 0);
 				
 				void setVSync() {
 					glfwSwapInterval(1);
@@ -154,6 +153,8 @@
 				}
 
 				void onResize(GLFWwindowsizefun cbfun) {
+					cbfun(_glfw_window, _window_width, _window_height);
+					
 					glfwSetWindowSizeCallback(_glfw_window, cbfun);
 				}
 				
@@ -184,6 +185,8 @@
 				{
 					if (!_singleton) {
 						_singleton =  new Window;
+						
+						std::atexit(free);
 					}
 
 					return _singleton;

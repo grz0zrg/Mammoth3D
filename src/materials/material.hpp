@@ -88,11 +88,15 @@
 					bindTextures();
 				}
 				
-				core::Texture *getTexture(unsigned int index = 0) {
+				core::Texture *getTexture(unsigned int index = 0) const {
 					if (index < _textures.size()) {
 						return _textures[index];
 					}
 				}
+                
+                program::Program *getProgram() const {
+                    return _prog;
+                }
 				
 				void bindTextures() {
 					if (_prog) {

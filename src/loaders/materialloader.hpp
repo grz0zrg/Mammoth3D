@@ -37,7 +37,7 @@
 				}
 
 				material::Material *createMaterial() {
-					material::Material *material = new material::Material();
+					auto material = new material::Material();
 					_materials.push_back(material);
 					return material;
 				}

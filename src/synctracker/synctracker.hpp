@@ -6,6 +6,7 @@
 	
 	#include <vector>
 	#include <string>
+    #include <map>
 	#include <cmath>
 	#include <iostream>
 	#include <algorithm>
@@ -133,13 +134,19 @@
 				
 				float _bpm, _lpb;
 				
-				void setBPM(float bpm) {
+				void setBpm(float bpm) {
 					_bpm = bpm;
 				}
 				
-				void setLPB(float lpb) {
+				void setLpb(float lpb) {
 					_lpb = lpb;
 				}
+                
+                void setTracks(const std::map<std::string, float *> &tracks = std::map<std::string, float *>()) {
+                    for (auto it = tracks.begin(); it != tracks.end(); ++it) {
+                        setTrack(it->first, it->second);
+                    }
+                }
 				
 				void setTrack(const std::string& name, float *linked_value) {
 					int track_id = findTrack(name);
@@ -308,7 +315,7 @@
 			
 					file.close();
 					
-					std::cout << "[SyncTracker] \"sync.mms\" saved" << std::endl;
+					std::cout << "[SyncTracker ] \"sync.mms\" saved" << std::endl;
 				}
 				
 				void load(const std::string& filename) {
@@ -319,11 +326,11 @@
 						file.open(filename.c_str(), std::ios::in|std::ios::binary);
 
 						if (!file.is_open()) {
-							std::cout << "[SyncTracker] Unable to load " << filename << std::endl;
+							std::cout << "[SyncTracker ] Unable to load " << filename << std::endl;
 							return;
 						} 
 						
-						std::cout << "[SyncTracker] loading " << filename << std::endl;
+						std::cout << "[SyncTracker ] loading " << filename << std::endl;
 						
 						freeTracks();
 						
@@ -362,7 +369,7 @@
 						
 						file.close();
 					} catch (std::ifstream::failure e) {
-						std::cout << "[SyncTracker] Unable to load " << filename << std::endl;
+						std::cout << "[SyncTracker ] Unable to load " << filename << std::endl;
 					}
 				}
 				
@@ -378,8 +385,10 @@
 				{
 					if (!_singleton) {
 						_singleton =  new SyncTracker;
+						
+						std::atexit(free);
 					}
-
+				
 					return _singleton;
 				}
 
